@@ -1,0 +1,376 @@
+/* OwnerDashboard.module.css */
+
+/* --- Variables & Reset --- */
+:root {
+  --primary-color: #8B4789;
+  --secondary-color: #D64A94;
+  --accent-color: #FFB3D9;
+  --bg-gradient: linear-gradient(135deg, #FFF5F0 0%, #F0F8FF 50%, #F5F0FF 100%);
+  --glass-bg: rgba(255, 255, 255, 0.85);
+  --glass-border: 1px solid rgba(255, 255, 255, 0.6);
+  --glass-shadow: 0 8px 32px 0 rgba(139, 71, 137, 0.1);
+  --font-main: 'Fredoka', sans-serif;
+}
+
+.dashboardContainer {
+  min-height: 100vh;
+  background: var(--bg-gradient);
+  font-family: var(--font-main);
+  color: var(--primary-color);
+  padding-bottom: 2rem;
+}
+
+/* --- Hero Section --- */
+.heroSection {
+  position: relative;
+  height: 55vh;
+  overflow: hidden;
+  border-bottom-left-radius: 40px;
+  border-bottom-right-radius: 40px;
+  box-shadow: 0 10px 30px rgba(139, 71, 137, 0.2);
+}
+
+.heroBackground {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  transition: background-image 1s ease-in-out;
+}
+
+.heroOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255, 179, 217, 0.7) 0%, rgba(139, 71, 137, 0.6) 100%);
+  backdrop-filter: blur(2px);
+}
+
+.heroContent {
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  color: white;
+  z-index: 10;
+}
+
+.heroTitle {
+  font-size: 3.5rem;
+  font-weight: 800;
+  text-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  margin-bottom: 1rem;
+}
+
+.heroSubtitle {
+  font-size: 1.5rem;
+  font-weight: 500;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  margin-bottom: 2rem;
+}
+
+.heroButtons {
+  display: flex;
+  gap: 1rem;
+}
+
+.primaryBtn, .secondaryBtn {
+  padding: 1rem 2rem;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: none;
+}
+
+.primaryBtn {
+  background: white;
+  color: var(--primary-color);
+  box-shadow: 0 4px 15px rgba(255, 255, 255, 0.4);
+}
+
+.secondaryBtn {
+  background: rgba(255, 255, 255, 0.25);
+  color: white;
+  border: 2px solid white;
+  backdrop-filter: blur(5px);
+}
+
+.primaryBtn:hover, .secondaryBtn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+/* --- Floating Elements --- */
+.floatingPaw {
+  position: absolute;
+  font-size: 4rem;
+  opacity: 0.4;
+  animation: floatAnimation 6s ease-in-out infinite;
+}
+
+@keyframes floatAnimation {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-20px) rotate(10deg); }
+}
+
+/* --- Indicators --- */
+.indicators {
+  position: absolute;
+  bottom: 2rem;
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  width: 100%;
+  z-index: 20;
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  transition: all 0.3s;
+}
+
+.dotActive {
+  background: white;
+  transform: scale(1.3);
+}
+
+/* --- Main Layout --- */
+.mainContent {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  margin-top: -60px; /* Overlap hero */
+  position: relative;
+  z-index: 20;
+}
+
+/* --- Stats Grid --- */
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+.statCard {
+  background: var(--glass-bg);
+  border: var(--glass-border);
+  backdrop-filter: blur(12px);
+  padding: 1.5rem;
+  border-radius: 24px;
+  box-shadow: var(--glass-shadow);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: transform 0.3s;
+}
+
+.statCard:hover {
+  transform: translateY(-5px);
+}
+
+.statValue {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--primary-color);
+  line-height: 1;
+}
+
+.statLabel {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--secondary-color);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* --- Sticky Glass Navbar --- */
+.navContainer {
+  position: sticky;
+  top: 20px;
+  z-index: 100;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(15px);
+  border-radius: 20px;
+  padding: 0.75rem;
+  box-shadow: 0 10px 30px rgba(139, 71, 137, 0.15);
+  margin-bottom: 2rem;
+  display: flex;
+  overflow-x: auto;
+  gap: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+}
+
+/* Custom Horizontal Scrollbar */
+.navContainer::-webkit-scrollbar {
+  height: 6px;
+}
+.navContainer::-webkit-scrollbar-track {
+  background: transparent;
+}
+.navContainer::-webkit-scrollbar-thumb {
+  background-color: #ffb3d9;
+  border-radius: 10px;
+}
+
+.navItem {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.8rem 1.5rem;
+  border-radius: 15px;
+  border: none;
+  background: transparent;
+  color: var(--secondary-color);
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.navItemActive {
+  background: linear-gradient(135deg, #FFD4C3 0%, #FFB3D9 100%);
+  color: var(--primary-color);
+  box-shadow: 0 4px 15px rgba(255, 179, 217, 0.4);
+}
+
+.navItem:hover:not(.navItemActive) {
+  background: rgba(255, 179, 217, 0.2);
+}
+
+/* --- Cards General --- */
+.cardGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.featureCard, .petCard {
+  background: white;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(139, 71, 137, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.featureCard:hover, .petCard:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(139, 71, 137, 0.15);
+  border-color: var(--accent-color);
+}
+
+.cardContent {
+  padding: 1.5rem;
+}
+
+.cardTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  margin-bottom: 0.5rem;
+}
+
+.cardText {
+  color: #666;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+/* --- Inputs & Search --- */
+.searchContainer {
+  position: relative;
+  flex: 1;
+}
+
+.searchInput, .selectInput {
+  width: 100%;
+  padding: 1rem 1.5rem;
+  border-radius: 15px;
+  border: 2px solid #FFE4E1;
+  background: white;
+  font-size: 1rem;
+  color: var(--primary-color);
+  transition: all 0.3s;
+  outline: none;
+}
+
+.searchInput:focus, .selectInput:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 4px rgba(255, 179, 217, 0.2);
+}
+
+/* --- Modal --- */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.modalContent {
+  background: white;
+  width: 100%;
+  max-width: 600px;
+  border-radius: 30px;
+  padding: 2rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  border: 4px solid var(--accent-color);
+  animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.closeBtn {
+  float: right;
+  background: #f0f0f0;
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+}
+
+.closeBtn:hover {
+  background: #ffcccc;
+  color: red;
+}
+
+/* --- Utility --- */
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.comingSoonBox {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 30px;
+}

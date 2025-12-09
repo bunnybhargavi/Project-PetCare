@@ -1,0 +1,752 @@
+{
+  "info": {
+    "_postman_id": "petcare-api-collection",
+    "name": "PetCare API",
+    "description": "Complete API collection for PetCare Backend - Authentication, Registration, and Profile Management",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/auth/health",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "auth",
+            "health"
+          ]
+        },
+        "description": "Check if the API is running"
+      },
+      "response": []
+    },
+    {
+      "name": "Registration",
+      "item": [
+        {
+          "name": "Step 1 - Initiate Registration (Send OTP)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"bhargavi123ammu@gmail.com\",\n  \"name\": \"Bhargavi\",\n  \"phone\": \"9876543210\",\n  \"role\": \"OWNER\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/auth/register/initiate",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "auth",
+                "register",
+                "initiate"
+              ]
+            },
+            "description": "Initiates registration and sends OTP to the provided email"
+          },
+          "response": []
+        },
+        {
+          "name": "Step 2 - Complete Registration (Verify OTP)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"bhargavi123ammu@gmail.com\",\n  \"otp\": \"123456\",\n  \"name\": \"Bhargavi\",\n  \"phone\": \"9876543210\",\n  \"role\": \"OWNER\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/auth/register/complete",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "auth",
+                "register",
+                "complete"
+              ]
+            },
+            "description": "Completes registration by verifying OTP and creating user account"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Login",
+      "item": [
+        {
+          "name": "Step 1 - Initiate Login (Send OTP)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"bhargavi123ammu@gmail.com\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/auth/login/initiate",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "auth",
+                "login",
+                "initiate"
+              ]
+            },
+            "description": "Initiates login and sends OTP to the registered email"
+          },
+          "response": []
+        },
+        {
+          "name": "Step 2 - Complete Login (Verify OTP)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"bhargavi123ammu@gmail.com\",\n  \"otp\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/auth/login/complete",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "auth",
+                "login",
+                "complete"
+              ]
+            },
+            "description": "Completes login by verifying OTP and returns JWT token"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Logout",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{jwt_token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:8080/api/auth/logout",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "auth",
+            "logout"
+          ]
+        },
+        "description": "Logs out the user (Frontend removes JWT token)"
+      },
+      "response": []
+    },
+    {
+      "name": "Profile",
+      "item": [
+        {
+          "name": "Get User Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/profile",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "profile"
+              ]
+            },
+            "description": "Retrieves the authenticated user's profile (requires JWT token)"
+          },
+          "response": []
+        },
+        {
+          "name": "Update User Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Bhargavi Updated\",\n  \"phone\": \"9876543210\",\n  \"address\": \"123 Pet Street, Animal City\",\n  \"profilePhoto\": \"https://example.com/photo.jpg\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/profile",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "profile"
+              ]
+            },
+            "description": "Updates the authenticated user's profile (requires JWT token)"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Pets",
+      "item": [
+        {
+          "name": "List My Pets",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwt_token}}", "type": "text" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/pets",
+              "host": [ "{{base_url}}" ],
+              "path": [ "api", "pets" ]
+            },
+            "description": "List pets for the authenticated user"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Pet",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json", "type": "text" },
+              { "key": "Authorization", "value": "Bearer {{jwt_token}}", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Buddy\",\n  \"species\": \"Dog\",\n  \"breed\": \"Labrador\",\n  \"dateOfBirth\": \"2023-01-10\",\n  \"gender\": \"MALE\",\n  \"microchipId\": \"MC123\",\n  \"notes\": \"Friendly dog\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/pets",
+              "host": [ "{{base_url}}" ],
+              "path": [ "api", "pets" ]
+            },
+            "description": "Create a new pet"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Pet by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwt_token}}", "type": "text" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/pets/{{petId}}",
+              "host": [ "{{base_url}}" ],
+              "path": [ "api", "pets", "{{petId}}" ]
+            },
+            "description": "Fetch a pet by ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Pet",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json", "type": "text" },
+              { "key": "Authorization", "value": "Bearer {{jwt_token}}", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Buddy Updated\",\n  \"species\": \"Dog\",\n  \"breed\": \"Labrador\",\n  \"dateOfBirth\": \"2023-01-10\",\n  \"gender\": \"MALE\",\n  \"microchipId\": \"MC123\",\n  \"notes\": \"Updated notes\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/pets/{{petId}}",
+              "host": [ "{{base_url}}" ],
+              "path": [ "api", "pets", "{{petId}}" ]
+            },
+            "description": "Update an existing pet"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Pet",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwt_token}}", "type": "text" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/pets/{{petId}}",
+              "host": [ "{{base_url}}" ],
+              "path": [ "api", "pets", "{{petId}}" ]
+            },
+            "description": "Delete a pet"
+          },
+          "response": []
+        },
+        {
+          "name": "Upload Pet Photo",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwt_token}}", "type": "text" }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "file", "type": "file", "src": [], "description": "Select an image file" }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/pets/{{petId}}/photo",
+              "host": [ "{{base_url}}" ],
+              "path": [ "api", "pets", "{{petId}}", "photo" ]
+            },
+            "description": "Upload a photo for the pet"
+          },
+          "response": []
+        },
+        {
+          "name": "Search Pets",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwt_token}}", "type": "text" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/pets/search?q={{query}}",
+              "host": [ "{{base_url}}" ],
+              "path": [ "api", "pets", "search" ],
+              "query": [
+                { "key": "q", "value": "{{query}}" }
+              ]
+            },
+            "description": "Search pets by name/species/breed"
+          },
+          "response": []
+        },
+        {
+          "name": "Increment Walk Streak",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwt_token}}", "type": "text" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/pets/{{petId}}/walk",
+              "host": [ "{{base_url}}" ],
+              "path": [ "api", "pets", "{{petId}}", "walk" ]
+            },
+            "description": "Increment pet walk streak"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Medical Records",
+      "item": [
+        {
+          "name": "List Medical Records",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwt_token}}", "type": "text" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/pets/{{petId}}/medical-records",
+              "host": [ "{{base_url}}" ],
+              "path": [ "api", "pets", "{{petId}}", "medical-records" ]
+            },
+            "description": "List medical records for a pet"
+          },
+          "response": []
+        },
+        {
+          "name": "Add Medical Record",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json", "type": "text" },
+              { "key": "Authorization", "value": "Bearer {{jwt_token}}", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"visitDate\": \"2025-12-08\",\n  \"recordType\": \"CHECKUP\",\n  \"vetName\": \"Dr. Vet\",\n  \"diagnosis\": \"Healthy\",\n  \"treatment\": \"None\",\n  \"prescriptions\": \"\",\n  \"notes\": \"Routine check\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/pets/{{petId}}/medical-records",
+              "host": [ "{{base_url}}" ],
+              "path": [ "api", "pets", "{{petId}}", "medical-records" ]
+            },
+            "description": "Add a medical record"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Medical Record",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json", "type": "text" },
+              { "key": "Authorization", "value": "Bearer {{jwt_token}}", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"visitDate\": \"2025-12-10\",\n  \"recordType\": \"TREATMENT\",\n  \"vetName\": \"Dr. Vet\",\n  \"diagnosis\": \"Skin allergy\",\n  \"treatment\": \"Medicated shampoo\",\n  \"prescriptions\": \"Shampoo weekly\",\n  \"notes\": \"Follow up in 2 weeks\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/pets/{{petId}}/medical-records/{{recordId}}",
+              "host": [ "{{base_url}}" ],
+              "path": [ "api", "pets", "{{petId}}", "medical-records", "{{recordId}}" ]
+            },
+            "description": "Update a medical record"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Medical Record",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwt_token}}", "type": "text" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/pets/{{petId}}/medical-records/{{recordId}}",
+              "host": [ "{{base_url}}" ],
+              "path": [ "api", "pets", "{{petId}}", "medical-records", "{{recordId}}" ]
+            },
+            "description": "Delete a medical record"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Vaccinations",
+      "item": [
+        {
+          "name": "List Vaccinations",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwt_token}}", "type": "text" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/pets/{{petId}}/vaccinations",
+              "host": [ "{{base_url}}" ],
+              "path": [ "api", "pets", "{{petId}}", "vaccinations" ]
+            },
+            "description": "List vaccinations for a pet"
+          },
+          "response": []
+        },
+        {
+          "name": "Add Vaccination",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json", "type": "text" },
+              { "key": "Authorization", "value": "Bearer {{jwt_token}}", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"vaccineName\": \"Rabies\",\n  \"dateGiven\": \"2025-12-08\",\n  \"nextDueDate\": \"2026-12-08\",\n  \"batchNumber\": \"RB123\",\n  \"veterinarianName\": \"Dr. Vet\",\n  \"notes\": \"Annual vaccine\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/pets/{{petId}}/vaccinations",
+              "host": [ "{{base_url}}" ],
+              "path": [ "api", "pets", "{{petId}}", "vaccinations" ]
+            },
+            "description": "Add a vaccination record"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Vaccination",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json", "type": "text" },
+              { "key": "Authorization", "value": "Bearer {{jwt_token}}", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"vaccineName\": \"Rabies Booster\",\n  \"dateGiven\": \"2025-12-09\",\n  \"nextDueDate\": \"2026-12-09\",\n  \"batchNumber\": \"RB124\",\n  \"veterinarianName\": \"Dr. Vet\",\n  \"notes\": \"Booster dose\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/pets/{{petId}}/vaccinations/{{vaccinationId}}",
+              "host": [ "{{base_url}}" ],
+              "path": [ "api", "pets", "{{petId}}", "vaccinations", "{{vaccinationId}}" ]
+            },
+            "description": "Update a vaccination record"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Vaccination",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwt_token}}", "type": "text" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/pets/{{petId}}/vaccinations/{{vaccinationId}}",
+              "host": [ "{{base_url}}" ],
+              "path": [ "api", "pets", "{{petId}}", "vaccinations", "{{vaccinationId}}" ]
+            },
+            "description": "Delete a vaccination"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Health Measurements",
+      "item": [
+        {
+          "name": "List Measurements",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwt_token}}", "type": "text" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/pets/{{petId}}/measurements",
+              "host": [ "{{base_url}}" ],
+              "path": [ "api", "pets", "{{petId}}", "measurements" ]
+            },
+            "description": "List health measurements for a pet"
+          },
+          "response": []
+        },
+        {
+          "name": "Add Measurement",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json", "type": "text" },
+              { "key": "Authorization", "value": "Bearer {{jwt_token}}", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"measurementDate\": \"2025-12-08\",\n  \"weight\": 10.5,\n  \"temperature\": 38.2,\n  \"notes\": \"All good\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/pets/{{petId}}/measurements",
+              "host": [ "{{base_url}}" ],
+              "path": [ "api", "pets", "{{petId}}", "measurements" ]
+            },
+            "description": "Add a health measurement"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Measurement",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json", "type": "text" },
+              { "key": "Authorization", "value": "Bearer {{jwt_token}}", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"measurementDate\": \"2025-12-09\",\n  \"weight\": 10.8,\n  \"temperature\": 38.1,\n  \"notes\": \"Slightly heavier\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/pets/{{petId}}/measurements/{{measurementId}}",
+              "host": [ "{{base_url}}" ],
+              "path": [ "api", "pets", "{{petId}}", "measurements", "{{measurementId}}" ]
+            },
+            "description": "Update a health measurement"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Measurement",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwt_token}}", "type": "text" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/pets/{{petId}}/measurements/{{measurementId}}",
+              "host": [ "{{base_url}}" ],
+              "path": [ "api", "pets", "{{petId}}", "measurements", "{{measurementId}}" ]
+            },
+            "description": "Delete a health measurement"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Reminders",
+      "item": [
+        {
+          "name": "List Reminders",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwt_token}}", "type": "text" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/pets/{{petId}}/reminders",
+              "host": [ "{{base_url}}" ],
+              "path": [ "api", "pets", "{{petId}}", "reminders" ]
+            },
+            "description": "List reminders for a pet"
+          },
+          "response": []
+        },
+        {
+          "name": "Add Reminder",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json", "type": "text" },
+              { "key": "Authorization", "value": "Bearer {{jwt_token}}", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Vet Check\",\n  \"type\": \"CHECKUP\",\n  \"dueDate\": \"2025-12-20\",\n  \"isRecurring\": false,\n  \"repeatRule\": \"\",\n  \"notes\": \"Annual check\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/pets/{{petId}}/reminders",
+              "host": [ "{{base_url}}" ],
+              "path": [ "api", "pets", "{{petId}}", "reminders" ]
+            },
+            "description": "Add a reminder"
+          },
+          "response": []
+        },
+        {
+          "name": "Complete Reminder",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwt_token}}", "type": "text" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/pets/{{petId}}/reminders/{{reminderId}}/complete",
+              "host": [ "{{base_url}}" ],
+              "path": [ "api", "pets", "{{petId}}", "reminders", "{{reminderId}}", "complete" ]
+            },
+            "description": "Mark reminder as completed"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Reminder",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwt_token}}", "type": "text" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/pets/{{petId}}/reminders/{{reminderId}}",
+              "host": [ "{{base_url}}" ],
+              "path": [ "api", "pets", "{{petId}}", "reminders", "{{reminderId}}" ]
+            },
+            "description": "Delete a reminder"
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "jwt_token",
+      "value": "",
+      "type": "string",
+      "description": "JWT token received from login/complete endpoint - paste it here. Example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+    },
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080",
+      "type": "string",
+      "description": "Base URL for the API - change to production URL when needed"
+    }
+  ]
+}

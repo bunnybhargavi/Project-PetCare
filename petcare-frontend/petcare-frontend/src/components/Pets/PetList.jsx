@@ -1,0 +1,217 @@
+import React, { useState, useEffect } from 'react';
+import { Plus, Search, Filter } from 'lucide-react';
+import { petService } from '../../services/petService';
+import PetCard from './PetCard';
+import AddPetModal from './AddPetModal';
+import EditPetModal from './EditPetModal';
+import PetProfile from './PetProfile';
+
+const PetList = () => {
+  const [pets, setPets] = useState([]);
+  const [filteredPets, setFilteredPets] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedSpecies, setSelectedSpecies] = useState('all');
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [selectedPet, setSelectedPet] = useState(null);
+  const [editingPet, setEditingPet] = useState(null);
+
+  useEffect(() => {
+    loadPets();
+  }, []);
+
+  useEffect(() => {
+    filterPets();
+  }, [pets, searchTerm, selectedSpecies]);
+
+  const loadPets = async () => {
+    try {
+      setLoading(true);
+      const data = await petService.getAllPets();
+      setPets(data);
+    } catch (error) {
+      console.error('Error loading pets:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filterPets = () => {
+    let filtered = [...pets];
+
+    if (searchTerm) {
+      filtered = filtered.filter(pet =>
+        pet.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        pet.breed.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    if (selectedSpecies !== 'all') {
+      filtered = filtered.filter(pet => pet.species === selectedSpecies);
+    }
+
+    setFilteredPets(filtered);
+  };
+
+  const handleAddPet = async (petData) => {
+    try {
+      const newPet = await petService.createPet(petData);
+      setPets([...pets, newPet]);
+      setShowAddModal(false);
+    } catch (error) {
+      console.error('Error adding pet:', error);
+    }
+  };
+
+  const handleUpdatePet = async (id, petData) => {
+    try {
+      const updatedPet = await petService.updatePet(id, petData);
+      setPets(pets.map(p => p.id === id ? updatedPet : p));
+      setShowEditModal(false);
+      setEditingPet(null);
+    } catch (error) {
+      console.error('Error updating pet:', error);
+    }
+  };
+
+  const handleDeletePet = async (id) => {
+    if (window.confirm('Are you sure you want to delete this pet?')) {
+      try {
+        await petService.deletePet(id);
+        setPets(pets.filter(p => p.id !== id));
+      } catch (error) {
+        console.error('Error deleting pet:', error);
+      }
+    }
+  };
+
+  const handleEditClick = (pet) => {
+    setEditingPet(pet);
+    setShowEditModal(true);
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-6">
+      {/* Header */}
+      <div className="max-w-7xl mx-auto mb-8">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h1 className="text-4xl font-bold text-gray-800 mb-2">My Pets</h1>
+            <p className="text-gray-600">Manage and track your beloved companions</p>
+          </div>
+          <button
+            onClick={() => setShowAddModal(true)}
+            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-200"
+          >
+            <Plus size={20} />
+            Add Pet
+          </button>
+        </div>
+
+        {/* Search and Filter */}
+        <div className="flex gap-4 mb-6">
+          <div className="flex-1 relative">
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+            <input
+              type="text"
+              placeholder="Search pets by name or breed..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-12 pr-4 py-3 bg-white rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:outline-none transition-colors"
+            />
+          </div>
+          <div className="relative">
+            <Filter className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+            <select
+              value={selectedSpecies}
+              onChange={(e) => setSelectedSpecies(e.target.value)}
+              className="pl-12 pr-8 py-3 bg-white rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:outline-none transition-colors appearance-none"
+            >
+              <option value="all">All Species</option>
+              <option value="Dog">Dogs</option>
+              <option value="Cat">Cats</option>
+              <option value="Bird">Birds</option>
+              <option value="Rabbit">Rabbits</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      {/* Pet Grid */}
+      <div className="max-w-7xl mx-auto">
+        {filteredPets.length === 0 ? (
+          <div className="text-center py-20">
+            <div className="text-6xl mb-4">🐾</div>
+            <h3 className="text-2xl font-bold text-gray-800 mb-2">No pets found</h3>
+            <p className="text-gray-600 mb-6">
+              {searchTerm || selectedSpecies !== 'all'
+                ? 'Try adjusting your filters'
+                : 'Start by adding your first pet'}
+            </p>
+            {!searchTerm && selectedSpecies === 'all' && (
+              <button
+                onClick={() => setShowAddModal(true)}
+                className="px-8 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-200"
+              >
+                Add Your First Pet
+              </button>
+            )}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredPets.map((pet) => (
+              <PetCard
+                key={pet.id}
+                pet={pet}
+                onSelect={setSelectedPet}
+                onEdit={handleEditClick}
+                onDelete={handleDeletePet}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Modals */}
+      {showAddModal && (
+        <AddPetModal
+          isOpen={showAddModal}
+          onClose={() => setShowAddModal(false)}
+          onAdd={handleAddPet}
+        />
+      )}
+
+      {showEditModal && editingPet && (
+        <EditPetModal
+          isOpen={showEditModal}
+          pet={editingPet}
+          onClose={() => {
+            setShowEditModal(false);
+            setEditingPet(null);
+          }}
+          onUpdate={handleUpdatePet}
+        />
+      )}
+
+      {selectedPet && (
+        <PetProfile
+          pet={selectedPet}
+          onClose={() => setSelectedPet(null)}
+          onUpdate={loadPets}
+        />
+      )}
+    </div>
+  );
+};
+
+export default PetList;
