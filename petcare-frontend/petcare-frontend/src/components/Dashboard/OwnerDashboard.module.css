@@ -374,3 +374,26 @@
   background: rgba(255, 255, 255, 0.6);
   border-radius: 30px;
 }
+
+.errorBanner {
+  background: #ffe5e5;
+  color: #b00020;
+  border: 1px solid #ffcdd2;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.loadingState {
+  text-align: center;
+  padding: 1.25rem;
+  color: var(--secondary-color);
+  font-weight: 600;
+}
+
+.primaryBtn:disabled,
+.secondaryBtn:disabled {
+  cursor: not-allowed;
+  opacity: 0.8;
+}

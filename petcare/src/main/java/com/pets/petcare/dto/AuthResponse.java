@@ -10,18 +10,20 @@ public class AuthResponse {
     private String email; // User's email
     private String name; // User's name
     private String role; // OWNER or VET
+    private Long vetId; // Veterinarian specific ID (null if not a vet)
     private String message; // Success/error message
 
     // Constructors
     public AuthResponse() {
     }
 
-    public AuthResponse(String token, Long userId, String email, String name, String role, String message) {
+    public AuthResponse(String token, Long userId, String email, String name, String role, Long vetId, String message) {
         this.token = token;
         this.userId = userId;
         this.email = email;
         this.name = name;
         this.role = role;
+        this.vetId = vetId;
         this.message = message;
     }
 
@@ -36,6 +38,7 @@ public class AuthResponse {
         private String email;
         private String name;
         private String role;
+        private Long vetId;
         private String message;
 
         public Builder token(String token) {
@@ -63,13 +66,18 @@ public class AuthResponse {
             return this;
         }
 
+        public Builder vetId(Long vetId) {
+            this.vetId = vetId;
+            return this;
+        }
+
         public Builder message(String message) {
             this.message = message;
             return this;
         }
 
         public AuthResponse build() {
-            return new AuthResponse(token, userId, email, name, role, message);
+            return new AuthResponse(token, userId, email, name, role, vetId, message);
         }
     }
 
@@ -92,6 +100,10 @@ public class AuthResponse {
 
     public String getRole() {
         return role;
+    }
+
+    public Long getVetId() {
+        return vetId;
     }
 
     public String getMessage() {
@@ -117,6 +129,10 @@ public class AuthResponse {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public void setVetId(Long vetId) {
+        this.vetId = vetId;
     }
 
     public void setMessage(String message) {

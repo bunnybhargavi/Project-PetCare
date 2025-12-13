@@ -1,0 +1,476 @@
+{
+    "info": {
+        "_postman_id": "petcare-appointments-v3",
+        "name": "PetCare API - Appointments & Vet Search v3",
+        "description": "Enhanced appointment scheduling with search, status management, and notifications",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Veterinarian Search",
+            "item": [
+                {
+                    "name": "Get All Veterinarians",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/veterinarians",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "veterinarians"
+                            ]
+                        },
+                        "description": "Get list of all veterinarians"
+                    }
+                },
+                {
+                    "name": "Get Veterinarian by ID",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/veterinarians/1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "veterinarians",
+                                "1"
+                            ]
+                        },
+                        "description": "Get specific veterinarian details"
+                    }
+                },
+                {
+                    "name": "Search Veterinarians (Advanced)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"specialization\": \"Dermatology\",\n  \"location\": \"Street\",\n  \"teleconsultAvailable\": true\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/veterinarians/search",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "veterinarians",
+                                "search"
+                            ]
+                        },
+                        "description": "Search vets by specialty, location, and teleconsult availability. All fields are optional."
+                    }
+                },
+                {
+                    "name": "Find by Specialization",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/veterinarians/specialty/Dermatology",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "veterinarians",
+                                "specialty",
+                                "Dermatology"
+                            ]
+                        },
+                        "description": "Find vets by specialization (case-insensitive partial match)"
+                    }
+                },
+                {
+                    "name": "Find by Location",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/veterinarians/location/Street",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "veterinarians",
+                                "location",
+                                "Street"
+                            ]
+                        },
+                        "description": "Find vets by location/address (case-insensitive partial match)"
+                    }
+                },
+                {
+                    "name": "Find Teleconsult Vets",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/veterinarians/teleconsult",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "veterinarians",
+                                "teleconsult"
+                            ]
+                        },
+                        "description": "Get all vets available for teleconsultation"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Appointment Slots",
+            "item": [
+                {
+                    "name": "Create Slot (Vet)",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Slot created successfully\", function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.id).to.exist;",
+                                    "    pm.collectionVariables.set('slotId', jsonData.id);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{jwt_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"startTime\": \"2025-12-20T10:00:00\",\n  \"endTime\": \"2025-12-20T10:30:00\",\n  \"supportedType\": \"BOTH\",\n  \"capacity\": 1\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/appointments/slots?vetId=1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "appointments",
+                                "slots"
+                            ],
+                            "query": [
+                                {
+                                    "key": "vetId",
+                                    "value": "1"
+                                }
+                            ]
+                        },
+                        "description": "Create availability slot for a vet. supportedType: VIDEO, IN_CLINIC, or BOTH"
+                    }
+                },
+                {
+                    "name": "Get Available Slots",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/appointments/slots/1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "appointments",
+                                "slots",
+                                "1"
+                            ]
+                        },
+                        "description": "Get all available slots for a specific vet"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Appointment Booking",
+            "item": [
+                {
+                    "name": "Book Appointment",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Appointment booked successfully\", function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.id).to.exist;",
+                                    "    pm.expect(jsonData.status).to.eql('CONFIRMED');",
+                                    "    pm.collectionVariables.set('appointmentId', jsonData.id);",
+                                    "    console.log('✅ Appointment booked! ID:', jsonData.id);",
+                                    "    if (jsonData.meetingLink) {",
+                                    "        console.log('📹 Video Link:', jsonData.meetingLink);",
+                                    "    }",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{jwt_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"petId\": {{petId}},\n  \"veterinarianId\": 1,\n  \"slotId\": {{slotId}},\n  \"type\": \"VIDEO\",\n  \"reason\": \"Regular checkup\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/appointments/book",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "appointments",
+                                "book"
+                            ]
+                        },
+                        "description": "Book appointment. If slotId is provided, it will use that slot. Type: VIDEO or IN_CLINIC. Video appointments get a Jitsi meeting link."
+                    }
+                },
+                {
+                    "name": "Get Pet Appointments",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{jwt_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/appointments/pet/{{petId}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "appointments",
+                                "pet",
+                                "{{petId}}"
+                            ]
+                        },
+                        "description": "Get all appointments for a specific pet"
+                    }
+                },
+                {
+                    "name": "Get Vet Appointments",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{jwt_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/appointments/vet/1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "appointments",
+                                "vet",
+                                "1"
+                            ]
+                        },
+                        "description": "Get all appointments for a specific vet"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Appointment Status Management",
+            "item": [
+                {
+                    "name": "Update Appointment Status",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{jwt_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"status\": \"COMPLETED\",\n  \"notes\": \"Pet is healthy. Recommended diet changes.\",\n  \"prescription\": \"Vitamin supplements - 1 tablet daily for 30 days\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/appointments/{{appointmentId}}/status",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "appointments",
+                                "{{appointmentId}}",
+                                "status"
+                            ]
+                        },
+                        "description": "Update appointment status and add consultation notes/prescription. Status: PENDING, CONFIRMED, COMPLETED, CANCELLED, NO_SHOW"
+                    }
+                },
+                {
+                    "name": "Cancel Appointment",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{jwt_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"status\": \"CANCELLED\",\n  \"notes\": \"Owner requested cancellation\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/appointments/{{appointmentId}}/status",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "appointments",
+                                "{{appointmentId}}",
+                                "status"
+                            ]
+                        },
+                        "description": "Cancel an appointment (sends cancellation email to owner)"
+                    }
+                },
+                {
+                    "name": "Get Appointments by Status",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{jwt_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/appointments/status/CONFIRMED",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "appointments",
+                                "status",
+                                "CONFIRMED"
+                            ]
+                        },
+                        "description": "Get all appointments with specific status. Status: PENDING, CONFIRMED, COMPLETED, CANCELLED, NO_SHOW"
+                    }
+                },
+                {
+                    "name": "Get Vet Appointments by Status",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{jwt_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/appointments/vet/1/status/CONFIRMED",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "appointments",
+                                "vet",
+                                "1",
+                                "status",
+                                "CONFIRMED"
+                            ]
+                        },
+                        "description": "Get vet's appointments filtered by status"
+                    }
+                }
+            ]
+        }
+    ],
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "http://localhost:8080",
+            "type": "string"
+        },
+        {
+            "key": "jwt_token",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "petId",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "slotId",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "appointmentId",
+            "value": "",
+            "type": "string"
+        }
+    ]
+}

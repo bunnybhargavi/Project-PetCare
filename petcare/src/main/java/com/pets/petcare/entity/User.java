@@ -20,6 +20,8 @@ public class User {
     @Column(nullable = false, unique = true)
     private String email;
 
+    private String password;
+
     @Column(nullable = false)
     private String name;
 
@@ -156,6 +158,14 @@ public class User {
 
     public void setVeterinarian(Veterinarian veterinarian) {
         this.veterinarian = veterinarian;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public enum Role {

@@ -33,26 +33,9 @@
   box-shadow: 0 10px 30px rgba(44, 95, 124, 0.2);
 }
 
-.vet-hero-background {
-  position: absolute;
-  inset: 0;
-  background-size: cover;
-  background-position: center;
-  transition: background-image 1s ease-in-out;
-  animation: vetKenburns 20s ease-in-out infinite alternate;
-}
 
-@keyframes vetKenburns {
-  0% { transform: scale(1) translateX(0); }
-  100% { transform: scale(1.08) translateX(-20px); }
-}
 
-.vet-hero-overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, rgba(168, 213, 226, 0.75) 0%, rgba(44, 95, 124, 0.65) 100%);
-  backdrop-filter: blur(2px);
-}
+
 
 .vet-hero-content {
   position: relative;
@@ -96,6 +79,7 @@
     opacity: 0;
     transform: translateY(-30px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -107,6 +91,7 @@
     opacity: 0;
     transform: translateY(30px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -114,7 +99,8 @@
 }
 
 /* ==================== BUTTONS ==================== */
-.vet-primary-btn, .vet-secondary-btn {
+.vet-primary-btn,
+.vet-secondary-btn {
   padding: 1rem 2rem;
   border-radius: 20px;
   font-weight: 700;
@@ -141,12 +127,14 @@
   backdrop-filter: blur(5px);
 }
 
-.vet-primary-btn:hover, .vet-secondary-btn:hover {
+.vet-primary-btn:hover,
+.vet-secondary-btn:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
-.vet-primary-btn:active, .vet-secondary-btn:active {
+.vet-primary-btn:active,
+.vet-secondary-btn:active {
   transform: translateY(-1px);
 }
 
@@ -160,45 +148,21 @@
 }
 
 @keyframes vetFloat {
-  0%, 100% { 
-    transform: translateY(0) rotate(0deg); 
+
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
     opacity: 0.3;
   }
-  50% { 
-    transform: translateY(-25px) rotate(15deg); 
+
+  50% {
+    transform: translateY(-25px) rotate(15deg);
     opacity: 0.5;
   }
 }
 
 /* ==================== INDICATORS ==================== */
-.vet-indicators {
-  position: absolute;
-  bottom: 2rem;
-  display: flex;
-  gap: 0.5rem;
-  justify-content: center;
-  width: 100%;
-  z-index: 20;
-}
 
-.vet-dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.5);
-  transition: var(--vet-transition);
-  cursor: pointer;
-}
-
-.vet-dot-active {
-  background: white;
-  transform: scale(1.3);
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
-}
-
-.vet-dot:hover {
-  background: rgba(255, 255, 255, 0.8);
-}
 
 /* ==================== MAIN CONTENT ==================== */
 .vet-main-content {
@@ -233,16 +197,28 @@
   animation-fill-mode: backwards;
 }
 
-.vet-stat-card:nth-child(1) { animation-delay: 0.1s; }
-.vet-stat-card:nth-child(2) { animation-delay: 0.2s; }
-.vet-stat-card:nth-child(3) { animation-delay: 0.3s; }
-.vet-stat-card:nth-child(4) { animation-delay: 0.4s; }
+.vet-stat-card:nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+.vet-stat-card:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.vet-stat-card:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+.vet-stat-card:nth-child(4) {
+  animation-delay: 0.4s;
+}
 
 @keyframes vetSlideInUp {
   from {
     opacity: 0;
     transform: translateY(30px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -286,8 +262,15 @@
 }
 
 @keyframes vetPulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.05); }
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.05);
+  }
 }
 
 .vet-stat-icon {
@@ -318,6 +301,7 @@
     opacity: 0;
     transform: translateY(-30px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -373,8 +357,13 @@
 }
 
 @keyframes vetFadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 /* ==================== CARDS ==================== */
@@ -384,7 +373,8 @@
   gap: 2rem;
 }
 
-.vet-action-card, .vet-patient-card {
+.vet-action-card,
+.vet-patient-card {
   background: white;
   border-radius: 24px;
   overflow: hidden;
@@ -401,13 +391,15 @@
     opacity: 0;
     transform: scale(0.9);
   }
+
   to {
     opacity: 1;
     transform: scale(1);
   }
 }
 
-.vet-action-card:hover, .vet-patient-card:hover {
+.vet-action-card:hover,
+.vet-patient-card:hover {
   transform: translateY(-8px) scale(1.02);
   box-shadow: 0 20px 40px rgba(44, 95, 124, 0.15);
   border-color: var(--vet-accent);
@@ -489,7 +481,8 @@
 }
 
 /* ==================== APPOINTMENTS ==================== */
-.vet-appointments-preview, .vet-appointments-list {
+.vet-appointments-preview,
+.vet-appointments-list {
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -646,7 +639,9 @@
   font-size: 1rem;
 }
 
-.vet-search-input, .vet-select-input, .vet-input-field {
+.vet-search-input,
+.vet-select-input,
+.vet-input-field {
   width: 100%;
   padding: 1rem 1.5rem;
   border-radius: 15px;
@@ -663,7 +658,9 @@
   padding-left: 3rem;
 }
 
-.vet-search-input:focus, .vet-select-input:focus, .vet-input-field:focus {
+.vet-search-input:focus,
+.vet-select-input:focus,
+.vet-input-field:focus {
   border-color: var(--vet-primary);
   box-shadow: 0 0 0 4px rgba(168, 213, 226, 0.2);
 }
@@ -705,13 +702,14 @@
 }
 
 @keyframes vetPopIn {
-  from { 
-    opacity: 0; 
-    transform: scale(0.9) translateY(20px); 
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(20px);
   }
-  to { 
-    opacity: 1; 
-    transform: scale(1) translateY(0); 
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
   }
 }
 
@@ -887,8 +885,15 @@
 }
 
 @keyframes vetBounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-15px); }
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-15px);
+  }
 }
 
 .vet-coming-soon h2 {
@@ -932,7 +937,8 @@
     width: 100%;
   }
 
-  .vet-primary-btn, .vet-secondary-btn {
+  .vet-primary-btn,
+  .vet-secondary-btn {
     width: 100%;
     justify-content: center;
   }
@@ -973,7 +979,8 @@
     width: 100%;
   }
 
-  .vet-primary-btn, .vet-secondary-btn {
+  .vet-primary-btn,
+  .vet-secondary-btn {
     width: 100%;
   }
 }

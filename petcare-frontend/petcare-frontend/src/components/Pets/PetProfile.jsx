@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { X, Heart, Calendar, Activity, FileText, Plus } from 'lucide-react';
+import { X, Heart, Calendar, Activity, FileText, Plus, Edit2 } from 'lucide-react';
 import { medicalRecordService } from '../../services/medicalRecordService';
 import { vaccinationService } from '../../services/vaccinationService';
 import { healthService } from '../../services/healthService';
 import { reminderService } from '../../services/reminderService';
+import { petService } from '../../services/petService';
 import PetInfoTab from './PetInfoTab';
 import TimelineTab from './TimelineTab';
 import VitalsTab from './VitalsTab';
@@ -12,6 +13,7 @@ import AddMedicalRecordModal from './AddMedicalRecordModal';
 import AddVaccinationModal from './AddVaccinationModal';
 import AddMeasurementModal from './AddMeasurementModal';
 import AddReminderModal from './AddReminderModal';
+import EditPetModal from './EditPetModal';
 
 const PetProfile = ({ pet, onClose, onUpdate }) => {
   const [activeTab, setActiveTab] = useState('info');
@@ -20,12 +22,13 @@ const PetProfile = ({ pet, onClose, onUpdate }) => {
   const [measurements, setMeasurements] = useState([]);
   const [reminders, setReminders] = useState([]);
   const [loading, setLoading] = useState(false);
-  
+
   // Modal states
   const [showRecordModal, setShowRecordModal] = useState(false);
   const [showVaccinationModal, setShowVaccinationModal] = useState(false);
   const [showMeasurementModal, setShowMeasurementModal] = useState(false);
   const [showReminderModal, setShowReminderModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
 
   useEffect(() => {
     if (pet) {
@@ -77,24 +80,27 @@ const PetProfile = ({ pet, onClose, onUpdate }) => {
   const addButtonConfig = getAddButtonConfig();
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fadeIn">
-      <div className="bg-white rounded-3xl w-full max-w-6xl max-h-[90vh] overflow-hidden animate-slideUp shadow-2xl">
-        {/* Header with Gradient */}
-        <div className="relative h-64 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 overflow-hidden">
-          {/* Close Button */}
-          <button
-            onClick={onClose}
-            className="absolute top-4 right-4 p-2 bg-white/90 rounded-full hover:bg-white transition-all backdrop-blur-sm z-10"
-          >
-            <X size={24} />
-          </button>
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 py-8 px-4 animate-fadeIn overflow-auto">
+      <div className="bg-white rounded-3xl w-full max-w-xl max-h-[90vh] overflow-hidden animate-slideUp shadow-2xl my-auto">
+        {/* Header with Pink-Purple Gradient */}
+        <div className="relative bg-gradient-to-r from-purple-500 via-pink-500 to-purple-400 px-6 pt-6 pb-16">
+          {/* Close Button - Top Right Corner */}
+          <div className="absolute top-4 right-4 z-20">
+            <button
+              onClick={onClose}
+              className="p-2 bg-white/20 hover:bg-white/30 rounded-full transition-all"
+            >
+              <X size={18} className="text-white" />
+            </button>
+          </div>
 
-          {/* Pet Info */}
-          <div className="absolute -bottom-16 left-8 flex items-end gap-6 z-10">
-            <div className="w-32 h-32 rounded-3xl border-4 border-white shadow-xl bg-white overflow-hidden">
-              {pet.imageUrl ? (
+          {/* Pet Photo and Info Container */}
+          <div className="flex items-start gap-4">
+            {/* Circular Pet Photo */}
+            <div className="w-24 h-24 rounded-full border-4 border-white shadow-xl bg-white overflow-hidden flex-shrink-0">
+              {pet.photo ? (
                 <img
-                  src={pet.imageUrl}
+                  src={`http://localhost:8080${pet.photo}`}
                   alt={pet.name}
                   className="w-full h-full object-cover"
                   onError={(e) => {
@@ -102,80 +108,86 @@ const PetProfile = ({ pet, onClose, onUpdate }) => {
                   }}
                 />
               ) : (
-                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-100 to-purple-100">
-                  <Heart className="text-purple-400" size={48} />
+                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-pink-100 to-purple-100">
+                  <Heart className="text-purple-400" size={36} />
                 </div>
               )}
             </div>
-            <div className="pb-4">
-              <h1 className="text-4xl font-bold text-white mb-2">{pet.name}</h1>
-              <p className="text-white/90 text-lg">
-                {pet.breed} • {pet.age} {pet.age === 1 ? 'year' : 'years'} old
+
+            {/* Pet Name and Details - Takes Available Space */}
+            <div className="flex-1 min-w-0 pr-2">
+              <h1 className="text-xl font-bold text-white mb-1 truncate">{pet.name}</h1>
+              <p className="text-white/90 text-sm">
+                {pet.breed} • {pet.age ? `${pet.age} ${pet.age === 1 ? 'year' : 'years'} old` : 'Age unknown'}
               </p>
             </div>
-          </div>
 
-          {/* Decorative Elements */}
-          <div className="absolute top-10 right-20 w-32 h-32 bg-white/10 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-10 left-1/3 w-40 h-40 bg-white/10 rounded-full blur-3xl"></div>
+            {/* Edit Profile Button */}
+            <button
+              onClick={() => setShowEditModal(true)}
+              className="px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-semibold transition-all shadow-lg text-xs whitespace-nowrap flex-shrink-0 mr-8"
+            >
+              Edit
+            </button>
+          </div>
         </div>
 
-        {/* Tabs */}
-        <div className="mt-20 px-8 border-b border-gray-200 flex justify-between items-center">
-          <div className="flex gap-1">
+        {/* Tabs - Positioned below gradient header */}
+        <div className="px-6 border-b border-gray-200 bg-white -mt-6 relative z-20">
+          <div className="flex gap-4">
             {tabs.map((tab) => {
               const Icon = tab.icon;
               return (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-2 px-6 py-3 rounded-t-xl font-semibold transition-all duration-200 ${
-                    activeTab === tab.id
-                      ? 'bg-white text-blue-600 shadow-lg -mb-px'
-                      : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
-                  }`}
+                  className={`flex items-center gap-2 px-3 py-2.5 font-semibold transition-all duration-200 border-b-2 text-sm ${activeTab === tab.id
+                    ? 'text-purple-600 border-purple-600'
+                    : 'text-gray-500 hover:text-gray-700 border-transparent'
+                    }`}
                 >
-                  <Icon size={18} />
-                  {tab.label}
+                  {tab.label.toUpperCase()}
                 </button>
               );
             })}
           </div>
-
-          {/* Add Button */}
-          {addButtonConfig && (
-            <button
-              onClick={addButtonConfig.onClick}
-              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-200 mb-2"
-            >
-              <Plus size={18} />
-              {addButtonConfig.label}
-            </button>
-          )}
         </div>
 
         {/* Tab Content */}
-        <div className="p-8 overflow-y-auto" style={{ maxHeight: 'calc(90vh - 400px)' }}>
+        <div className="p-6 overflow-y-auto" style={{ maxHeight: 'calc(90vh - 320px)' }}>
           {loading ? (
             <div className="flex items-center justify-center py-20">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
             </div>
           ) : (
             <>
-              {activeTab === 'info' && <PetInfoTab pet={pet} />}
+              {activeTab === 'info' && (
+                <PetInfoTab
+                  pet={pet}
+                  latestMeasurement={
+                    measurements && measurements.length
+                      ? [...measurements].sort((a, b) => new Date(b.measurementDate) - new Date(a.measurementDate))[0]
+                      : null
+                  }
+                />
+              )}
               {activeTab === 'timeline' && (
                 <TimelineTab
                   medicalRecords={medicalRecords}
                   vaccinations={vaccinations}
+                  onAddMedicalRecord={() => setShowRecordModal(true)}
                   onAddVaccination={() => setShowVaccinationModal(true)}
                   onRefresh={loadPetData}
                 />
               )}
-              {activeTab === 'vitals' && (
-                <VitalsTab measurements={measurements} petId={pet.id} />
-              )}
+              {activeTab === 'vitals' && <VitalsTab measurements={measurements} />}
               {activeTab === 'documents' && (
-                <DocumentsTab reminders={reminders} onRefresh={loadPetData} />
+                <DocumentsTab
+                  reminders={reminders}
+                  petId={pet.id}
+                  onRefresh={loadPetData}
+                  onAddReminder={() => setShowReminderModal(true)}
+                />
               )}
             </>
           )}
@@ -227,6 +239,23 @@ const PetProfile = ({ pet, onClose, onUpdate }) => {
           onAdd={() => {
             setShowReminderModal(false);
             loadPetData();
+          }}
+        />
+      )}
+
+      {showEditModal && (
+        <EditPetModal
+          isOpen={showEditModal}
+          pet={pet}
+          onClose={() => setShowEditModal(false)}
+          onUpdate={async (id, payload) => {
+            await petService.updatePet(id, payload.petData);
+            if (payload.photoFile) {
+              await petService.uploadPetImage(id, payload.photoFile);
+            }
+            setShowEditModal(false);
+            await onUpdate?.();
+            await loadPetData();
           }}
         />
       )}

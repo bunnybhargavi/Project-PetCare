@@ -54,20 +54,28 @@ const PetList = () => {
     setFilteredPets(filtered);
   };
 
-  const handleAddPet = async (petData) => {
+  const handleAddPet = async ({ petData, photoFile }) => {
     try {
       const newPet = await petService.createPet(petData);
-      setPets([...pets, newPet]);
+      if (photoFile) {
+        await petService.uploadPetImage(newPet.id, photoFile);
+      }
+      const refreshed = await petService.getAllPets();
+      setPets(refreshed);
       setShowAddModal(false);
     } catch (error) {
       console.error('Error adding pet:', error);
     }
   };
 
-  const handleUpdatePet = async (id, petData) => {
+  const handleUpdatePet = async (id, { petData, photoFile }) => {
     try {
-      const updatedPet = await petService.updatePet(id, petData);
-      setPets(pets.map(p => p.id === id ? updatedPet : p));
+      await petService.updatePet(id, petData);
+      if (photoFile) {
+        await petService.uploadPetImage(id, photoFile);
+      }
+      const refreshed = await petService.getAllPets();
+      setPets(refreshed);
       setShowEditModal(false);
       setEditingPet(null);
     } catch (error) {

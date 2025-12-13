@@ -131,4 +131,144 @@ public class EmailService {
             log.error("Failed to send reminder email", e);
         }
     }
+
+    public void sendAppointmentConfirmationEmail(String to, String ownerName, String vetName, String dateTime,
+            String type, String meetingLink) {
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setTo(to);
+            message.setSubject("✅ Appointment Confirmed with " + vetName);
+            String body = "Hello " + ownerName + ",\n\n" +
+                    "Your appointment has been confirmed!\n\n" +
+                    "Vet: " + vetName + "\n" +
+                    "Time: " + dateTime + "\n" +
+                    "Type: " + type + "\n";
+
+            if (meetingLink != null && !meetingLink.isEmpty()) {
+                body += "Meeting Link: " + meetingLink + "\n";
+            }
+
+            body += "\nPlease arrive/join 5 minutes early.\n\n" +
+                    "Best regards,\n" +
+                    "Pet Care Team";
+
+            message.setText(body);
+            mailSender.send(message);
+            log.info("Appointment confirmation email sent to: {}", to);
+        } catch (Exception e) {
+            log.error("Failed to send appointment confirmation email", e);
+        }
+    }
+
+    public void sendAppointmentCancellationEmail(String to, String ownerName, String vetName, String dateTime) {
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setTo(to);
+            message.setSubject("❌ Appointment Cancelled: " + vetName);
+            message.setText(
+                    "Hello " + ownerName + ",\n\n" +
+                            "Your appointment with " + vetName + " on " + dateTime + " has been cancelled.\n\n" +
+                            "Please book a new slot if needed.\n\n" +
+                            "Best regards,\n" +
+                            "Pet Care Team");
+
+            mailSender.send(message);
+            log.info("Appointment cancellation email sent to: {}", to);
+        } catch (Exception e) {
+            log.error("Failed to send appointment cancellation email", e);
+        }
+    }
+
+    /**
+     * Send appointment reminder email
+     */
+    public void sendAppointmentReminder(String to, String ownerName, String petName, String vetName,
+            String appointmentTime, String timeframe, String meetingLink) {
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setTo(to);
+            message.setSubject("🔔 Reminder: Appointment in " + timeframe);
+
+            String body = "Hello " + ownerName + ",\n\n" +
+                    "This is a reminder that " + petName + " has an appointment coming up:\n\n" +
+                    "Veterinarian: " + vetName + "\n" +
+                    "Time: " + appointmentTime + "\n" +
+                    "In: " + timeframe + "\n";
+
+            if (meetingLink != null && !meetingLink.isEmpty()) {
+                body += "\nVideo Meeting Link: " + meetingLink + "\n";
+            }
+
+            body += "\nPlease arrive/join on time.\n\n" +
+                    "Best regards,\n" +
+                    "Pet Care Team";
+
+            message.setText(body);
+            mailSender.send(message);
+            log.info("Appointment reminder sent to: {}", to);
+        } catch (Exception e) {
+            log.error("Failed to send appointment reminder", e);
+        }
+    }
+
+    /**
+     * Send notification to vet about new booking
+     */
+    public void sendVetBookingNotification(String to, String vetName, String petName, String ownerName,
+            String appointmentTime, String type, String reason) {
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setTo(to);
+            message.setSubject("🆕 New Appointment Booking");
+
+            String body = "Hello Dr. " + vetName + ",\n\n" +
+                    "You have a new appointment booking:\n\n" +
+                    "Pet: " + petName + "\n" +
+                    "Owner: " + ownerName + "\n" +
+                    "Time: " + appointmentTime + "\n" +
+                    "Type: " + type + "\n";
+
+            if (reason != null && !reason.isEmpty()) {
+                body += "Reason: " + reason + "\n";
+            }
+
+            body += "\nPlease log in to your dashboard to view details.\n\n" +
+                    "Best regards,\n" +
+                    "Pet Care Team";
+
+            message.setText(body);
+            mailSender.send(message);
+            log.info("Vet booking notification sent to: {}", to);
+        } catch (Exception e) {
+            log.error("Failed to send vet booking notification", e);
+        }
+    }
+
+    /**
+     * Send vaccination reminder email
+     */
+    public void sendVaccinationReminder(String to, String ownerName, String petName,
+            String vaccineName, String timeframe) {
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setTo(to);
+            message.setSubject("💉 Vaccination Reminder: " + petName);
+
+            String body = "Hello " + ownerName + ",\n\n" +
+                    "This is a reminder that " + petName + " has a vaccination due " + timeframe + ":\n\n" +
+                    "Vaccination: " + vaccineName + "\n" +
+                    "Due: " + timeframe + "\n\n" +
+                    "Please schedule an appointment with your veterinarian to ensure " + petName +
+                    " stays protected and healthy.\n\n" +
+                    "You can book an appointment through the PetCare app.\n\n" +
+                    "Best regards,\n" +
+                    "Pet Care Team";
+
+            message.setText(body);
+            mailSender.send(message);
+            log.info("Vaccination reminder sent to: {}", to);
+        } catch (Exception e) {
+            log.error("Failed to send vaccination reminder", e);
+        }
+    }
 }

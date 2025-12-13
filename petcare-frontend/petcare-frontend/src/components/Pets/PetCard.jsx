@@ -18,9 +18,10 @@ const PetCard = ({ pet, onSelect, onEdit, onDelete }) => {
   };
 
   const getGenderColor = (gender) => {
-    return gender === 'Male' 
-      ? { bg: '#C3E5FF', text: '#4A7BA8' }
-      : { bg: '#FFB3D9', text: '#D64A94' };
+    const g = (gender || '').toUpperCase();
+    if (g === 'MALE') return { bg: '#C3E5FF', text: '#4A7BA8', label: 'Male', symbol: '♂️' };
+    if (g === 'FEMALE') return { bg: '#FFB3D9', text: '#D64A94', label: 'Female', symbol: '♀️' };
+    return { bg: '#E5E7EB', text: '#374151', label: 'Unknown', symbol: '⚪' };
   };
 
   const genderColor = getGenderColor(pet.gender);
@@ -33,8 +34,8 @@ const PetCard = ({ pet, onSelect, onEdit, onDelete }) => {
       onClick={() => onSelect(pet)}
       style={{
         background: 'rgba(255, 255, 255, 0.9)',
-        boxShadow: isHovered 
-          ? '0 15px 35px rgba(255, 179, 217, 0.25)' 
+        boxShadow: isHovered
+          ? '0 15px 35px rgba(255, 179, 217, 0.25)'
           : '0 4px 20px rgba(255, 179, 217, 0.15)'
       }}
     >
@@ -50,12 +51,12 @@ const PetCard = ({ pet, onSelect, onEdit, onDelete }) => {
       <div className="relative h-56 overflow-hidden" style={{
         background: 'linear-gradient(135deg, #FFD4C3 0%, #FFB3D9 50%, #E0BBE4 100%)'
       }}>
-        {pet.imageUrl ? (
+        {pet.photo ? (
           <img
-            src={pet.imageUrl}
+            src={`http://localhost:8080${pet.photo}`}
             alt={pet.name}
             className="w-full h-full object-cover transition-transform duration-500"
-            style={{ 
+            style={{
               transform: isHovered ? 'scale(1.1) rotate(2deg)' : 'scale(1)',
               mixBlendMode: 'multiply'
             }}
@@ -70,7 +71,7 @@ const PetCard = ({ pet, onSelect, onEdit, onDelete }) => {
             </div>
           </div>
         )}
-        
+
         {/* Gradient Overlay */}
         <div
           className="absolute inset-0 transition-opacity duration-300"
@@ -139,8 +140,8 @@ const PetCard = ({ pet, onSelect, onEdit, onDelete }) => {
 
         {/* Sparkle Decoration */}
         {isHovered && (
-          <Sparkles 
-            className="absolute bottom-4 right-4 text-white animate-pulse-gentle" 
+          <Sparkles
+            className="absolute bottom-4 right-4 text-white animate-pulse-gentle"
             size={28}
             style={{ filter: 'drop-shadow(0 2px 4px rgba(255, 179, 217, 0.6))' }}
           />
@@ -150,9 +151,9 @@ const PetCard = ({ pet, onSelect, onEdit, onDelete }) => {
       {/* Pet Info */}
       <div className="p-6" style={{ background: 'rgba(255, 255, 255, 0.6)' }}>
         <div className="flex items-center justify-between mb-3">
-          <h3 
-            className="text-2xl font-bold truncate" 
-            style={{ 
+          <h3
+            className="text-2xl font-bold truncate"
+            style={{
               fontFamily: 'Fredoka, sans-serif',
               color: '#8B4789'
             }}
@@ -168,13 +169,13 @@ const PetCard = ({ pet, onSelect, onEdit, onDelete }) => {
               border: `2px solid ${genderColor.text}20`
             }}
           >
-            {pet.gender === 'Male' ? '♂️' : '♀️'} {pet.gender}
+            {genderColor.symbol} {genderColor.label}
           </span>
         </div>
 
-        <p 
-          className="text-base mb-4 truncate" 
-          style={{ 
+        <p
+          className="text-base mb-4 truncate"
+          style={{
             color: '#D64A94',
             fontWeight: '500'
           }}
@@ -183,7 +184,7 @@ const PetCard = ({ pet, onSelect, onEdit, onDelete }) => {
         </p>
 
         <div className="flex items-center gap-4 text-sm">
-          <span 
+          <span
             className="flex items-center gap-2 px-3 py-2 rounded-xl transition-all"
             style={{
               background: '#FFF9C4',
@@ -195,20 +196,7 @@ const PetCard = ({ pet, onSelect, onEdit, onDelete }) => {
             <Calendar size={16} />
             <span>{pet.age} {pet.age === 1 ? 'year' : 'years'}</span>
           </span>
-          {pet.weight && (
-            <span 
-              className="flex items-center gap-2 px-3 py-2 rounded-xl transition-all"
-              style={{
-                background: '#E0BBE4',
-                color: '#8B4789',
-                fontWeight: '600',
-                border: '2px solid #8B478930'
-              }}
-            >
-              <Weight size={16} />
-              <span>{pet.weight} kg</span>
-            </span>
-          )}
+
         </div>
 
         {/* Hover Effect Line */}
@@ -222,7 +210,7 @@ const PetCard = ({ pet, onSelect, onEdit, onDelete }) => {
 
         {/* Love Badge */}
         {isHovered && (
-          <div 
+          <div
             className="absolute -top-3 -right-3 animate-bounce-gentle"
             style={{
               background: 'linear-gradient(135deg, #FFB3D9 0%, #E0BBE4 100%)',

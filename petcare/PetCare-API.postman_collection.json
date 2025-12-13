@@ -279,12 +279,21 @@
           "request": {
             "method": "GET",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{jwt_token}}", "type": "text" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
             ],
             "url": {
               "raw": "{{base_url}}/api/pets",
-              "host": [ "{{base_url}}" ],
-              "path": [ "api", "pets" ]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "pets"
+              ]
             },
             "description": "List pets for the authenticated user"
           },
@@ -295,8 +304,16 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Content-Type", "value": "application/json", "type": "text" },
-              { "key": "Authorization", "value": "Bearer {{jwt_token}}", "type": "text" }
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -304,24 +321,103 @@
             },
             "url": {
               "raw": "{{base_url}}/api/pets",
-              "host": [ "{{base_url}}" ],
-              "path": [ "api", "pets" ]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "pets"
+              ]
             },
             "description": "Create a new pet"
           },
-          "response": []
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "try {",
+                  "  const json = pm.response.json();",
+                  "  const id = json && (json.id || json.petId || (json.data && json.data.id));",
+                  "  if (id) { pm.collectionVariables.set('petIdBuddy', id); }",
+                  "} catch (e) {}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Sample Pet - Luna",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Luna\",\n  \"species\": \"Cat\",\n  \"breed\": \"Siamese\",\n  \"dateOfBirth\": \"2021-03-15\",\n  \"gender\": \"FEMALE\",\n  \"microchipId\": \"MC987\",\n  \"notes\": \"Calm and curious\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/pets",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "pets"
+              ]
+            },
+            "description": "Create sample pet Luna"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "try {",
+                  "  const json = pm.response.json();",
+                  "  const id = json && (json.id || json.petId || (json.data && json.data.id));",
+                  "  if (id) { pm.collectionVariables.set('petIdLuna', id); }",
+                  "} catch (e) {}"
+                ]
+              }
+            }
+          ]
         },
         {
           "name": "Get Pet by ID",
           "request": {
             "method": "GET",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{jwt_token}}", "type": "text" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
             ],
             "url": {
               "raw": "{{base_url}}/api/pets/{{petId}}",
-              "host": [ "{{base_url}}" ],
-              "path": [ "api", "pets", "{{petId}}" ]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "pets",
+                "{{petId}}"
+              ]
             },
             "description": "Fetch a pet by ID"
           },
@@ -332,8 +428,16 @@
           "request": {
             "method": "PUT",
             "header": [
-              { "key": "Content-Type", "value": "application/json", "type": "text" },
-              { "key": "Authorization", "value": "Bearer {{jwt_token}}", "type": "text" }
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -341,8 +445,14 @@
             },
             "url": {
               "raw": "{{base_url}}/api/pets/{{petId}}",
-              "host": [ "{{base_url}}" ],
-              "path": [ "api", "pets", "{{petId}}" ]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "pets",
+                "{{petId}}"
+              ]
             },
             "description": "Update an existing pet"
           },
@@ -353,12 +463,22 @@
           "request": {
             "method": "DELETE",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{jwt_token}}", "type": "text" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
             ],
             "url": {
               "raw": "{{base_url}}/api/pets/{{petId}}",
-              "host": [ "{{base_url}}" ],
-              "path": [ "api", "pets", "{{petId}}" ]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "pets",
+                "{{petId}}"
+              ]
             },
             "description": "Delete a pet"
           },
@@ -369,18 +489,34 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{jwt_token}}", "type": "text" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
             ],
             "body": {
               "mode": "formdata",
               "formdata": [
-                { "key": "file", "type": "file", "src": [], "description": "Select an image file" }
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": [],
+                  "description": "Select an image file"
+                }
               ]
             },
             "url": {
               "raw": "{{base_url}}/api/pets/{{petId}}/photo",
-              "host": [ "{{base_url}}" ],
-              "path": [ "api", "pets", "{{petId}}", "photo" ]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "pets",
+                "{{petId}}",
+                "photo"
+              ]
             },
             "description": "Upload a photo for the pet"
           },
@@ -391,14 +527,27 @@
           "request": {
             "method": "GET",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{jwt_token}}", "type": "text" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
             ],
             "url": {
               "raw": "{{base_url}}/api/pets/search?q={{query}}",
-              "host": [ "{{base_url}}" ],
-              "path": [ "api", "pets", "search" ],
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "pets",
+                "search"
+              ],
               "query": [
-                { "key": "q", "value": "{{query}}" }
+                {
+                  "key": "q",
+                  "value": "{{query}}"
+                }
               ]
             },
             "description": "Search pets by name/species/breed"
@@ -410,12 +559,23 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{jwt_token}}", "type": "text" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
             ],
             "url": {
               "raw": "{{base_url}}/api/pets/{{petId}}/walk",
-              "host": [ "{{base_url}}" ],
-              "path": [ "api", "pets", "{{petId}}", "walk" ]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "pets",
+                "{{petId}}",
+                "walk"
+              ]
             },
             "description": "Increment pet walk streak"
           },
@@ -431,12 +591,23 @@
           "request": {
             "method": "GET",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{jwt_token}}", "type": "text" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
             ],
             "url": {
               "raw": "{{base_url}}/api/pets/{{petId}}/medical-records",
-              "host": [ "{{base_url}}" ],
-              "path": [ "api", "pets", "{{petId}}", "medical-records" ]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "pets",
+                "{{petId}}",
+                "medical-records"
+              ]
             },
             "description": "List medical records for a pet"
           },
@@ -447,8 +618,16 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Content-Type", "value": "application/json", "type": "text" },
-              { "key": "Authorization", "value": "Bearer {{jwt_token}}", "type": "text" }
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -456,8 +635,15 @@
             },
             "url": {
               "raw": "{{base_url}}/api/pets/{{petId}}/medical-records",
-              "host": [ "{{base_url}}" ],
-              "path": [ "api", "pets", "{{petId}}", "medical-records" ]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "pets",
+                "{{petId}}",
+                "medical-records"
+              ]
             },
             "description": "Add a medical record"
           },
@@ -468,8 +654,16 @@
           "request": {
             "method": "PUT",
             "header": [
-              { "key": "Content-Type", "value": "application/json", "type": "text" },
-              { "key": "Authorization", "value": "Bearer {{jwt_token}}", "type": "text" }
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -477,8 +671,16 @@
             },
             "url": {
               "raw": "{{base_url}}/api/pets/{{petId}}/medical-records/{{recordId}}",
-              "host": [ "{{base_url}}" ],
-              "path": [ "api", "pets", "{{petId}}", "medical-records", "{{recordId}}" ]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "pets",
+                "{{petId}}",
+                "medical-records",
+                "{{recordId}}"
+              ]
             },
             "description": "Update a medical record"
           },
@@ -489,14 +691,98 @@
           "request": {
             "method": "DELETE",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{jwt_token}}", "type": "text" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
             ],
             "url": {
               "raw": "{{base_url}}/api/pets/{{petId}}/medical-records/{{recordId}}",
-              "host": [ "{{base_url}}" ],
-              "path": [ "api", "pets", "{{petId}}", "medical-records", "{{recordId}}" ]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "pets",
+                "{{petId}}",
+                "medical-records",
+                "{{recordId}}"
+              ]
             },
             "description": "Delete a medical record"
+          },
+          "response": []
+        },
+        {
+          "name": "Add Sample Record - Buddy",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"visitDate\": \"2024-11-10\",\n  \"recordType\": \"CHECKUP\",\n  \"vetName\": \"Dr. Smith\",\n  \"diagnosis\": \"Healthy\",\n  \"treatment\": \"Routine check\",\n  \"prescriptions\": \"\",\n  \"notes\": \"All good\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/pets/{{petIdBuddy}}/medical-records",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "pets",
+                "{{petIdBuddy}}",
+                "medical-records"
+              ]
+            },
+            "description": "Add sample medical record for Buddy"
+          },
+          "response": []
+        },
+        {
+          "name": "Add Sample Record - Luna",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"visitDate\": \"2024-10-05\",\n  \"recordType\": \"TREATMENT\",\n  \"vetName\": \"Dr. Patel\",\n  \"diagnosis\": \"Minor allergy\",\n  \"treatment\": \"Antihistamines\",\n  \"prescriptions\": \"Cetirizine\",\n  \"notes\": \"Monitor for 2 weeks\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/pets/{{petIdLuna}}/medical-records",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "pets",
+                "{{petIdLuna}}",
+                "medical-records"
+              ]
+            },
+            "description": "Add sample medical record for Luna"
           },
           "response": []
         }
@@ -510,12 +796,23 @@
           "request": {
             "method": "GET",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{jwt_token}}", "type": "text" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
             ],
             "url": {
               "raw": "{{base_url}}/api/pets/{{petId}}/vaccinations",
-              "host": [ "{{base_url}}" ],
-              "path": [ "api", "pets", "{{petId}}", "vaccinations" ]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "pets",
+                "{{petId}}",
+                "vaccinations"
+              ]
             },
             "description": "List vaccinations for a pet"
           },
@@ -526,8 +823,16 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Content-Type", "value": "application/json", "type": "text" },
-              { "key": "Authorization", "value": "Bearer {{jwt_token}}", "type": "text" }
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -535,8 +840,15 @@
             },
             "url": {
               "raw": "{{base_url}}/api/pets/{{petId}}/vaccinations",
-              "host": [ "{{base_url}}" ],
-              "path": [ "api", "pets", "{{petId}}", "vaccinations" ]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "pets",
+                "{{petId}}",
+                "vaccinations"
+              ]
             },
             "description": "Add a vaccination record"
           },
@@ -547,8 +859,16 @@
           "request": {
             "method": "PUT",
             "header": [
-              { "key": "Content-Type", "value": "application/json", "type": "text" },
-              { "key": "Authorization", "value": "Bearer {{jwt_token}}", "type": "text" }
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -556,8 +876,16 @@
             },
             "url": {
               "raw": "{{base_url}}/api/pets/{{petId}}/vaccinations/{{vaccinationId}}",
-              "host": [ "{{base_url}}" ],
-              "path": [ "api", "pets", "{{petId}}", "vaccinations", "{{vaccinationId}}" ]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "pets",
+                "{{petId}}",
+                "vaccinations",
+                "{{vaccinationId}}"
+              ]
             },
             "description": "Update a vaccination record"
           },
@@ -568,12 +896,24 @@
           "request": {
             "method": "DELETE",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{jwt_token}}", "type": "text" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
             ],
             "url": {
               "raw": "{{base_url}}/api/pets/{{petId}}/vaccinations/{{vaccinationId}}",
-              "host": [ "{{base_url}}" ],
-              "path": [ "api", "pets", "{{petId}}", "vaccinations", "{{vaccinationId}}" ]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "pets",
+                "{{petId}}",
+                "vaccinations",
+                "{{vaccinationId}}"
+              ]
             },
             "description": "Delete a vaccination"
           },
@@ -589,12 +929,23 @@
           "request": {
             "method": "GET",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{jwt_token}}", "type": "text" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
             ],
             "url": {
               "raw": "{{base_url}}/api/pets/{{petId}}/measurements",
-              "host": [ "{{base_url}}" ],
-              "path": [ "api", "pets", "{{petId}}", "measurements" ]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "pets",
+                "{{petId}}",
+                "measurements"
+              ]
             },
             "description": "List health measurements for a pet"
           },
@@ -605,8 +956,16 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Content-Type", "value": "application/json", "type": "text" },
-              { "key": "Authorization", "value": "Bearer {{jwt_token}}", "type": "text" }
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -614,8 +973,15 @@
             },
             "url": {
               "raw": "{{base_url}}/api/pets/{{petId}}/measurements",
-              "host": [ "{{base_url}}" ],
-              "path": [ "api", "pets", "{{petId}}", "measurements" ]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "pets",
+                "{{petId}}",
+                "measurements"
+              ]
             },
             "description": "Add a health measurement"
           },
@@ -626,8 +992,16 @@
           "request": {
             "method": "PUT",
             "header": [
-              { "key": "Content-Type", "value": "application/json", "type": "text" },
-              { "key": "Authorization", "value": "Bearer {{jwt_token}}", "type": "text" }
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -635,8 +1009,16 @@
             },
             "url": {
               "raw": "{{base_url}}/api/pets/{{petId}}/measurements/{{measurementId}}",
-              "host": [ "{{base_url}}" ],
-              "path": [ "api", "pets", "{{petId}}", "measurements", "{{measurementId}}" ]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "pets",
+                "{{petId}}",
+                "measurements",
+                "{{measurementId}}"
+              ]
             },
             "description": "Update a health measurement"
           },
@@ -647,14 +1029,98 @@
           "request": {
             "method": "DELETE",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{jwt_token}}", "type": "text" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
             ],
             "url": {
               "raw": "{{base_url}}/api/pets/{{petId}}/measurements/{{measurementId}}",
-              "host": [ "{{base_url}}" ],
-              "path": [ "api", "pets", "{{petId}}", "measurements", "{{measurementId}}" ]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "pets",
+                "{{petId}}",
+                "measurements",
+                "{{measurementId}}"
+              ]
             },
             "description": "Delete a health measurement"
+          },
+          "response": []
+        },
+        {
+          "name": "Add Sample Measurement - Buddy",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"measurementDate\": \"2024-11-01\",\n  \"weight\": 26.2,\n  \"temperature\": 38.6,\n  \"notes\": \"Post-checkup weight\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/pets/{{petIdBuddy}}/measurements",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "pets",
+                "{{petIdBuddy}}",
+                "measurements"
+              ]
+            },
+            "description": "Add sample measurement for Buddy"
+          },
+          "response": []
+        },
+        {
+          "name": "Add Sample Measurement - Luna",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"measurementDate\": \"2024-11-15\",\n  \"weight\": 4.4,\n  \"temperature\": 38.2,\n  \"notes\": \"Stable\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/pets/{{petIdLuna}}/measurements",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "pets",
+                "{{petIdLuna}}",
+                "measurements"
+              ]
+            },
+            "description": "Add sample measurement for Luna"
           },
           "response": []
         }
@@ -668,12 +1134,23 @@
           "request": {
             "method": "GET",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{jwt_token}}", "type": "text" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
             ],
             "url": {
               "raw": "{{base_url}}/api/pets/{{petId}}/reminders",
-              "host": [ "{{base_url}}" ],
-              "path": [ "api", "pets", "{{petId}}", "reminders" ]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "pets",
+                "{{petId}}",
+                "reminders"
+              ]
             },
             "description": "List reminders for a pet"
           },
@@ -684,8 +1161,16 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Content-Type", "value": "application/json", "type": "text" },
-              { "key": "Authorization", "value": "Bearer {{jwt_token}}", "type": "text" }
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -693,8 +1178,15 @@
             },
             "url": {
               "raw": "{{base_url}}/api/pets/{{petId}}/reminders",
-              "host": [ "{{base_url}}" ],
-              "path": [ "api", "pets", "{{petId}}", "reminders" ]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "pets",
+                "{{petId}}",
+                "reminders"
+              ]
             },
             "description": "Add a reminder"
           },
@@ -705,12 +1197,25 @@
           "request": {
             "method": "PATCH",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{jwt_token}}", "type": "text" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
             ],
             "url": {
               "raw": "{{base_url}}/api/pets/{{petId}}/reminders/{{reminderId}}/complete",
-              "host": [ "{{base_url}}" ],
-              "path": [ "api", "pets", "{{petId}}", "reminders", "{{reminderId}}", "complete" ]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "pets",
+                "{{petId}}",
+                "reminders",
+                "{{reminderId}}",
+                "complete"
+              ]
             },
             "description": "Mark reminder as completed"
           },
@@ -721,14 +1226,161 @@
           "request": {
             "method": "DELETE",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{jwt_token}}", "type": "text" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
             ],
             "url": {
               "raw": "{{base_url}}/api/pets/{{petId}}/reminders/{{reminderId}}",
-              "host": [ "{{base_url}}" ],
-              "path": [ "api", "pets", "{{petId}}", "reminders", "{{reminderId}}" ]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "pets",
+                "{{petId}}",
+                "reminders",
+                "{{reminderId}}"
+              ]
             },
             "description": "Delete a reminder"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Appointments",
+      "item": [
+        {
+          "name": "Create Availability Slot (Vet)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"startTime\": \"2025-12-15T10:00:00\",\n  \"endTime\": \"2025-12-15T10:30:00\",\n  \"supportedType\": \"BOTH\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/appointments/slots?vetId=1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "appointments",
+                "slots"
+              ],
+              "query": [
+                {
+                  "key": "vetId",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Create a new availability slot for a veterinarian"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Available Slots",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/appointments/slots/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "appointments",
+                "slots",
+                "1"
+              ]
+            },
+            "description": "Get available slots for a vet"
+          },
+          "response": []
+        },
+        {
+          "name": "Book Appointment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"petId\": 1,\n  \"slotId\": 1,\n  \"type\": \"VIDEO\",\n  \"reason\": \"Pet looks sad\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/appointments/book",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "appointments",
+                "book"
+              ]
+            },
+            "description": "Book an appointment"
+          },
+          "response": []
+        },
+        {
+          "name": "Get My Appointments",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/appointments/pet/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "appointments",
+                "pet",
+                "1"
+              ]
+            },
+            "description": "Get appointments for a pet"
           },
           "response": []
         }

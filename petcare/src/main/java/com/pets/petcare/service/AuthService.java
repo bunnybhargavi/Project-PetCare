@@ -90,12 +90,21 @@ public class AuthService {
         // Generate JWT token
         String token = jwtUtil.generateToken(user.getEmail(), user.getRole().name(), user.getId());
 
+        Long vetId = null;
+        if (user.getRole() == User.Role.VET) {
+            Veterinarian vet = veterinarianRepository.findByUserId(user.getId())
+                    .orElse(null);
+            if (vet != null)
+                vetId = vet.getId();
+        }
+
         return AuthResponse.builder()
                 .token(token)
                 .userId(user.getId())
                 .email(user.getEmail())
                 .name(user.getName())
                 .role(user.getRole().name())
+                .vetId(vetId)
                 .message("Registration successful")
                 .build();
     }
@@ -132,12 +141,21 @@ public class AuthService {
 
         log.info("User logged in successfully: {}", user.getEmail());
 
+        Long vetId = null;
+        if (user.getRole() == User.Role.VET) {
+            Veterinarian vet = veterinarianRepository.findByUserId(user.getId())
+                    .orElse(null);
+            if (vet != null)
+                vetId = vet.getId();
+        }
+
         return AuthResponse.builder()
                 .token(token)
                 .userId(user.getId())
                 .email(user.getEmail())
                 .name(user.getName())
                 .role(user.getRole().name())
+                .vetId(vetId)
                 .message("Login successful")
                 .build();
     }

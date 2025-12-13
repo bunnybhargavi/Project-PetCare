@@ -14,6 +14,9 @@ import OwnerDashboard from './components/Dashboard/OwnerDashboard';
 import VetDashboard from './components/Dashboard/VetDashboard';
 import ProfilePage from './components/Profile/ProfilePage';
 import Navbar from './components/Layout/Navbar';
+import PetList from './components/Pets/PetList';
+import CommunityPage from './components/Community/CommunityPage';
+import FindVetPage from './components/Vets/FindVetPage';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -120,23 +123,54 @@ function App() {
               }
             />
 
-            {/* Protected Routes */}
-            <Route
-              path="/dashboard"
-              element={
-                <ProtectedRoute>
-                  <DashboardRoute />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/profile"
-              element={
-                <ProtectedRoute>
-                  <ProfilePage />
-                </ProtectedRoute>
-              }
-            />
+          {/* Protected Routes */}
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <DashboardRoute />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/pets"
+            element={
+              <ProtectedRoute>
+                <>
+                  <Navbar />
+                  <PetList />
+                </>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <ProfilePage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Community Route */}
+          <Route
+            path="/community"
+            element={
+              <ProtectedRoute>
+                <CommunityPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Find a Vet Route */}
+          <Route
+            path="/find-vet"
+            element={
+              <ProtectedRoute>
+                <FindVetPage />
+              </ProtectedRoute>
+            }
+          />
 
             {/* 404 Route - redirect to landing */}
             <Route path="*" element={<Navigate to="/" />} />

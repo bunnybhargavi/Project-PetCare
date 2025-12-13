@@ -1,21 +1,18 @@
 import React, { useState } from 'react';
-import { X, Heart, Sparkles } from 'lucide-react';
+import { X, Camera, PawPrint } from 'lucide-react';
 
 const AddPetModal = ({ isOpen, onClose, onAdd }) => {
   const [formData, setFormData] = useState({
     name: '',
     species: 'Dog',
     breed: '',
-    age: '',
-    gender: 'Male',
-    weight: '',
-    color: '',
-    microchipId: '',
     dateOfBirth: '',
-    imageUrl: '',
-    ownerId: 1,
+    gender: 'MALE',
+    microchipId: '',
+    notes: '',
   });
-
+  const [photoFile, setPhotoFile] = useState(null);
+  const [photoPreview, setPhotoPreview] = useState(null);
   const [errors, setErrors] = useState({});
 
   if (!isOpen) return null;
@@ -23,359 +20,225 @@ const AddPetModal = ({ isOpen, onClose, onAdd }) => {
   const validateForm = () => {
     const newErrors = {};
     if (!formData.name.trim()) newErrors.name = 'Name is required';
-    if (!formData.breed.trim()) newErrors.breed = 'Breed is required';
-    if (!formData.age || formData.age <= 0) newErrors.age = 'Valid age is required';
-    if (formData.weight && formData.weight <= 0) newErrors.weight = 'Weight must be positive';
+    if (!formData.species.trim()) newErrors.species = 'Species is required';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = () => {
-    if (validateForm()) {
-      const petData = {
-        ...formData,
-        age: parseInt(formData.age),
-        weight: formData.weight ? parseFloat(formData.weight) : null,
-      };
-      onAdd(petData);
-      handleClose();
-    }
+    if (!validateForm()) return;
+    const payload = {
+      name: formData.name,
+      species: formData.species,
+      breed: formData.breed || '',
+      dateOfBirth: formData.dateOfBirth || null,
+      gender: formData.gender || 'UNKNOWN',
+      microchipId: formData.microchipId || '',
+      notes: formData.notes || '',
+    };
+    onAdd({ petData: payload, photoFile });
+    handleClose();
   };
 
   const handleClose = () => {
     setFormData({
-      name: '', species: 'Dog', breed: '', age: '', gender: 'Male',
-      weight: '', color: '', microchipId: '', dateOfBirth: '', imageUrl: '', ownerId: 1,
+      name: '', species: 'Dog', breed: '', dateOfBirth: '', gender: 'MALE', microchipId: '', notes: '',
     });
+    setPhotoFile(null);
+    setPhotoPreview(null);
     setErrors({});
     onClose();
   };
 
-  const getSpeciesEmoji = (species) => {
-    const emojis = {
-      'Dog': '🐶', 'Cat': '🐱', 'Bird': '🐦', 'Rabbit': '🐰',
-      'Hamster': '🐹', 'Guinea Pig': '🐹', 'Other': '🐾'
-    };
-    return emojis[species] || '🐾';
+  const handlePhotoChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setPhotoFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPhotoPreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   return (
-    <div 
-      className="fixed inset-0 flex items-center justify-center z-50 p-4 animate-fadeIn"
-      style={{ background: 'rgba(139, 71, 137, 0.4)', backdropFilter: 'blur(10px)' }}
+    <div
+      className="fixed inset-0 flex items-center justify-center z-50 py-8 px-4 animate-fadeIn overflow-auto"
+      style={{ background: 'rgba(0, 0, 0, 0.5)', backdropFilter: 'blur(8px)' }}
     >
-      <div 
-        className="rounded-3xl p-8 max-w-3xl w-full mx-4 max-h-[90vh] overflow-y-auto animate-slideUp relative"
-        style={{
-          background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 245, 240, 0.95) 100%)',
-          boxShadow: '0 20px 60px rgba(255, 179, 217, 0.4)',
-          border: '3px solid rgba(255, 179, 217, 0.3)'
-        }}
+      <div
+        className="bg-white rounded-3xl p-6 w-full max-w-sm max-h-[85vh] overflow-y-auto animate-slideUp relative shadow-2xl my-auto"
       >
-        {/* Decorative Elements */}
-        <div className="paw-print" style={{ top: '20px', right: '80px', fontSize: '60px', opacity: '0.1' }}>🐾</div>
-        <div className="paw-print" style={{ bottom: '20px', left: '80px', fontSize: '50px', opacity: '0.1' }}>🐾</div>
-
         {/* Header */}
-        <div className="flex justify-between items-center mb-6 relative z-10">
-          <div className="flex items-center gap-4">
-            <div 
-              className="p-4 rounded-2xl animate-pulse-gentle"
-              style={{
-                background: 'linear-gradient(135deg, #FFD4C3 0%, #FFB3D9 100%)',
-                boxShadow: '0 4px 20px rgba(255, 179, 217, 0.4)'
-              }}
-            >
-              <Heart className="text-white" size={32} />
-            </div>
-            <div>
-              <h2 
-                className="text-3xl font-bold flex items-center gap-2"
-                style={{ fontFamily: 'Fredoka, sans-serif', color: '#8B4789' }}
-              >
-                Add New Pet
-                <Sparkles className="text-pink-400 animate-bounce-gentle" size={28} />
-              </h2>
-              <p style={{ color: '#D64A94', fontFamily: 'Fredoka, sans-serif' }}>
-                Let's welcome a new family member! 💕
-              </p>
-            </div>
-          </div>
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-bold text-purple-700 flex items-center gap-2">
+            Add New Pet <PawPrint size={20} className="text-pink-500" />
+          </h2>
           <button
             onClick={handleClose}
-            className="p-2 hover:bg-pink-100 rounded-full transition-all hover:rotate-90 duration-300"
-            style={{ color: '#D64A94' }}
+            className="p-1.5 hover:bg-gray-100 rounded-full transition-colors"
           >
-            <X size={28} />
+            <X size={20} className="text-gray-600" />
           </button>
         </div>
 
+        {/* Photo Upload - Circular Placeholder */}
+        <div className="flex justify-center mb-5">
+          <label className="cursor-pointer">
+            <input
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handlePhotoChange}
+            />
+            <div className="w-28 h-28 rounded-full border-4 border-dashed border-pink-300 flex items-center justify-center bg-pink-50 hover:bg-pink-100 transition-all overflow-hidden">
+              {photoPreview ? (
+                <img src={photoPreview} alt="Preview" className="w-full h-full object-cover" />
+              ) : (
+                <div className="text-center">
+                  <Camera className="text-pink-400 mx-auto mb-1" size={28} />
+                  <div className="text-xs text-pink-600 font-medium">Add Photo</div>
+                </div>
+              )}
+            </div>
+          </label>
+        </div>
+
         {/* Form */}
-        <div className="space-y-5 relative z-10">
+        <div className="space-y-3">
+          {/* Name */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+              Name
+            </label>
+            <input
+              type="text"
+              placeholder="e.g. Bella"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              className={`w-full px-4 py-2.5 border-2 rounded-xl focus:outline-none transition-colors ${errors.name ? 'border-red-300 focus:border-red-500' : 'border-gray-200 focus:border-purple-500'
+                }`}
+            />
+            {errors.name && <p className="text-xs mt-1 text-red-500">{errors.name}</p>}
+          </div>
+
+          {/* Species and Breed */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label 
-                className="block text-sm font-semibold mb-2"
-                style={{ color: '#8B4789', fontFamily: 'Fredoka, sans-serif' }}
-              >
-                Pet Name ✨ *
-              </label>
-              <input
-                type="text"
-                placeholder="Enter adorable name..."
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full px-4 py-3 rounded-xl transition-all"
-                style={{
-                  border: errors.name ? '2px solid #FFB5A0' : '2px solid #FFD4C3',
-                  background: 'rgba(255, 255, 255, 0.9)',
-                  fontFamily: 'Inter, sans-serif'
-                }}
-              />
-              {errors.name && <p className="text-xs mt-1" style={{ color: '#D66B4A' }}>{errors.name}</p>}
-            </div>
-
-            <div>
-              <label 
-                className="block text-sm font-semibold mb-2"
-                style={{ color: '#8B4789', fontFamily: 'Fredoka, sans-serif' }}
-              >
-                Species {getSpeciesEmoji(formData.species)} *
+              <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+                Species
               </label>
               <select
                 value={formData.species}
                 onChange={(e) => setFormData({ ...formData, species: e.target.value })}
-                className="w-full px-4 py-3 rounded-xl transition-all"
-                style={{
-                  border: '2px solid #E0BBE4',
-                  background: 'rgba(255, 255, 255, 0.9)',
-                  fontFamily: 'Fredoka, sans-serif',
-                  color: '#8B4789'
-                }}
+                className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-purple-500"
               >
                 <option value="Dog">🐶 Dog</option>
                 <option value="Cat">🐱 Cat</option>
                 <option value="Bird">🐦 Bird</option>
                 <option value="Rabbit">🐰 Rabbit</option>
                 <option value="Hamster">🐹 Hamster</option>
-                <option value="Guinea Pig">🐹 Guinea Pig</option>
                 <option value="Other">🐾 Other</option>
               </select>
             </div>
-          </div>
-
-          <div>
-            <label 
-              className="block text-sm font-semibold mb-2"
-              style={{ color: '#8B4789', fontFamily: 'Fredoka, sans-serif' }}
-            >
-              Breed 🎨 *
-            </label>
-            <input
-              type="text"
-              placeholder="Enter breed..."
-              value={formData.breed}
-              onChange={(e) => setFormData({ ...formData, breed: e.target.value })}
-              className="w-full px-4 py-3 rounded-xl transition-all"
-              style={{
-                border: errors.breed ? '2px solid #FFB5A0' : '2px solid #FFD4C3',
-                background: 'rgba(255, 255, 255, 0.9)',
-                fontFamily: 'Inter, sans-serif'
-              }}
-            />
-            {errors.breed && <p className="text-xs mt-1" style={{ color: '#D66B4A' }}>{errors.breed}</p>}
-          </div>
-
-          <div className="grid grid-cols-3 gap-4">
-            <div>
-              <label 
-                className="block text-sm font-semibold mb-2"
-                style={{ color: '#8B4789', fontFamily: 'Fredoka, sans-serif' }}
-              >
-                Age 🎂 *
-              </label>
-              <input
-                type="number"
-                placeholder="0"
-                min="0"
-                value={formData.age}
-                onChange={(e) => setFormData({ ...formData, age: e.target.value })}
-                className="w-full px-4 py-3 rounded-xl transition-all"
-                style={{
-                  border: errors.age ? '2px solid #FFB5A0' : '2px solid #FFF9C4',
-                  background: 'rgba(255, 255, 255, 0.9)',
-                  fontFamily: 'Inter, sans-serif'
-                }}
-              />
-              {errors.age && <p className="text-xs mt-1" style={{ color: '#D66B4A' }}>{errors.age}</p>}
-            </div>
 
             <div>
-              <label 
-                className="block text-sm font-semibold mb-2"
-                style={{ color: '#8B4789', fontFamily: 'Fredoka, sans-serif' }}
-              >
-                Gender {formData.gender === 'Male' ? '♂️' : '♀️'} *
-              </label>
-              <select
-                value={formData.gender}
-                onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
-                className="w-full px-4 py-3 rounded-xl transition-all"
-                style={{
-                  border: formData.gender === 'Male' ? '2px solid #C3E5FF' : '2px solid #FFB3D9',
-                  background: 'rgba(255, 255, 255, 0.9)',
-                  fontFamily: 'Fredoka, sans-serif',
-                  color: '#8B4789'
-                }}
-              >
-                <option value="Male">♂️ Male</option>
-                <option value="Female">♀️ Female</option>
-              </select>
-            </div>
-
-            <div>
-              <label 
-                className="block text-sm font-semibold mb-2"
-                style={{ color: '#8B4789', fontFamily: 'Fredoka, sans-serif' }}
-              >
-                Weight (kg) ⚖️
-              </label>
-              <input
-                type="number"
-                placeholder="0.0"
-                min="0"
-                step="0.1"
-                value={formData.weight}
-                onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
-                className="w-full px-4 py-3 rounded-xl transition-all"
-                style={{
-                  border: '2px solid #D5F4E6',
-                  background: 'rgba(255, 255, 255, 0.9)',
-                  fontFamily: 'Inter, sans-serif'
-                }}
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label 
-                className="block text-sm font-semibold mb-2"
-                style={{ color: '#8B4789', fontFamily: 'Fredoka, sans-serif' }}
-              >
-                Color 🎨
+              <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+                Breed
               </label>
               <input
                 type="text"
-                placeholder="Pet color..."
-                value={formData.color}
-                onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-                className="w-full px-4 py-3 rounded-xl transition-all"
-                style={{
-                  border: '2px solid #FFD4C3',
-                  background: 'rgba(255, 255, 255, 0.9)',
-                  fontFamily: 'Inter, sans-serif'
-                }}
+                placeholder="e.g. Beagle"
+                value={formData.breed}
+                onChange={(e) => setFormData({ ...formData, breed: e.target.value })}
+                className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-purple-500"
               />
             </div>
+          </div>
 
+          {/* Birthday and Gender */}
+          <div className="grid grid-cols-2 gap-4">
             <div>
-              <label 
-                className="block text-sm font-semibold mb-2"
-                style={{ color: '#8B4789', fontFamily: 'Fredoka, sans-serif' }}
-              >
-                Date of Birth 📅
+              <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+                Birthday
               </label>
               <input
                 type="date"
                 value={formData.dateOfBirth}
                 onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
-                className="w-full px-4 py-3 rounded-xl transition-all"
-                style={{
-                  border: '2px solid #E0BBE4',
-                  background: 'rgba(255, 255, 255, 0.9)',
-                  fontFamily: 'Inter, sans-serif'
-                }}
+                className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-purple-500"
               />
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+                Gender
+              </label>
+              <select
+                value={formData.gender}
+                onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
+                className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-purple-500"
+              >
+                <option value="MALE">♂️ Male</option>
+                <option value="FEMALE">♀️ Female</option>
+                <option value="UNKNOWN">⚪ Unknown</option>
+              </select>
             </div>
           </div>
 
+          {/* Notes */}
           <div>
-            <label 
-              className="block text-sm font-semibold mb-2"
-              style={{ color: '#8B4789', fontFamily: 'Fredoka, sans-serif' }}
-            >
-              Microchip ID 🔖
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Notes
             </label>
-            <input
-              type="text"
-              placeholder="Enter microchip ID..."
-              value={formData.microchipId}
-              onChange={(e) => setFormData({ ...formData, microchipId: e.target.value })}
-              className="w-full px-4 py-3 rounded-xl transition-all"
-              style={{
-                border: '2px solid #C3E5FF',
-                background: 'rgba(255, 255, 255, 0.9)',
-                fontFamily: 'Inter, sans-serif'
-              }}
+            <textarea
+              placeholder="Any special needs?"
+              value={formData.notes}
+              onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+              rows="2"
+              className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-purple-500 resize-none"
             />
-          </div>
-
-          <div>
-            <label 
-              className="block text-sm font-semibold mb-2"
-              style={{ color: '#8B4789', fontFamily: 'Fredoka, sans-serif' }}
-            >
-              Image URL 📸
-            </label>
-            <input
-              type="url"
-              placeholder="https://example.com/pet-photo.jpg"
-              value={formData.imageUrl}
-              onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
-              className="w-full px-4 py-3 rounded-xl transition-all"
-              style={{
-                border: '2px solid #D5F4E6',
-                background: 'rgba(255, 255, 255, 0.9)',
-                fontFamily: 'Inter, sans-serif'
-              }}
-            />
-            <p className="text-xs mt-1" style={{ color: '#D64A94' }}>
-              Optional: Add a photo URL for your pet 💕
-            </p>
           </div>
 
           {/* Action Buttons */}
-          <div className="flex gap-4 pt-4">
+          <div className="flex gap-3 pt-3">
             <button
               onClick={handleClose}
-              className="flex-1 px-6 py-4 rounded-xl font-semibold transition-all hover:scale-105"
-              style={{
-                border: '2px solid #E0BBE4',
-                color: '#8B4789',
-                background: 'rgba(255, 255, 255, 0.9)',
-                fontFamily: 'Fredoka, sans-serif'
-              }}
+              className="flex-1 px-5 py-2.5 border-2 border-gray-300 text-gray-700 rounded-xl font-semibold hover:bg-gray-50 transition-all"
             >
               Cancel
             </button>
             <button
               onClick={handleSubmit}
-              className="flex-1 px-6 py-4 rounded-xl font-semibold transition-all hover:scale-105 wiggle-on-hover"
-              style={{
-                background: 'linear-gradient(135deg, #FFD4C3 0%, #FFB3D9 100%)',
-                color: '#8B4789',
-                boxShadow: '0 4px 20px rgba(255, 179, 217, 0.4)',
-                fontFamily: 'Fredoka, sans-serif'
-              }}
+              className="flex-1 px-5 py-2.5 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl font-semibold hover:shadow-lg transform hover:scale-105 transition-all"
             >
-              Add Pet 🐾
+              Save New Pet
             </button>
           </div>
         </div>
+
+        {/* Animation Styles */}
+        <style>{`
+          @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+          }
+          @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+          }
+          .animate-fadeIn {
+            animation: fadeIn 0.3s ease-out;
+          }
+          .animate-slideUp {
+            animation: slideUp 0.4s ease-out;
+          }
+        `}</style>
       </div>
     </div>
   );
 };
 
 export default AddPetModal;
+

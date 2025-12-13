@@ -1,66 +1,69 @@
-import axios from 'axios';
+import api from './api';
 
-const API_URL = 'http://localhost:8080/api/pets';
-
-const getAuthHeader = () => {
-  const token = localStorage.getItem('token');
-  return { Authorization: `Bearer ${token}` };
-};
+const PET_ENDPOINT = '/pets';
 
 export const petService = {
   // Get all pets for current owner
   getAllPets: async () => {
-    const response = await axios.get(API_URL, {
-      headers: getAuthHeader()
-    });
-    return response.data;
+    const { data } = await api.get(PET_ENDPOINT);
+    return data;
   },
 
   // Get pet by ID
   getPetById: async (petId) => {
-    const response = await axios.get(`${API_URL}/${petId}`, {
-      headers: getAuthHeader()
-    });
-    return response.data;
+    const { data } = await api.get(`${PET_ENDPOINT}/${petId}`);
+    return data;
   },
 
-  // Add new pet
+  // Create new pet
+  createPet: async (petData) => {
+    const { data } = await api.post(PET_ENDPOINT, petData);
+    return data;
+  },
+
+  // Legacy alias to avoid breaking existing imports
   addPet: async (petData) => {
-    const response = await axios.post(API_URL, petData, {
-      headers: getAuthHeader()
-    });
-    return response.data;
+    const { data } = await api.post(PET_ENDPOINT, petData);
+    return data;
   },
 
   // Update pet
   updatePet: async (petId, petData) => {
-    const response = await axios.put(`${API_URL}/${petId}`, petData, {
-      headers: getAuthHeader()
-    });
-    return response.data;
+    const { data } = await api.put(`${PET_ENDPOINT}/${petId}`, petData);
+    return data;
   },
 
   // Delete pet
   deletePet: async (petId) => {
-    const response = await axios.delete(`${API_URL}/${petId}`, {
-      headers: getAuthHeader()
-    });
-    return response.data;
+    const { data } = await api.delete(`${PET_ENDPOINT}/${petId}`);
+    return data;
   },
 
   // Upload pet image
   uploadPetImage: async (petId, imageFile) => {
     const formData = new FormData();
-    formData.append('image', imageFile);
-    
-    const response = await axios.post(`${API_URL}/${petId}/image`, formData, {
-      headers: {
-        ...getAuthHeader(),
-        'Content-Type': 'multipart/form-data'
-      }
+    formData.append('file', imageFile);
+
+    const { data } = await api.post(`${PET_ENDPOINT}/${petId}/photo`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
     });
-    return response.data;
-  }
+
+    return data;
+  },
+
+  // Search pets
+  searchPets: async (query) => {
+    const { data } = await api.get(`${PET_ENDPOINT}/search`, {
+      params: { q: query },
+    });
+    return data;
+  },
+
+  // Increment walk streak
+  incrementWalkStreak: async (petId) => {
+    const { data } = await api.post(`${PET_ENDPOINT}/${petId}/walk`);
+    return data;
+  },
 };
 
 export default petService;

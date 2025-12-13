@@ -9,14 +9,14 @@ const fetchImageAsBlob = async (relativePath) => {
   if (relativePath.startsWith('http') && !relativePath.includes('localhost:8080')) {
     return relativePath;
   }
-  
+
   try {
     const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080/api';
     const BASE_URL = API_URL.replace('/api', '');
     const token = localStorage.getItem('token');
-    
+
     if (!token) return null;
-    
+
     let imageUrl;
     if (relativePath.startsWith('/uploads/profiles/')) {
       imageUrl = `${BASE_URL}${relativePath}`;
@@ -25,7 +25,7 @@ const fetchImageAsBlob = async (relativePath) => {
     } else {
       imageUrl = `${BASE_URL}/uploads/profiles/${relativePath.replace(/^\/+/, '')}`;
     }
-    
+
     const response = await fetch(imageUrl, {
       method: 'GET',
       headers: {
@@ -33,7 +33,7 @@ const fetchImageAsBlob = async (relativePath) => {
       },
       credentials: 'include',
     });
-    
+
     if (response.ok) {
       const blob = await response.blob();
       return URL.createObjectURL(blob);
@@ -50,12 +50,12 @@ const Navbar = () => {
   const navigate = useNavigate();
   const [showDropdown, setShowDropdown] = useState(false);
   const [profilePhotoUrl, setProfilePhotoUrl] = useState(null);
-  
+
   useEffect(() => {
     const loadProfilePhoto = async () => {
-      const photoPath = user?.profilePhoto || user?.photoUrl || user?.photo_url 
+      const photoPath = user?.profilePhoto || user?.photoUrl || user?.photo_url
         || user?.ownerProfilePhoto || user?.vetProfilePhoto;
-      
+
       if (photoPath) {
         const blobUrl = await fetchImageAsBlob(photoPath);
         if (blobUrl) {
@@ -63,11 +63,11 @@ const Navbar = () => {
         }
       }
     };
-    
+
     if (user) {
       loadProfilePhoto();
     }
-    
+
     // Cleanup blob URL on unmount
     return () => {
       if (profilePhotoUrl && profilePhotoUrl.startsWith('blob:')) {
@@ -86,10 +86,10 @@ const Navbar = () => {
     <nav className="bg-white shadow-lg sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
-          
+
           {/* Logo and Brand */}
           <div className="flex items-center">
-            <button 
+            <button
               onClick={() => navigate('/dashboard')}
               className="flex items-center space-x-2"
             >
@@ -100,7 +100,7 @@ const Navbar = () => {
 
           {/* Navigation Links */}
           <div className="flex items-center space-x-4">
-            
+
             {/* Dashboard Link */}
             <button
               onClick={() => navigate('/dashboard')}
@@ -108,6 +108,31 @@ const Navbar = () => {
             >
               Dashboard
             </button>
+
+            {/* Pets Link */}
+            <button
+              onClick={() => navigate('/pets')}
+              className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100"
+            >
+              Pets
+            </button>
+
+            {/* Community Link */}
+            <button
+              onClick={() => navigate('/community')}
+              className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100"
+            >
+              Community
+            </button>
+
+            {user?.role !== 'VET' && (
+              <button
+                onClick={() => navigate('/find-vet')}
+                className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100"
+              >
+                Find a Vet
+              </button>
+            )}
 
             {/* Profile Link */}
             <button
@@ -124,7 +149,7 @@ const Navbar = () => {
                 className="flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100"
               >
                 {profilePhotoUrl ? (
-                  <img 
+                  <img
                     src={profilePhotoUrl}
                     alt={user?.name}
                     className="w-8 h-8 rounded-full object-cover"
@@ -150,15 +175,14 @@ const Navbar = () => {
                   <div className="px-4 py-2 border-b border-gray-100">
                     <p className="text-sm font-medium text-gray-900">{user?.name}</p>
                     <p className="text-xs text-gray-500">{user?.email}</p>
-                    <span className={`inline-block mt-1 px-2 py-1 text-xs rounded-full ${
-                      user?.role === 'VET' 
-                        ? 'bg-green-100 text-green-800' 
+                    <span className={`inline-block mt-1 px-2 py-1 text-xs rounded-full ${user?.role === 'VET'
+                        ? 'bg-green-100 text-green-800'
                         : 'bg-blue-100 text-blue-800'
-                    }`}>
+                      }`}>
                       {user?.role === 'VET' ? '🩺 Veterinarian' : '🐕 Pet Owner'}
                     </span>
                   </div>
-                  
+
                   <button
                     onClick={() => {
                       navigate('/profile');
@@ -168,7 +192,7 @@ const Navbar = () => {
                   >
                     👤 My Profile
                   </button>
-                  
+
                   <button
                     onClick={() => {
                       navigate('/dashboard');
@@ -178,9 +202,41 @@ const Navbar = () => {
                   >
                     📊 Dashboard
                   </button>
-                  
+
+                  <button
+                    onClick={() => {
+                      navigate('/pets');
+                      setShowDropdown(false);
+                    }}
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    🐾 Pets
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      navigate('/community');
+                      setShowDropdown(false);
+                    }}
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    🫶 Community
+                  </button>
+
+                  {user?.role !== 'VET' && (
+                    <button
+                      onClick={() => {
+                        navigate('/find-vet');
+                        setShowDropdown(false);
+                      }}
+                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      🩺 Find a Vet
+                    </button>
+                  )}
+
                   <hr className="my-1" />
-                  
+
                   <button
                     onClick={handleLogout}
                     className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"

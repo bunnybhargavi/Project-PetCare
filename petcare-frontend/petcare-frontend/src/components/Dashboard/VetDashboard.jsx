@@ -1,57 +1,104 @@
 import React, { useState, useEffect } from 'react';
-import { 
+import {
   FaStethoscope, FaCalendarAlt, FaUserMd, FaClipboardList,
   FaSyringe, FaPrescriptionBottle, FaSearch, FaTimes,
   FaPhone, FaEnvelope, FaPaw, FaEdit, FaEye,
   FaClock, FaCheckCircle, FaExclamationTriangle, FaPlus,
   FaChartBar, FaBell, FaFileAlt, FaUsers
 } from 'react-icons/fa';
+import { appointmentService } from '../../services/appointmentService';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 import './VetDashboard.css';
 
 // Mock data - replace with actual API calls
-const mockAppointments = [
-  { id: 1, petName: 'Max', ownerName: 'Sarah Johnson', time: '10:00 AM', date: '2024-12-15', type: 'Checkup', status: 'scheduled' },
-  { id: 2, petName: 'Luna', ownerName: 'Mike Brown', time: '11:30 AM', date: '2024-12-15', type: 'Vaccination', status: 'scheduled' },
-  { id: 3, petName: 'Charlie', ownerName: 'Emma Davis', time: '2:00 PM', date: '2024-12-15', type: 'Surgery', status: 'in-progress' },
-];
 
-const mockPatients = [
-  { id: 1, name: 'Max', species: 'Dog', breed: 'Golden Retriever', age: 3, owner: 'Sarah Johnson', lastVisit: '2024-11-20', imageUrl: 'https://images.unsplash.com/photo-1633722715463-d30f4f325e24?w=400' },
-  { id: 2, name: 'Luna', species: 'Cat', breed: 'Persian', age: 2, owner: 'Mike Brown', lastVisit: '2024-11-25', imageUrl: 'https://images.unsplash.com/photo-1574158622682-e40e69881006?w=400' },
-  { id: 3, name: 'Charlie', species: 'Dog', breed: 'Beagle', age: 5, owner: 'Emma Davis', lastVisit: '2024-12-01', imageUrl: 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=400' },
-];
 
 const VetDashboard = () => {
-  const [user] = useState({ name: 'Dr. Emily Parker', specialty: 'Small Animal Medicine', license: 'VET-12345' });
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState('overview');
-  const [appointments, setAppointments] = useState(mockAppointments);
-  const [patients, setPatients] = useState(mockPatients);
-  const [selectedPatient, setSelectedPatient] = useState(null);
-  const [showPatientDetail, setShowPatientDetail] = useState(false);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [stats, setStats] = useState({
-    todayAppointments: 8,
-    totalPatients: 127,
-    pendingRecords: 5,
-    urgentCases: 2
-  });
-
-  const carouselImages = [
-    'https://images.unsplash.com/photo-1628009368231-7bb7cfcb0def?w=1200',
-    'https://images.unsplash.com/photo-1576201836106-db1758fd1c97?w=1200',
-    'https://images.unsplash.com/photo-1530041539828-114de669390e?w=1200',
-  ];
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentImageIndex((prev) => (prev + 1) % carouselImages.length);
-    }, 5000);
-    return () => clearInterval(timer);
-  }, []);
+    if (!user) navigate('/login');
+  }, [user, navigate]);
+  const [appointments, setAppointments] = useState([]);
+  const [patients, setPatients] = useState([]);
+  const [selectedPatient, setSelectedPatient] = useState(null);
+  const [showPatientDetail, setShowPatientDetail] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  const [stats, setStats] = useState({
+    todayAppointments: 0,
+    totalPatients: 0,
+    pendingRecords: 0,
+    urgentCases: 0
+  });
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const vetId = user?.vetId || user?.userId || user?.id;
+      if (!vetId) return;
+      try {
+        const data = await appointmentService.getVetAppointments(vetId);
+
+        // Map Appointment Data
+        const mappedAppointments = data.map(apt => ({
+          id: apt.id,
+          petName: apt.pet?.name || 'Unknown Pet',
+          ownerName: apt.pet?.owner?.user?.name || 'Unknown Owner',
+          time: new Date(apt.appointmentDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          date: new Date(apt.appointmentDate).toLocaleDateString(),
+          type: apt.type,
+          status: apt.status?.toLowerCase() || 'pending',
+          rawDate: apt.appointmentDate
+        }));
+        setAppointments(mappedAppointments);
+
+        // Derive Unique Patients
+        const uniquePatientsMap = new Map();
+        data.forEach(apt => {
+          if (apt.pet && !uniquePatientsMap.has(apt.pet.id)) {
+            uniquePatientsMap.set(apt.pet.id, {
+              id: apt.pet.id,
+              name: apt.pet.name,
+              species: apt.pet.species || 'Unknown',
+              breed: apt.pet.breed || 'Unknown',
+              age: apt.pet.age || 0,
+              owner: apt.pet.owner?.user?.name || 'Unknown',
+              lastVisit: new Date(apt.appointmentDate).toLocaleDateString(),
+              imageUrl: apt.pet.photoUrl
+            });
+          }
+        });
+        const derivedPatients = Array.from(uniquePatientsMap.values());
+        setPatients(derivedPatients);
+
+        // Update Stats
+        const today = new Date().toLocaleDateString();
+        setStats({
+          todayAppointments: mappedAppointments.filter(a => a.date === today).length,
+          totalPatients: derivedPatients.length,
+          pendingRecords: 0,
+          urgentCases: 0
+        });
+
+      } catch (error) {
+        console.error("Error fetching vet dashboard data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (user) {
+      fetchData();
+    }
+  }, [user]);
 
   const menuItems = [
     { id: 'overview', icon: FaStethoscope, label: 'Overview', emoji: '🏥' },
     { id: 'appointments', icon: FaCalendarAlt, label: 'Appointments', emoji: '📅' },
+    { id: 'availability', icon: FaClock, label: 'Availability', emoji: '⏰' },
     { id: 'patients', icon: FaPaw, label: 'Patients', emoji: '🐾' },
     { id: 'records', icon: FaClipboardList, label: 'Records', emoji: '📋' },
     { id: 'prescriptions', icon: FaPrescriptionBottle, label: 'Prescriptions', emoji: '💊' },
@@ -68,26 +115,16 @@ const VetDashboard = () => {
 
   return (
     <div className="vet-dashboard-container">
-      {/* Hero Section */}
-      <div className="vet-hero-section">
-        <div 
-          className="vet-hero-background"
-          style={{ backgroundImage: `url(${carouselImages[currentImageIndex]})` }}
-        />
-        <div className="vet-hero-overlay" />
-        
-        <div className="floating-element" style={{ top: '15%', right: '10%' }}>🩺</div>
-        <div className="floating-element" style={{ bottom: '25%', left: '8%', animationDelay: '2s' }}>💉</div>
-        <div className="floating-element" style={{ top: '40%', right: '5%', animationDelay: '1s' }}>🐾</div>
-        
-        <div className="vet-hero-content">
+      {/* Hero Section - Simplified */}
+      <div className="vet-hero-section" style={{ minHeight: '200px', backgroundImage: 'linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)' }}>
+        <div className="vet-hero-content" style={{ marginTop: '0', paddingTop: '40px' }}>
           <h1 className="vet-hero-title">
             Welcome, {user?.name}! 🩺
           </h1>
           <p className="vet-hero-subtitle">
-            Providing exceptional care, one paw at a time 💙
+            Manage your appointments and patients efficiently.
           </p>
-          
+
           <div className="vet-hero-buttons">
             <button onClick={() => setActiveSection('appointments')} className="vet-primary-btn">
               <FaCalendarAlt /> View Appointments
@@ -96,15 +133,6 @@ const VetDashboard = () => {
               <FaPaw /> Patient Records
             </button>
           </div>
-        </div>
-
-        <div className="vet-indicators">
-          {carouselImages.map((_, index) => (
-            <div
-              key={index}
-              className={`vet-dot ${currentImageIndex === index ? 'vet-dot-active' : ''}`}
-            />
-          ))}
         </div>
       </div>
 
@@ -148,17 +176,18 @@ const VetDashboard = () => {
         {/* Content Sections */}
         <div className="vet-content-section">
           {activeSection === 'overview' && (
-            <OverviewSection 
-              appointments={appointments} 
-              patients={patients} 
+            <OverviewSection
+              appointments={appointments}
+              patients={patients}
               setActiveSection={setActiveSection}
             />
           )}
           {activeSection === 'appointments' && (
             <AppointmentsSection appointments={appointments} />
           )}
+          {activeSection === 'availability' && <AvailabilitySection user={user} />}
           {activeSection === 'patients' && (
-            <PatientsSection 
+            <PatientsSection
               patients={patients}
               setSelectedPatient={setSelectedPatient}
               setShowPatientDetail={setShowPatientDetail}
@@ -173,8 +202,8 @@ const VetDashboard = () => {
 
       {/* Modals */}
       {showPatientDetail && selectedPatient && (
-        <PatientDetailModal 
-          patient={selectedPatient} 
+        <PatientDetailModal
+          patient={selectedPatient}
           onClose={() => {
             setShowPatientDetail(false);
             setSelectedPatient(null);
@@ -187,7 +216,8 @@ const VetDashboard = () => {
 
 // Overview Section
 const OverviewSection = ({ appointments, patients, setActiveSection }) => {
-  const todayAppointments = appointments.filter(apt => apt.date === '2024-12-15');
+  const today = new Date().toLocaleDateString();
+  const todayAppointments = appointments.filter(apt => apt.date === today);
   const recentPatients = patients.slice(0, 3);
 
   const quickActions = [
@@ -247,8 +277,8 @@ const AppointmentsSection = ({ appointments }) => {
   const [searchTerm, setSearchTerm] = useState('');
 
   const filteredAppointments = appointments.filter(apt => {
-    const matchesSearch = apt.petName.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                         apt.ownerName.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = apt.petName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      apt.ownerName.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesFilter = filterStatus === 'all' || apt.status === filterStatus;
     return matchesSearch && matchesFilter;
   });
@@ -297,7 +327,7 @@ const AppointmentsSection = ({ appointments }) => {
 // Appointment Card
 const AppointmentCard = ({ appointment, compact = false }) => {
   const getStatusColor = (status) => {
-    switch(status) {
+    switch (status) {
       case 'scheduled': return '#4CAF50';
       case 'in-progress': return '#FF9800';
       case 'completed': return '#2196F3';
@@ -306,7 +336,7 @@ const AppointmentCard = ({ appointment, compact = false }) => {
   };
 
   const getStatusIcon = (status) => {
-    switch(status) {
+    switch (status) {
       case 'scheduled': return <FaClock />;
       case 'in-progress': return <FaExclamationTriangle />;
       case 'completed': return <FaCheckCircle />;
@@ -348,7 +378,7 @@ const PatientsSection = ({ patients, setSelectedPatient, setShowPatientDetail })
 
   const filteredPatients = patients.filter(patient => {
     const matchesSearch = patient.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         patient.owner.toLowerCase().includes(searchTerm.toLowerCase());
+      patient.owner.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesFilter = filterSpecies === 'all' || patient.species === filterSpecies;
     return matchesSearch && matchesFilter;
   });
@@ -387,8 +417,8 @@ const PatientsSection = ({ patients, setSelectedPatient, setShowPatientDetail })
 
       <div className="vet-card-grid">
         {filteredPatients.map((patient) => (
-          <PatientCard 
-            key={patient.id} 
+          <PatientCard
+            key={patient.id}
             patient={patient}
             onClick={() => {
               setSelectedPatient(patient);
@@ -432,22 +462,26 @@ const ComingSoonSection = ({ icon, title }) => (
 );
 
 // Profile Section
-const ProfileSection = ({ user }) => (
-  <div className="vet-profile-section">
-    <div className="vet-profile-card">
-      <div className="vet-profile-avatar">
-        <FaUserMd />
-      </div>
-      <h2>{user.name}</h2>
-      <p className="vet-profile-specialty">{user.specialty}</p>
-      <p className="vet-profile-license">License: {user.license}</p>
-      <div className="vet-profile-actions">
-        <button className="vet-primary-btn">Edit Profile</button>
-        <button className="vet-secondary-btn">View Schedule</button>
+const ProfileSection = ({ user }) => {
+  if (!user) return null;
+  return (
+    <div className="vet-profile-section">
+      <div className="vet-profile-card">
+        <div className="vet-profile-avatar">
+          <FaUserMd />
+        </div>
+        <h2>{user.name}</h2>
+        <p className="vet-profile-email" style={{ color: '#666', marginBottom: '0.5rem' }}>{user.email}</p>
+        <p className="vet-profile-specialty">{user.specialty}</p>
+        <p className="vet-profile-license">License: {user.license}</p>
+        <div className="vet-profile-actions">
+          <button className="vet-primary-btn">Edit Profile</button>
+          <button className="vet-secondary-btn">View Schedule</button>
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 // Patient Detail Modal
 const PatientDetailModal = ({ patient, onClose }) => {
@@ -462,19 +496,19 @@ const PatientDetailModal = ({ patient, onClose }) => {
         </div>
 
         <div className="vet-modal-tabs">
-          <button 
+          <button
             className={`vet-tab ${activeTab === 'info' ? 'vet-tab-active' : ''}`}
             onClick={() => setActiveTab('info')}
           >
             Information
           </button>
-          <button 
+          <button
             className={`vet-tab ${activeTab === 'medical' ? 'vet-tab-active' : ''}`}
             onClick={() => setActiveTab('medical')}
           >
             Medical History
           </button>
-          <button 
+          <button
             className={`vet-tab ${activeTab === 'prescriptions' ? 'vet-tab-active' : ''}`}
             onClick={() => setActiveTab('prescriptions')}
           >
@@ -522,6 +556,67 @@ const PatientDetailModal = ({ patient, onClose }) => {
               <p>Prescription records will be displayed here...</p>
             </div>
           )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const AvailabilitySection = ({ user }) => {
+  const [startTime, setStartTime] = useState('');
+  const [endTime, setEndTime] = useState('');
+  const [type, setType] = useState('BOTH');
+  const [loading, setLoading] = useState(false);
+
+  const vetId = user?.vetId || user?.userId || user?.id || 1;
+
+  const handleCreate = async () => {
+    if (!startTime || !endTime) return alert("Select times");
+    setLoading(true);
+    try {
+      const start = new Date(startTime);
+      const end = new Date(endTime);
+      await appointmentService.createSlot({
+        vetId,
+        startTime: start.toISOString(),
+        endTime: end.toISOString(),
+        supportedType: type
+      });
+      alert('Slot created successfully!');
+      setStartTime(''); setEndTime('');
+    } catch (e) { alert('Error: ' + (e.response?.data?.message || e.message)); }
+    setLoading(false);
+  }
+
+  return (
+    <div className="vet-content-section">
+      <div className="vet-section-header">
+        <h2>Manage Availability ⏰</h2>
+      </div>
+      <div className="vet-card-grid" style={{ gridTemplateColumns: '1fr' }}>
+        <div className="vet-action-card p-4" style={{ cursor: 'default' }}>
+          <h3 className="mb-4 font-bold">Add New Slot</h3>
+          <div className="flex gap-4 items-end flex-wrap">
+            <div>
+              <label className="block text-sm mb-1 font-semibold">Start Time</label>
+              <input type="datetime-local" className="border p-2 rounded w-full" value={startTime} onChange={e => setStartTime(e.target.value)} />
+            </div>
+            <div>
+              <label className="block text-sm mb-1 font-semibold">End Time</label>
+              <input type="datetime-local" className="border p-2 rounded w-full" value={endTime} onChange={e => setEndTime(e.target.value)} />
+            </div>
+            <div>
+              <label className="block text-sm mb-1 font-semibold">Type</label>
+              <select className="border p-2 rounded w-full" value={type} onChange={e => setType(e.target.value)}>
+                <option value="BOTH">Video & Clinic</option>
+                <option value="VIDEO">Video Only</option>
+                <option value="IN_CLINIC">Clinic Only</option>
+              </select>
+            </div>
+            <button onClick={handleCreate} disabled={loading} className="vet-primary-btn" style={{ height: '42px', marginTop: 'auto' }}>
+              {loading ? 'Adding...' : 'Add Slot'}
+            </button>
+          </div>
         </div>
       </div>
     </div>

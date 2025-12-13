@@ -7,7 +7,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,11 +28,13 @@ public class MedicalRecordService {
     private final MedicalRecordRepository medicalRecordRepository;
     private final PetRepository petRepository;
 
+    private static final String ATTACHMENTS_DIR = "uploads/medical-records/";
+
     /**
      * Get all medical records for a pet
      */
     public List<MedicalRecordResponse> getPetMedicalRecords(Long petId) {
-        Pet pet = petRepository.findById(petId)
+        petRepository.findById(petId)
                 .orElseThrow(() -> new RuntimeException("Pet not found"));
 
         List<MedicalRecord> records = medicalRecordRepository
@@ -95,6 +102,42 @@ public class MedicalRecordService {
         log.info("Medical record added for pet: {}", pet.getName());
 
         return mapToResponse(record);
+    }
+
+    /**
+     * Upload or replace an attachment for a medical record.
+     */
+    @Transactional
+    public MedicalRecordResponse uploadAttachment(Long recordId, MultipartFile file) {
+        MedicalRecord record = medicalRecordRepository.findById(recordId)
+                .orElseThrow(() -> new RuntimeException("Medical record not found"));
+
+        try {
+            Path uploadPath = Paths.get(ATTACHMENTS_DIR);
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
+            }
+
+            String originalFilename = file.getOriginalFilename();
+            String extension = "";
+            if (originalFilename != null && originalFilename.contains(".")) {
+                extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+            }
+
+            String filename = "record-" + recordId + "-" + System.currentTimeMillis() + extension;
+            Path filePath = uploadPath.resolve(filename);
+            Files.copy(file.getInputStream(), filePath);
+
+            String publicUrl = "/uploads/medical-records/" + filename;
+            record.setAttachmentUrl(publicUrl);
+            medicalRecordRepository.save(record);
+
+            log.info("Attachment uploaded for medical record {}: {}", recordId, publicUrl);
+            return mapToResponse(record);
+        } catch (IOException e) {
+            log.error("Failed to upload attachment for record {}", recordId, e);
+            throw new RuntimeException("Failed to upload attachment");
+        }
     }
 
     /**
