@@ -1,5 +1,7 @@
 package com.pets.petcare.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,10 +26,12 @@ public class Appointment {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pet_id", nullable = false)
+    @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler", "appointments", "medicalRecords", "vaccinations", "healthMeasurements", "reminders" })
     private Pet pet;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "veterinarian_id", nullable = false)
+    @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler", "appointments", "user" })
     private Veterinarian veterinarian;
 
     // Optional link to the original slot
@@ -36,6 +40,7 @@ public class Appointment {
     private AppointmentSlot slot;
 
     @Column(nullable = false)
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime appointmentDate; // Represents Start Time
 
     private Integer durationMinutes = 30;

@@ -1,5 +1,6 @@
 package com.pets.petcare.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -20,6 +21,7 @@ public class Veterinarian {
   // One-to-One relationship with User
   @OneToOne
   @JoinColumn(name = "user_id", nullable = false, unique = true)
+  @JsonManagedReference
   private User user;
 
   // Veterinarian specific fields

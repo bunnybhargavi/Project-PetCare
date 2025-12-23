@@ -35,8 +35,8 @@ const PetCard = ({ pet, onSelect, onEdit, onDelete }) => {
       style={{
         background: 'rgba(255, 255, 255, 0.9)',
         boxShadow: isHovered
-          ? '0 15px 35px rgba(255, 179, 217, 0.25)'
-          : '0 4px 20px rgba(255, 179, 217, 0.15)'
+          ? '0 15px 35px rgba(0, 0, 0, 0.15)'
+          : '0 4px 20px rgba(0, 0, 0, 0.08)'
       }}
     >
       {/* Paw Print Decoration */}
@@ -48,36 +48,33 @@ const PetCard = ({ pet, onSelect, onEdit, onDelete }) => {
       </div>
 
       {/* Pet Image */}
-      <div className="relative h-56 overflow-hidden" style={{
-        background: 'linear-gradient(135deg, #FFD4C3 0%, #FFB3D9 50%, #E0BBE4 100%)'
-      }}>
+      <div className="relative h-56 overflow-hidden bg-gray-100">
         {pet.photo ? (
           <img
             src={`http://localhost:8080${pet.photo}`}
             alt={pet.name}
             className="w-full h-full object-cover transition-transform duration-500"
             style={{
-              transform: isHovered ? 'scale(1.1) rotate(2deg)' : 'scale(1)',
-              mixBlendMode: 'multiply'
+              transform: isHovered ? 'scale(1.1) rotate(2deg)' : 'scale(1)'
             }}
             onError={(e) => {
               e.target.style.display = 'none';
             }}
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center">
+          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50">
             <div className="text-8xl animate-bounce-gentle">
               {getSpeciesEmoji(pet.species)}
             </div>
           </div>
         )}
 
-        {/* Gradient Overlay */}
+        {/* Subtle Gradient Overlay for text readability */}
         <div
           className="absolute inset-0 transition-opacity duration-300"
           style={{
-            background: 'linear-gradient(to top, rgba(255, 179, 217, 0.8) 0%, transparent 50%)',
-            opacity: isHovered ? 1 : 0.3
+            background: 'linear-gradient(to top, rgba(0, 0, 0, 0.1) 0%, transparent 50%)',
+            opacity: isHovered ? 0.2 : 0
           }}
         />
 
@@ -203,7 +200,7 @@ const PetCard = ({ pet, onSelect, onEdit, onDelete }) => {
         <div
           className="mt-5 h-1.5 rounded-full transition-all duration-500"
           style={{
-            background: 'linear-gradient(90deg, #FFD4C3 0%, #FFB3D9 50%, #E0BBE4 100%)',
+            background: 'linear-gradient(90deg, #60A5FA 0%, #34D399 50%, #A78BFA 100%)',
             width: isHovered ? '100%' : '0%'
           }}
         />
@@ -213,10 +210,10 @@ const PetCard = ({ pet, onSelect, onEdit, onDelete }) => {
           <div
             className="absolute -top-3 -right-3 animate-bounce-gentle"
             style={{
-              background: 'linear-gradient(135deg, #FFB3D9 0%, #E0BBE4 100%)',
+              background: 'linear-gradient(135deg, #EF4444 0%, #F97316 100%)',
               padding: '8px',
               borderRadius: '50%',
-              boxShadow: '0 4px 15px rgba(255, 179, 217, 0.5)'
+              boxShadow: '0 4px 15px rgba(239, 68, 68, 0.3)'
             }}
           >
             <Heart className="text-white" size={20} fill="white" />

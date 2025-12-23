@@ -109,13 +109,15 @@ const Navbar = () => {
               Dashboard
             </button>
 
-            {/* Pets Link */}
-            <button
-              onClick={() => navigate('/pets')}
-              className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100"
-            >
-              Pets
-            </button>
+            {/* Pets Link - Only show for non-VET users */}
+            {user?.role !== 'VET' && (
+              <button
+                onClick={() => navigate('/pets')}
+                className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100"
+              >
+                Pets
+              </button>
+            )}
 
             {/* Community Link */}
             <button
@@ -133,6 +135,20 @@ const Navbar = () => {
                 Find a Vet
               </button>
             )}
+
+
+
+            {/* My Orders Link */}
+            {user?.role !== 'VET' && (
+              <button
+                onClick={() => navigate('/orders')}
+                className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100"
+              >
+                My Orders
+              </button>
+            )}
+
+
 
             {/* Profile Link */}
             <button
@@ -203,15 +219,17 @@ const Navbar = () => {
                     📊 Dashboard
                   </button>
 
-                  <button
-                    onClick={() => {
-                      navigate('/pets');
-                      setShowDropdown(false);
-                    }}
-                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  >
-                    🐾 Pets
-                  </button>
+                  {user?.role !== 'VET' && (
+                    <button
+                      onClick={() => {
+                        navigate('/pets');
+                        setShowDropdown(false);
+                      }}
+                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      🐾 Pets
+                    </button>
+                  )}
 
                   <button
                     onClick={() => {

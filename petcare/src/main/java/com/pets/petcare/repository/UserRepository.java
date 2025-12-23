@@ -50,4 +50,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
      * }
      */
     boolean existsByEmail(String email);
+    
+    /**
+     * Count users by role
+     */
+    long countByRole(User.Role role);
 }

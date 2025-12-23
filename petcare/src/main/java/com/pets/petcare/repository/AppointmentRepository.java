@@ -34,4 +34,24 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     List<Appointment> findUpcomingAppointments(
             @Param("now") LocalDateTime now,
             @Param("futureTime") LocalDateTime futureTime);
+    
+    // Statistics methods for admin dashboard
+    @Query("SELECT COUNT(a) FROM Appointment a WHERE a.appointmentDate > CURRENT_TIMESTAMP AND a.status IN ('PENDING', 'CONFIRMED')")
+    long countUpcomingAppointments();
+    
+    @Query("SELECT COUNT(a) FROM Appointment a WHERE a.status = 'COMPLETED'")
+    long countCompletedAppointments();
+    
+    @Query("SELECT COUNT(a) FROM Appointment a WHERE DATE(a.appointmentDate) = CURRENT_DATE AND a.status IN ('PENDING', 'CONFIRMED')")
+    long countTodayAppointments();
+    
+    // Vet-specific statistics
+    @Query("SELECT COUNT(a) FROM Appointment a WHERE a.veterinarian.id = :vetId AND a.appointmentDate > CURRENT_TIMESTAMP AND a.status IN ('PENDING', 'CONFIRMED')")
+    long countUpcomingAppointmentsByVet(@Param("vetId") Long vetId);
+    
+    @Query("SELECT COUNT(a) FROM Appointment a WHERE a.veterinarian.id = :vetId AND a.status = 'COMPLETED'")
+    long countCompletedAppointmentsByVet(@Param("vetId") Long vetId);
+    
+    @Query("SELECT COUNT(a) FROM Appointment a WHERE a.veterinarian.id = :vetId AND DATE(a.appointmentDate) = CURRENT_DATE AND a.status IN ('PENDING', 'CONFIRMED')")
+    long countTodayAppointmentsByVet(@Param("vetId") Long vetId);
 }

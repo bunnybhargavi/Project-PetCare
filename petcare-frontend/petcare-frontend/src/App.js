@@ -18,6 +18,15 @@ import PetList from './components/Pets/PetList';
 import CommunityPage from './components/Community/CommunityPage';
 import FindVetPage from './components/Vets/FindVetPage';
 
+// Marketplace Components
+import ShopPage from './components/Marketplace/ShopPage';
+import OrdersPage from './components/Marketplace/OrdersPage';
+import VendorDashboard from './components/Marketplace/VendorDashboard';
+import CartPage from './components/Marketplace/CartPage';
+
+// Admin Components
+import AdminPanel from './components/Admin/AdminPanel';
+
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
@@ -77,6 +86,8 @@ const DashboardRoute = () => {
   );
 };
 
+
+
 function App() {
   return (
     <Router>
@@ -123,54 +134,108 @@ function App() {
               }
             />
 
-          {/* Protected Routes */}
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <DashboardRoute />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/pets"
-            element={
-              <ProtectedRoute>
-                <>
-                  <Navbar />
-                  <PetList />
-                </>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/profile"
-            element={
-              <ProtectedRoute>
-                <ProfilePage />
-              </ProtectedRoute>
-            }
-          />
+            {/* Protected Routes */}
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <DashboardRoute />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/pets"
+              element={
+                <ProtectedRoute>
+                  <>
+                    <Navbar />
+                    <PetList />
+                  </>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <ProfilePage />
+                </ProtectedRoute>
+              }
+            />
 
-          {/* Community Route */}
-          <Route
-            path="/community"
-            element={
-              <ProtectedRoute>
-                <CommunityPage />
-              </ProtectedRoute>
-            }
-          />
+            {/* Community Route */}
+            <Route
+              path="/community"
+              element={
+                <ProtectedRoute>
+                  <CommunityPage />
+                </ProtectedRoute>
+              }
+            />
 
-          {/* Find a Vet Route */}
-          <Route
-            path="/find-vet"
-            element={
-              <ProtectedRoute>
-                <FindVetPage />
-              </ProtectedRoute>
-            }
-          />
+            {/* Find a Vet Route */}
+            <Route
+              path="/find-vet"
+              element={
+                <ProtectedRoute>
+                  <FindVetPage />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Marketplace Routes */}
+            <Route
+              path="/shop"
+              element={
+                <ProtectedRoute>
+                  <ShopPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/orders"
+              element={
+                <ProtectedRoute>
+                  <OrdersPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/vendor"
+              element={
+                <ProtectedRoute>
+                  <VendorDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/cart"
+              element={
+                <ProtectedRoute>
+                  <CartPage />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Admin Routes */}
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute>
+                  <AdminPanel />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Vet Dashboard Route */}
+            <Route
+              path="/vet-dashboard"
+              element={
+                <ProtectedRoute>
+                  <VetDashboard />
+                </ProtectedRoute>
+              }
+            />
 
             {/* 404 Route - redirect to landing */}
             <Route path="*" element={<Navigate to="/" />} />

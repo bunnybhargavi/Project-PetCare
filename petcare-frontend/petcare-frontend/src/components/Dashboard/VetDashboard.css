@@ -33,6 +33,55 @@
   box-shadow: 0 10px 30px rgba(44, 95, 124, 0.2);
 }
 
+.vet-hero-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  transition: opacity 1s ease-in-out;
+  z-index: 1;
+}
+
+.vet-hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(30, 58, 138, 0.4) 0%, rgba(59, 130, 246, 0.3) 100%);
+  z-index: 2;
+  backdrop-filter: blur(2px);
+}
+
+.vet-indicators {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+  z-index: 20;
+}
+
+.vet-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.vet-dot-active {
+  background: white;
+  transform: scale(1.3);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
 
 
 

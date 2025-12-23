@@ -37,13 +37,13 @@ const VitalsTab = ({ measurements }) => {
 
   const chartData = measurements
     .slice(0, 12)
-    .reverse()
     .map(m => ({
       date: m.measurementDate,
       value: getBarValue(m),
       id: m.id
     }))
-    .filter(d => d.value !== null && d.value !== 0);
+    .filter(d => d.value !== null && d.value !== 0)
+    .reverse(); // Reverse to show oldest to newest (left to right)
 
   const maxValue = chartData.length > 0 ? Math.max(...chartData.map(d => d.value)) : 0;
   const minValue = chartData.length > 0 ? Math.min(...chartData.map(d => d.value)) : 0;

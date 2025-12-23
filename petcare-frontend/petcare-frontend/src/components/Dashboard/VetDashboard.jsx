@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import {
   FaStethoscope, FaCalendarAlt, FaUserMd, FaClipboardList,
-  FaSyringe, FaPrescriptionBottle, FaSearch, FaTimes,
-  FaPhone, FaEnvelope, FaPaw, FaEdit, FaEye,
+  FaPrescriptionBottle, FaSearch, FaTimes,
+  FaPaw, FaEdit, FaEye,
   FaClock, FaCheckCircle, FaExclamationTriangle, FaPlus,
-  FaChartBar, FaBell, FaFileAlt, FaUsers
+  FaChartBar, FaFileAlt
 } from 'react-icons/fa';
 import { appointmentService } from '../../services/appointmentService';
 import { useNavigate } from 'react-router-dom';
@@ -14,19 +14,40 @@ import './VetDashboard.css';
 // Mock data - replace with actual API calls
 
 
+// Carousel Images - Using more reliable sources
+const vetCarouselImages = [
+  'https://images.unsplash.com/photo-1551601651-2a8555f1a136?w=1200&q=80&auto=format&fit=crop', // Vet with dog
+  'https://images.unsplash.com/photo-1576201836106-db1758fd1c97?w=1200&q=80&auto=format&fit=crop', // Vet clinic
+  'https://images.unsplash.com/photo-1559190394-df5a28aab5c5?w=1200&q=80&auto=format&fit=crop', // Vet examining pet
+  'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=1200&q=80&auto=format&fit=crop', // Modern vet office
+];
+
 const VetDashboard = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState('overview');
-
-  useEffect(() => {
-    if (!user) navigate('/login');
-  }, [user, navigate]);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [appointments, setAppointments] = useState([]);
   const [patients, setPatients] = useState([]);
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [showPatientDetail, setShowPatientDetail] = useState(false);
-  const [loading, setLoading] = useState(true);
+
+  // Carousel timer
+  useEffect(() => {
+    console.log('Carousel initialized with', vetCarouselImages.length, 'images');
+    const timer = setInterval(() => {
+      setCurrentImageIndex((prev) => {
+        const newIndex = (prev + 1) % vetCarouselImages.length;
+        console.log('Carousel changing from image', prev, 'to image', newIndex);
+        return newIndex;
+      });
+    }, 3000); // Faster for testing - 3 seconds
+    return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    if (!user) navigate('/login');
+  }, [user, navigate]);
 
   const [stats, setStats] = useState({
     todayAppointments: 0,
@@ -85,8 +106,6 @@ const VetDashboard = () => {
 
       } catch (error) {
         console.error("Error fetching vet dashboard data:", error);
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -116,7 +135,41 @@ const VetDashboard = () => {
   return (
     <div className="vet-dashboard-container">
       {/* Hero Section - Simplified */}
-      <div className="vet-hero-section" style={{ minHeight: '200px', backgroundImage: 'linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)' }}>
+      <div className="vet-hero-section">
+        {/* Background Carousel */}
+        {vetCarouselImages.map((img, index) => {
+          const isActive = currentImageIndex === index;
+          return (
+            <div
+              key={index}
+              className="vet-hero-background"
+              style={{
+                backgroundImage: `url(${img})`,
+                opacity: isActive ? 1 : 0,
+                transition: 'opacity 1.5s ease-in-out',
+                zIndex: 1
+              }}
+            />
+          );
+        })}
+        {/* Dark Overlay */}
+        <div className="vet-hero-overlay" />
+
+        {/* Indicators */}
+        <div className="vet-indicators">
+          {vetCarouselImages.map((_, index) => (
+            <div
+              key={index}
+              className={`vet-dot ${currentImageIndex === index ? 'vet-dot-active' : ''}`}
+              onClick={() => {
+                console.log('Clicked indicator:', index);
+                setCurrentImageIndex(index);
+              }}
+              style={{ cursor: 'pointer' }}
+            />
+          ))}
+        </div>
+
         <div className="vet-hero-content" style={{ marginTop: '0', paddingTop: '40px' }}>
           <h1 className="vet-hero-title">
             Welcome, {user?.name}! 🩺
@@ -124,6 +177,7 @@ const VetDashboard = () => {
           <p className="vet-hero-subtitle">
             Manage your appointments and patients efficiently.
           </p>
+
 
           <div className="vet-hero-buttons">
             <button onClick={() => setActiveSection('appointments')} className="vet-primary-btn">

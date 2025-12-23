@@ -61,7 +61,7 @@ const PetProfile = ({ pet, onClose, onUpdate }) => {
     { id: 'info', label: 'Info', icon: Heart },
     { id: 'timeline', label: 'Timeline', icon: Calendar },
     { id: 'vitals', label: 'Vitals', icon: Activity },
-    { id: 'documents', label: 'Documents', icon: FileText },
+    { id: 'documents', label: 'Reminders', icon: FileText },
   ];
 
   const getAddButtonConfig = () => {

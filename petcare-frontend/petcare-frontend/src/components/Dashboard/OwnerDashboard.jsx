@@ -9,6 +9,7 @@ import {
   FaShoppingCart,
   FaTimes,
   FaUser,
+  FaTrash,
 } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
@@ -89,20 +90,11 @@ const OwnerDashboard = () => {
         const data = await petService.getAllPets();
         const list = Array.isArray(data) ? data : [];
         setPets(list);
-        if (list.length === 0) {
-          await ensureSampleData();
-          const refreshed = await petService.getAllPets();
-          setPets(Array.isArray(refreshed) ? refreshed : []);
-        }
+
       } catch (err) {
         console.error('Failed to load pets', err);
         setError(err.response?.data?.message || 'Unable to load your pets right now.');
-        try {
-          await ensureSampleData();
-          const refreshed = await petService.getAllPets();
-          setPets(Array.isArray(refreshed) ? refreshed : []);
-          setError('');
-        } catch (_) { }
+
       } finally {
         setLoadingPets(false);
       }
@@ -119,16 +111,26 @@ const OwnerDashboard = () => {
       try {
         let totalReminders = 0;
         let healthAlerts = 0;
+        let totalAppointments = 0;
 
         for (const pet of pets) {
           // Get reminders
           const reminders = await reminderService.getRemindersByPet(pet.id).catch(() => []);
           const today = new Date();
+          today.setHours(0, 0, 0, 0);
           const upcomingReminders = reminders.filter(r => {
-            const reminderDate = new Date(r.reminderDate);
+            const reminderDate = new Date(r.dueDate);
             return reminderDate >= today;
           });
           totalReminders += upcomingReminders.length;
+
+          // Get appointments
+          const appointments = await appointmentService.getPetAppointments(pet.id).catch(() => []);
+          const upcomingAppointments = appointments.filter(a => {
+            const appointmentDate = new Date(a.appointmentDate);
+            return appointmentDate >= today;
+          });
+          totalAppointments += upcomingAppointments.length;
         }
 
         // Count health alerts
@@ -140,7 +142,7 @@ const OwnerDashboard = () => {
           pets: pets.length,
           health: healthAlerts,
           reminders: totalReminders,
-          appointments: 0 // Placeholder for future appointments feature
+          appointments: totalAppointments
         });
       } catch (error) {
         console.error('Failed to fetch nav badges:', error);
@@ -169,38 +171,20 @@ const OwnerDashboard = () => {
     return createdPet;
   };
 
-  const ensureSampleData = async () => {
-    try {
-      const existing = await petService.getAllPets();
-      const hasBuddy = existing.some((p) => (p.name || '').toLowerCase() === 'buddy');
-      const hasLuna = existing.some((p) => (p.name || '').toLowerCase() === 'luna');
-
-      let buddy = existing.find((p) => (p.name || '').toLowerCase() === 'buddy');
-      let luna = existing.find((p) => (p.name || '').toLowerCase() === 'luna');
-
-      if (!hasBuddy) {
-        buddy = await petService.createPet({
-          name: 'Buddy', species: 'Dog', breed: 'Labrador', dateOfBirth: '2020-06-01', gender: 'MALE', microchipId: 'MC123', notes: 'Friendly dog'
-        });
+  const handleDeletePet = async (petId, e) => {
+    e.stopPropagation();
+    if (window.confirm('Are you sure you want to delete this pet?')) {
+      try {
+        await petService.deletePet(petId);
+        setPets((prev) => prev.filter((p) => p.id !== petId));
+      } catch (err) {
+        console.error('Failed to delete pet', err);
+        alert('Failed to delete pet');
       }
-      if (!hasLuna) {
-        luna = await petService.createPet({
-          name: 'Luna', species: 'Cat', breed: 'Siamese', dateOfBirth: '2021-03-15', gender: 'FEMALE', microchipId: 'MC987', notes: 'Calm and curious'
-        });
-      }
-
-      if (buddy) {
-        await medicalRecordService.createRecord(buddy.id, { visitDate: '2024-11-10', recordType: 'CHECKUP', vetName: 'Dr. Smith', diagnosis: 'Healthy', treatment: 'Routine check', prescriptions: '', notes: 'All good' });
-        await healthService.createMeasurement(buddy.id, { measurementDate: '2024-11-01', weight: 26.2, temperature: 38.6, notes: 'Post-checkup weight' });
-      }
-      if (luna) {
-        await medicalRecordService.createRecord(luna.id, { visitDate: '2024-10-05', recordType: 'TREATMENT', vetName: 'Dr. Patel', diagnosis: 'Minor allergy', treatment: 'Antihistamines', prescriptions: 'Cetirizine', notes: 'Monitor for 2 weeks' });
-        await healthService.createMeasurement(luna.id, { measurementDate: '2024-11-15', weight: 4.4, temperature: 38.2, notes: 'Stable' });
-      }
-    } catch (e) {
-      // silent failure; just skip seeding
     }
   };
+
+
 
   const stats = useMemo(() => {
     const healthAlerts = pets.filter((pet) =>
@@ -348,6 +332,7 @@ const OwnerDashboard = () => {
               loading={loadingPets}
               setSelectedPet={setSelectedPet}
               setShowAddPetModal={setShowAddPetModal}
+              onDelete={handleDeletePet}
               styles={styles}
             />
           )}
@@ -424,9 +409,10 @@ const OverviewSection = ({ pets, styles }) => {
 
         // Count upcoming reminders (next 7 days)
         const today = new Date();
+        today.setHours(0, 0, 0, 0);
         const nextWeek = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
         const upcoming = allReminders.filter(r => {
-          const reminderDate = new Date(r.reminderDate);
+          const reminderDate = new Date(r.dueDate);
           return reminderDate >= today && reminderDate <= nextWeek;
         });
 
@@ -575,7 +561,7 @@ const OverviewSection = ({ pets, styles }) => {
   );
 };
 
-const PetsSection = ({ pets, loading, setSelectedPet, setShowAddPetModal, styles }) => {
+const PetsSection = ({ pets, loading, setSelectedPet, setShowAddPetModal, onDelete, styles }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterSpecies, setFilterSpecies] = useState('all');
 
@@ -602,13 +588,12 @@ const PetsSection = ({ pets, loading, setSelectedPet, setShowAddPetModal, styles
 
       <div className="flex gap-4 mb-6 flex-wrap md:flex-nowrap">
         <div className={styles.searchContainer}>
-          <FaSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-pink-300" />
           <input
             type="text"
             placeholder="Search pets... 🔍"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className={`${styles.searchInput} pl-12`}
+            className={styles.searchInput}
           />
         </div>
         <select
@@ -632,7 +617,13 @@ const PetsSection = ({ pets, loading, setSelectedPet, setShowAddPetModal, styles
         <>
           <div className={styles.cardGrid}>
             {filteredPets.map((pet) => (
-              <PetCard key={pet.id} pet={pet} onClick={() => setSelectedPet(pet)} styles={styles} />
+              <PetCard
+                key={pet.id}
+                pet={pet}
+                onClick={() => setSelectedPet(pet)}
+                onDelete={onDelete}
+                styles={styles}
+              />
             ))}
           </div>
 
@@ -647,13 +638,34 @@ const PetsSection = ({ pets, loading, setSelectedPet, setShowAddPetModal, styles
   );
 };
 
-const PetCard = ({ pet, onClick, styles }) => {
+const PetCard = ({ pet, onClick, onDelete, styles }) => {
   const age = pet.age ?? calculateAge(pet.dateOfBirth);
   const displayGender = formatGender(pet.gender);
   const speciesLabel = pet.species || 'Pet';
 
   return (
-    <div className={styles.petCard} onClick={onClick}>
+    <div className={styles.petCard} onClick={onClick} style={{ position: 'relative' }}>
+      {onDelete && (
+        <button
+          onClick={(e) => onDelete(pet.id, e)}
+          style={{
+            position: 'absolute',
+            top: '8px',
+            right: '8px',
+            background: 'rgba(255, 255, 255, 0.9)',
+            border: 'none',
+            borderRadius: '50%',
+            padding: '8px',
+            cursor: 'pointer',
+            zIndex: 10,
+            boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+          }}
+          className="hover:bg-red-50 hover:text-red-600 transition-colors"
+          title="Delete Pet"
+        >
+          <FaTrash size={14} color="#dc2626" />
+        </button>
+      )}
       <div className="h-48 overflow-hidden bg-gray-200">
         {pet.photo ? (
           <img
@@ -884,10 +896,11 @@ const RemindersSection = ({ pets, styles }) => {
         }
 
         const today = new Date();
-        const upcoming = allReminders.filter(r => new Date(r.reminderDate) >= today)
-          .sort((a, b) => new Date(a.reminderDate) - new Date(b.reminderDate));
-        const past = allReminders.filter(r => new Date(r.reminderDate) < today)
-          .sort((a, b) => new Date(b.reminderDate) - new Date(a.reminderDate));
+        today.setHours(0, 0, 0, 0);
+        const upcoming = allReminders.filter(r => new Date(r.dueDate) >= today)
+          .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
+        const past = allReminders.filter(r => new Date(r.dueDate) < today)
+          .sort((a, b) => new Date(b.dueDate) - new Date(a.dueDate));
 
         setReminders({ upcoming, past, loading: false });
       } catch (error) {
@@ -929,12 +942,12 @@ const RemindersSection = ({ pets, styles }) => {
               <div key={idx} className="p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded-xl">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
-                    <p className="font-bold text-gray-800">{reminder.title || reminder.reminderType}</p>
+                    <p className="font-bold text-gray-800">{reminder.title || reminder.type}</p>
                     <p className="text-sm text-gray-600">{reminder.petName}</p>
                     {reminder.description && <p className="text-sm text-gray-700 mt-1">{reminder.description}</p>}
                   </div>
                   <span className="text-xs font-semibold text-yellow-700 bg-yellow-100 px-2 py-1 rounded">
-                    {reminder.reminderDate}
+                    {reminder.dueDate}
                   </span>
                 </div>
               </div>
@@ -954,10 +967,10 @@ const RemindersSection = ({ pets, styles }) => {
               <div key={idx} className="p-4 bg-gray-50 rounded-xl opacity-75">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
-                    <p className="font-semibold text-gray-600">{reminder.title || reminder.reminderType}</p>
+                    <p className="font-semibold text-gray-600">{reminder.title || reminder.type}</p>
                     <p className="text-sm text-gray-500">{reminder.petName}</p>
                   </div>
-                  <span className="text-xs text-gray-400">{reminder.reminderDate}</span>
+                  <span className="text-xs text-gray-400">{reminder.dueDate}</span>
                 </div>
               </div>
             ))}
@@ -974,10 +987,26 @@ const AppointmentBookingModal = ({ pets, onClose, styles }) => {
   const [vets, setVets] = React.useState([]);
   const [selectedPetId, setSelectedPetId] = React.useState(pets[0]?.id || '');
   const [selectedVet, setSelectedVet] = React.useState(null);
+  const [selectedDate, setSelectedDate] = React.useState(() => {
+    // Default to tomorrow
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    return tomorrow.toISOString().split('T')[0];
+  });
   const [slots, setSlots] = React.useState([]);
   const [selectedSlot, setSelectedSlot] = React.useState(null);
   const [reason, setReason] = React.useState('');
   const [loading, setLoading] = React.useState(false);
+
+  // Get minimum date (today)
+  const minDate = new Date().toISOString().split('T')[0];
+
+  // Get maximum date (3 months from now)
+  const maxDate = (() => {
+    const max = new Date();
+    max.setMonth(max.getMonth() + 3);
+    return max.toISOString().split('T')[0];
+  })();
 
   React.useEffect(() => {
     const loadVets = async () => {
@@ -1007,13 +1036,28 @@ const AppointmentBookingModal = ({ pets, onClose, styles }) => {
 
   const handleBook = async () => {
     if (!selectedPetId) return alert("Select a pet");
+    if (!selectedDate) return alert("Select a date");
+
     setLoading(true);
     try {
+      // Combine selected date with slot time, or use default time if no slot
+      let appointmentDateTime;
+      if (selectedSlot && selectedSlot.startTime) {
+        // Use the slot's time but with the selected date
+        const slotTime = new Date(selectedSlot.startTime);
+        const [year, month, day] = selectedDate.split('-');
+        appointmentDateTime = new Date(year, month - 1, day, slotTime.getHours(), slotTime.getMinutes());
+      } else {
+        // Use selected date with default time (10:00 AM)
+        const [year, month, day] = selectedDate.split('-');
+        appointmentDateTime = new Date(year, month - 1, day, 10, 0, 0);
+      }
+
       await appointmentService.bookAppointment({
         petId: selectedPetId,
         slotId: selectedSlot?.id,
         veterinarianId: selectedVet.id,
-        dateTime: new Date().toISOString(),
+        dateTime: appointmentDateTime.toISOString(),
         type: selectedSlot?.supportedType === 'IN_CLINIC' ? 'IN_CLINIC' : 'VIDEO',
         reason
       });
@@ -1064,23 +1108,45 @@ const AppointmentBookingModal = ({ pets, onClose, styles }) => {
         {step === 2 && (
           <div className="space-y-4">
             <button onClick={() => setStep(1)} className="text-sm text-gray-500 mb-2">&larr; Back to Vets</button>
-            <h3 className="font-bold text-lg">Slots for {selectedVet?.clinicName}</h3>
+            <h3 className="font-bold text-lg">Book with {selectedVet?.clinicName}</h3>
 
-            {loading ? <p>Loading slots...</p> : (
-              <div className="grid grid-cols-3 gap-2">
-                {slots.length === 0 && <p className="col-span-3 text-gray-500">No slots available. (Using fallback booking)</p>}
+            {/* Date Picker */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                📅 Select Date
+              </label>
+              <input
+                type="date"
+                value={selectedDate}
+                onChange={(e) => setSelectedDate(e.target.value)}
+                min={minDate}
+                max={maxDate}
+                className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-purple-500 transition-colors"
+              />
+              <p className="text-xs text-gray-500 mt-1">You can book up to 3 months in advance</p>
+            </div>
 
-                {(slots.length > 0 ? slots : [
-                  { id: null, startTime: new Date(new Date().setHours(10, 0, 0, 0)).toISOString(), supportedType: 'VIDEO' }, // Mock
-                ]).map((slot, idx) => (
-                  <div key={slot.id || idx}
-                    onClick={() => setSelectedSlot(slot)}
-                    className={`p-2 border rounded text-center cursor-pointer ${selectedSlot === slot ? 'bg-blue-600 text-white' : 'hover:bg-gray-50'}`}>
-                    {new Date(slot.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  </div>
-                ))}
-              </div>
-            )}
+            {/* Time Slots */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                ⏰ Select Time Slot
+              </label>
+              {loading ? <p>Loading slots...</p> : (
+                <div className="grid grid-cols-3 gap-2">
+                  {slots.length === 0 && <p className="col-span-3 text-gray-500">No slots available. (Using fallback booking)</p>}
+
+                  {(slots.length > 0 ? slots : [
+                    { id: null, startTime: new Date(new Date().setHours(10, 0, 0, 0)).toISOString(), supportedType: 'VIDEO' }, // Mock
+                  ]).map((slot, idx) => (
+                    <div key={slot.id || idx}
+                      onClick={() => setSelectedSlot(slot)}
+                      className={`p-2 border rounded text-center cursor-pointer ${selectedSlot === slot ? 'bg-blue-600 text-white' : 'hover:bg-gray-50'}`}>
+                      {new Date(slot.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
 
             <textarea
               placeholder="Reason for visit..."
@@ -1102,14 +1168,20 @@ const AppointmentBookingModal = ({ pets, onClose, styles }) => {
 const AppointmentsSection = ({ pets, styles }) => {
   const [appointments, setAppointments] = React.useState({ upcoming: [], loading: true });
   const [showBooking, setShowBooking] = React.useState(false);
+  const [refreshTrigger, setRefreshTrigger] = React.useState(0);
 
-  React.useEffect(() => {
-    const fetchAppointments = async () => {
-      try {
-        const allAppointments = [];
-        for (const pet of pets) {
-          // Fetch Real Appointments
-          const realAppts = await appointmentService.getPetAppointments(pet.id).catch(() => []);
+  const fetchAppointments = React.useCallback(async () => {
+    try {
+      const allAppointments = [];
+
+      for (const pet of pets) {
+        // Fetch Real Appointments
+        const realAppts = await appointmentService.getPetAppointments(pet.id).catch((err) => {
+          console.error(`Error fetching appointments for pet ${pet.id}:`, err);
+          return [];
+        });
+
+        if (realAppts && realAppts.length > 0) {
           allAppointments.push(...realAppts.map(a => ({
             type: 'appointment',
             title: 'Vet Visit: ' + (a.type === 'VIDEO' ? 'Teleconsult' : 'In-Clinic'),
@@ -1119,40 +1191,47 @@ const AppointmentsSection = ({ pets, styles }) => {
             status: a.status,
             meetingLink: a.meetingLink
           })));
-
-          // Fetch Vaccinations as well
-          const vaccinations = await vaccinationService.getVaccinationsByPet(pet.id).catch(() => []);
-          vaccinations.forEach(v => {
-            if (v.nextDueDate) {
-              allAppointments.push({
-                type: 'vaccination',
-                title: `${v.vaccineName} - Due`,
-                date: v.nextDueDate,
-                petName: pet.name,
-                petId: pet.id
-              });
-            }
-          });
         }
 
-        const today = new Date();
-        const upcoming = allAppointments
-          .filter(a => new Date(a.date) >= today)
-          .sort((a, b) => new Date(a.date) - new Date(b.date));
-
-        setAppointments({ upcoming, loading: false });
-      } catch (error) {
-        console.error('Failed to fetch appointments:', error);
-        setAppointments({ upcoming: [], loading: false });
+        // Fetch Vaccinations as well
+        const vaccinations = await vaccinationService.getVaccinationsByPet(pet.id).catch(() => []);
+        vaccinations.forEach(v => {
+          if (v.nextDueDate) {
+            allAppointments.push({
+              type: 'vaccination',
+              title: `${v.vaccineName} - Due`,
+              date: v.nextDueDate,
+              petName: pet.name,
+              petId: pet.id
+            });
+          }
+        });
       }
-    };
 
+      // Set today to start of day for comparison
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      // Filter upcoming appointments
+      const upcoming = allAppointments.filter(a => {
+        const appointmentDate = new Date(a.date);
+        return appointmentDate >= today;
+      }).sort((a, b) => new Date(a.date) - new Date(b.date));
+
+      setAppointments({ upcoming, loading: false });
+    } catch (error) {
+      console.error('Failed to fetch appointments:', error);
+      setAppointments({ upcoming: [], loading: false });
+    }
+  }, [pets]);
+
+  React.useEffect(() => {
     if (pets.length > 0) {
       fetchAppointments();
     } else {
       setAppointments({ upcoming: [], loading: false });
     }
-  }, [pets]);
+  }, [pets, refreshTrigger, fetchAppointments]);
 
   if (appointments.loading) {
     return <div className={styles.loadingState}>Loading appointments...</div>;
@@ -1170,7 +1249,7 @@ const AppointmentsSection = ({ pets, styles }) => {
         </button>
       </div>
 
-      {showBooking && <AppointmentBookingModal pets={pets} onClose={() => { setShowBooking(false); window.location.reload(); /* Simple reload for now */ }} styles={styles} />}
+      {showBooking && <AppointmentBookingModal pets={pets} onClose={() => { setShowBooking(false); setRefreshTrigger(prev => prev + 1); }} styles={styles} />}
 
       <div className="bg-white rounded-2xl p-6 shadow-lg">
         <h3 className="text-xl font-bold mb-4 flex items-center gap-2" style={{ color: 'var(--primary-color)' }}>

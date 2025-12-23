@@ -37,7 +37,26 @@ const Login = () => {
       toast.success('OTP sent to your email!');
       setStep(2);
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to send OTP');
+      console.error('Login Error details:', error);
+
+      let errorMessage = 'Failed to send OTP';
+
+      if (error.response && error.response.data) {
+        // Try to get message from response data
+        errorMessage = error.response.data.message || error.response.data.error || errorMessage;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+
+      // Check for "User not found" specifically
+      if (errorMessage && errorMessage.toString().toLowerCase().includes('user not found')) {
+        toast.error('Account not found. Please register first', {
+          duration: 5000,
+          icon: '📝'
+        });
+      } else {
+        toast.error(errorMessage);
+      }
     } finally {
       setLoading(false);
     }

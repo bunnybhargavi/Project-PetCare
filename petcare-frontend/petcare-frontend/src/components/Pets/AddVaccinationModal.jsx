@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, Syringe } from 'lucide-react';
 import { vaccinationService } from '../../services/vaccinationService';
+import { reminderService } from '../../services/reminderService';
 
 const AddVaccinationModal = ({ isOpen, petId, onClose, onAdd }) => {
   const [formData, setFormData] = useState({
@@ -14,11 +15,31 @@ const AddVaccinationModal = ({ isOpen, petId, onClose, onAdd }) => {
   const [saving, setSaving] = useState(false);
 
   if (!isOpen) return null;
-
   const handleSubmit = async () => {
     try {
       setSaving(true);
+
+      // 1. Create the vaccination record
       await vaccinationService.createVaccination(petId, formData);
+
+      // 2. Automatically create a reminder if nextDueDate is set
+      if (formData.nextDueDate) {
+        try {
+          await reminderService.createReminder(petId, {
+            title: `Vaccine Due: ${formData.vaccineName}`,
+            dueDate: formData.nextDueDate,
+            type: 'VACCINATION',
+            isRecurring: false,
+            notes: `Automatic reminder created from vaccination record for ${formData.vaccineName}.`
+          });
+          console.log('Automatic vaccination reminder created');
+        } catch (remindError) {
+          console.error('Failed to create automatic reminder:', remindError);
+          // We don't block the success of the vaccination creation if reminder fails, 
+          // but we log it. 
+        }
+      }
+
       onAdd();
     } catch (error) {
       console.error('Error adding vaccination:', error);

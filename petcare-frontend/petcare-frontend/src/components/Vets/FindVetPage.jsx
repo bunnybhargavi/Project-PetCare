@@ -17,11 +17,40 @@ const FindVetPage = () => {
   const loadAll = async () => {
     setLoading(true);
     try {
+      console.log('Loading vets from API...');
       const data = await vetService.listAll();
-      setVets(data);
+      console.log('Loaded vets data:', data); // Debug log
+      console.log('Data type:', typeof data, 'Is array:', Array.isArray(data));
+      
+      // Ensure data is always an array
+      if (Array.isArray(data)) {
+        setVets(data);
+      } else if (data && Array.isArray(data.data)) {
+        // Handle case where data is wrapped in another object
+        setVets(data.data);
+      } else {
+        console.warn('Unexpected data format:', data);
+        setVets([]);
+      }
     } catch (error) {
       console.error('Failed to load vets:', error);
-      alert('Failed to load veterinarians');
+      console.error('Error details:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status
+      });
+      setVets([]); // Set empty array on error
+      
+      // More detailed error message
+      let errorMsg = 'Failed to load veterinarians';
+      if (error.response?.status === 404) {
+        errorMsg += ': API endpoint not found. Make sure backend is running on port 8080.';
+      } else if (error.message === 'Network Error') {
+        errorMsg += ': Cannot connect to backend. Make sure backend is running on http://localhost:8080';
+      } else {
+        errorMsg += ': ' + (error.response?.data?.message || error.message);
+      }
+      alert(errorMsg);
     } finally {
       setLoading(false);
     }
@@ -37,10 +66,13 @@ const FindVetPage = () => {
       if (searchParams.teleconsultAvailable !== null) params.teleconsultAvailable = searchParams.teleconsultAvailable;
 
       const data = await vetService.search(params);
-      setVets(data);
+      console.log('Search results:', data); // Debug log
+      // Ensure data is always an array
+      setVets(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Search failed:', error);
-      alert('Search failed. Please try again.');
+      setVets([]); // Set empty array on error
+      alert('Search failed: ' + (error.response?.data?.message || error.message));
     } finally {
       setLoading(false);
     }
@@ -55,7 +87,29 @@ const FindVetPage = () => {
     loadAll();
   };
 
-  useEffect(() => { loadAll(); }, []);
+  // Test backend connection
+  const testBackendConnection = async () => {
+    try {
+      const response = await fetch('http://localhost:8080/api/auth/health');
+      const text = await response.text();
+      console.log('Backend health check:', text);
+      return true;
+    } catch (error) {
+      console.error('Backend connection failed:', error);
+      return false;
+    }
+  };
+
+  useEffect(() => { 
+    // Test backend first, then load vets
+    testBackendConnection().then(isConnected => {
+      if (isConnected) {
+        loadAll();
+      } else {
+        alert('Backend is not running. Please start the backend server on port 8080.');
+      }
+    });
+  }, []);
 
   return (
     <>

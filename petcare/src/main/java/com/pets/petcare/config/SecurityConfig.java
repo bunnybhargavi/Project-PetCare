@@ -61,9 +61,12 @@ public class SecurityConfig {
                                                 // PUBLIC ENDPOINTS - No authentication required
                                                 .requestMatchers("/api/auth/**").permitAll() // Login, Register
                                                 .requestMatchers("/api/health").permitAll() // Health check
-                                                .requestMatchers("/uploads/**").permitAll() // Uploaded files (pet
-                                                                                            // photos, etc.)
-
+                                                .requestMatchers("/uploads/**").permitAll() // Uploaded files (pet photos, etc.)
+                                                .requestMatchers("/api/veterinarians/**").permitAll() // Vet search (public)
+                                                
+                                                // MARKETPLACE PUBLIC ENDPOINTS - Product browsing
+                                                .requestMatchers("GET", "/api/products/**").permitAll() // Browse products (public)
+                                                
                                                 // PROTECTED ENDPOINTS - Authentication required
                                                 .anyRequest().authenticated() // Everything else
                                 )

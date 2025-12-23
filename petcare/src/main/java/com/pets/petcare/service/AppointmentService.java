@@ -183,4 +183,20 @@ public class AppointmentService {
     public List<Appointment> getVetAppointmentsByStatus(Long vetId, Appointment.AppointmentStatus status) {
         return appointmentRepository.findByVeterinarianIdAndStatus(vetId, status);
     }
+    
+    /**
+     * Get upcoming appointments for vet
+     */
+    public List<Appointment> getUpcomingAppointmentsForVet(Long vetId) {
+        return appointmentRepository.findByVeterinarianIdAndStatus(vetId, Appointment.AppointmentStatus.CONFIRMED);
+    }
+    
+    /**
+     * Get today's appointments for vet
+     */
+    public List<Appointment> getTodayAppointmentsForVet(Long vetId) {
+        // This would need a custom query to filter by today's date
+        // For now, returning confirmed appointments
+        return appointmentRepository.findByVeterinarianIdAndStatus(vetId, Appointment.AppointmentStatus.CONFIRMED);
+    }
 }

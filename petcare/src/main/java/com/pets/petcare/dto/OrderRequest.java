@@ -1,0 +1,14 @@
+package com.pets.petcare.dto;
+
+import jakarta.validation.constraints.NotBlank;
+import lombok.Data;
+
+@Data
+public class OrderRequest {
+    
+    @NotBlank(message = "Shipping address is required")
+    private String shippingAddress;
+    
+    private String paymentMethod;
+    private String paymentId;
+}
