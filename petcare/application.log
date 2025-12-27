@@ -1,26 +1,26 @@
-2025-12-22T20:03:48.746+05:30  INFO 17004 --- [petcare-backend] [restartedMain] com.pets.petcare.PetcareApplication      : Starting PetcareApplication using Java 17.0.15 with PID 17004 (C:\Users\bharg\Desktop\Project-PetCare\petcare\target\classes started by bharg in C:\Users\bharg\Desktop\Project-PetCare\petcare)
-2025-12-22T20:03:48.759+05:30 DEBUG 17004 --- [petcare-backend] [restartedMain] com.pets.petcare.PetcareApplication      : Running with Spring Boot v3.5.8, Spring v6.2.14
-2025-12-22T20:03:48.761+05:30  INFO 17004 --- [petcare-backend] [restartedMain] com.pets.petcare.PetcareApplication      : No active profile set, falling back to 1 default profile: "default"
-2025-12-22T20:03:48.885+05:30  INFO 17004 --- [petcare-backend] [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
-2025-12-22T20:03:48.889+05:30  INFO 17004 --- [petcare-backend] [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
-2025-12-22T20:03:51.549+05:30  INFO 17004 --- [petcare-backend] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
-2025-12-22T20:03:52.342+05:30  INFO 17004 --- [petcare-backend] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 734 ms. Found 15 JPA repository interfaces.
-2025-12-22T20:03:54.486+05:30  INFO 17004 --- [petcare-backend] [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
-2025-12-22T20:03:54.514+05:30  INFO 17004 --- [petcare-backend] [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
-2025-12-22T20:03:54.515+05:30  INFO 17004 --- [petcare-backend] [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.49]
-2025-12-22T20:03:54.619+05:30  INFO 17004 --- [petcare-backend] [restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
-2025-12-22T20:03:54.623+05:30  INFO 17004 --- [petcare-backend] [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 5732 ms
-2025-12-22T20:03:54.765+05:30 DEBUG 17004 --- [petcare-backend] [restartedMain] c.p.p.security.JwtAuthenticationFilter   : Filter 'jwtAuthenticationFilter' configured for use
-2025-12-22T20:03:55.080+05:30  INFO 17004 --- [petcare-backend] [restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
-2025-12-22T20:03:55.237+05:30  INFO 17004 --- [petcare-backend] [restartedMain] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.36.Final
-2025-12-22T20:03:55.313+05:30  INFO 17004 --- [petcare-backend] [restartedMain] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
-2025-12-22T20:03:56.183+05:30  INFO 17004 --- [petcare-backend] [restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
-2025-12-22T20:03:56.256+05:30  INFO 17004 --- [petcare-backend] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
-2025-12-22T20:03:57.606+05:30  INFO 17004 --- [petcare-backend] [restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@5b5d5a12
-2025-12-22T20:03:57.612+05:30  INFO 17004 --- [petcare-backend] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
-2025-12-22T20:03:57.782+05:30  WARN 17004 --- [petcare-backend] [restartedMain] org.hibernate.orm.deprecation            : HHH90000025: MySQL8Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
-2025-12-22T20:03:57.788+05:30  WARN 17004 --- [petcare-backend] [restartedMain] org.hibernate.orm.deprecation            : HHH90000026: MySQL8Dialect has been deprecated; use org.hibernate.dialect.MySQLDialect instead
-2025-12-22T20:03:57.847+05:30  INFO 17004 --- [petcare-backend] [restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+2025-12-27T10:42:53.747+05:30  INFO 18748 --- [petcare-backend] [restartedMain] com.pets.petcare.PetcareApplication      : Starting PetcareApplication using Java 17.0.15 with PID 18748 (C:\Users\bharg\Desktop\bhargavi-Project-PetCare\petcare\target\classes started by bharg in C:\Users\bharg\Desktop\bhargavi-Project-PetCare\petcare)
+2025-12-27T10:42:53.761+05:30 DEBUG 18748 --- [petcare-backend] [restartedMain] com.pets.petcare.PetcareApplication      : Running with Spring Boot v3.5.8, Spring v6.2.14
+2025-12-27T10:42:53.763+05:30  INFO 18748 --- [petcare-backend] [restartedMain] com.pets.petcare.PetcareApplication      : No active profile set, falling back to 1 default profile: "default"
+2025-12-27T10:42:53.827+05:30  INFO 18748 --- [petcare-backend] [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2025-12-27T10:42:53.827+05:30  INFO 18748 --- [petcare-backend] [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2025-12-27T10:42:54.578+05:30  INFO 18748 --- [petcare-backend] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-12-27T10:42:54.666+05:30  INFO 18748 --- [petcare-backend] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 84 ms. Found 15 JPA repository interfaces.
+2025-12-27T10:42:55.188+05:30  INFO 18748 --- [petcare-backend] [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2025-12-27T10:42:55.204+05:30  INFO 18748 --- [petcare-backend] [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-12-27T10:42:55.205+05:30  INFO 18748 --- [petcare-backend] [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.49]
+2025-12-27T10:42:55.245+05:30  INFO 18748 --- [petcare-backend] [restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-12-27T10:42:55.245+05:30  INFO 18748 --- [petcare-backend] [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1413 ms
+2025-12-27T10:42:55.287+05:30 DEBUG 18748 --- [petcare-backend] [restartedMain] c.p.p.security.JwtAuthenticationFilter   : Filter 'jwtAuthenticationFilter' configured for use
+2025-12-27T10:42:55.398+05:30  INFO 18748 --- [petcare-backend] [restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-12-27T10:42:55.435+05:30  INFO 18748 --- [petcare-backend] [restartedMain] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.36.Final
+2025-12-27T10:42:55.468+05:30  INFO 18748 --- [petcare-backend] [restartedMain] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-12-27T10:42:55.715+05:30  INFO 18748 --- [petcare-backend] [restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-12-27T10:42:55.738+05:30  INFO 18748 --- [petcare-backend] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-12-27T10:42:56.047+05:30  INFO 18748 --- [petcare-backend] [restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@3a92dca2
+2025-12-27T10:42:56.047+05:30  INFO 18748 --- [petcare-backend] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-12-27T10:42:56.102+05:30  WARN 18748 --- [petcare-backend] [restartedMain] org.hibernate.orm.deprecation            : HHH90000025: MySQL8Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-12-27T10:42:56.102+05:30  WARN 18748 --- [petcare-backend] [restartedMain] org.hibernate.orm.deprecation            : HHH90000026: MySQL8Dialect has been deprecated; use org.hibernate.dialect.MySQLDialect instead
+2025-12-27T10:42:56.119+05:30  INFO 18748 --- [petcare-backend] [restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
 	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
 	Database driver: undefined/unknown
 	Database version: 8.0
@@ -28,52 +28,73 @@
 	Isolation level: undefined/unknown
 	Minimum pool size: undefined/unknown
 	Maximum pool size: undefined/unknown
-2025-12-22T20:04:01.095+05:30  INFO 17004 --- [petcare-backend] [restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
-2025-12-22T20:04:01.756+05:30  INFO 17004 --- [petcare-backend] [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
-2025-12-22T20:04:05.043+05:30  INFO 17004 --- [petcare-backend] [restartedMain] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
-2025-12-22T20:04:08.519+05:30  WARN 17004 --- [petcare-backend] [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
-2025-12-22T20:04:09.047+05:30  WARN 17004 --- [petcare-backend] [restartedMain] .s.s.UserDetailsServiceAutoConfiguration : 
+2025-12-27T10:42:57.083+05:30  INFO 18748 --- [petcare-backend] [restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-12-27T10:42:57.263+05:30  INFO 18748 --- [petcare-backend] [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-12-27T10:42:57.482+05:30  INFO 18748 --- [petcare-backend] [restartedMain] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2025-12-27T10:42:58.859+05:30  WARN 18748 --- [petcare-backend] [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-12-27T10:42:59.072+05:30  WARN 18748 --- [petcare-backend] [restartedMain] .s.s.UserDetailsServiceAutoConfiguration : 
 
-Using generated security password: b739783c-963e-421a-b060-a25e02992818
+Using generated security password: 38eae921-1e49-4e8d-9471-6eb7c01b87d1
 
 This generated password is for development use only. Your security configuration must be updated before running your application in production.
 
-2025-12-22T20:04:09.063+05:30  INFO 17004 --- [petcare-backend] [restartedMain] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
-2025-12-22T20:04:09.239+05:30  WARN 17004 --- [petcare-backend] [restartedMain] thorizationManagerRequestMatcherRegistry : One of the patterns in [GET, /api/products/**] is missing a leading slash. This is discouraged; please include the leading slash in all your request matcher patterns. In future versions of Spring Security, leaving out the leading slash will result in an exception.
-2025-12-22T20:04:10.055+05:30  INFO 17004 --- [petcare-backend] [restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
-2025-12-22T20:04:10.193+05:30  INFO 17004 --- [petcare-backend] [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
-2025-12-22T20:04:10.366+05:30  INFO 17004 --- [petcare-backend] [restartedMain] com.pets.petcare.PetcareApplication      : Started PetcareApplication in 22.544 seconds (process running for 23.55)
-2025-12-22T20:04:20.852+05:30  INFO 17004 --- [petcare-backend] [http-nio-8080-exec-3] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
-2025-12-22T20:04:20.856+05:30  INFO 17004 --- [petcare-backend] [http-nio-8080-exec-3] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
-2025-12-22T20:04:20.875+05:30  INFO 17004 --- [petcare-backend] [http-nio-8080-exec-3] o.s.web.servlet.DispatcherServlet        : Completed initialization in 6 ms
-2025-12-22T20:04:21.720+05:30 ERROR 17004 --- [petcare-backend] [http-nio-8080-exec-6] c.p.p.security.JwtAuthenticationFilter   : JWT Authentication failed: JWT expired at 2025-12-22T04:38:45Z. Current time: 2025-12-22T14:34:21Z, a difference of 35736713 milliseconds.  Allowed clock skew: 0 milliseconds.
-2025-12-22T20:04:21.802+05:30 ERROR 17004 --- [petcare-backend] [http-nio-8080-exec-7] c.p.p.security.JwtAuthenticationFilter   : JWT Authentication failed: JWT expired at 2025-12-22T04:38:45Z. Current time: 2025-12-22T14:34:21Z, a difference of 35736801 milliseconds.  Allowed clock skew: 0 milliseconds.
-2025-12-22T20:04:22.179+05:30  INFO 17004 --- [petcare-backend] [File Watcher] rtingClassPathChangeChangedEventListener : Restarting due to 139 class path changes (0 additions, 139 deletions, 0 modifications)
-2025-12-22T20:04:22.215+05:30  INFO 17004 --- [petcare-backend] [Thread-5] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
-2025-12-22T20:04:23.845+05:30  INFO 17004 --- [petcare-backend] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
-2025-12-22T20:04:23.884+05:30  INFO 17004 --- [petcare-backend] [Thread-5] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
-2025-12-22T20:04:23.907+05:30  INFO 17004 --- [petcare-backend] [Thread-5] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
-2025-12-22T20:04:23.964+05:30  INFO 17004 --- [petcare-backend] [Thread-5] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
-2025-12-22T20:04:31.776+05:30  INFO 17004 --- [petcare-backend] [restartedMain] com.pets.petcare.PetcareApplication      : Starting PetcareApplication using Java 17.0.15 with PID 17004 (C:\Users\bharg\Desktop\Project-PetCare\petcare\target\classes started by bharg in C:\Users\bharg\Desktop\Project-PetCare\petcare)
-2025-12-22T20:04:31.777+05:30 DEBUG 17004 --- [petcare-backend] [restartedMain] com.pets.petcare.PetcareApplication      : Running with Spring Boot v3.5.8, Spring v6.2.14
-2025-12-22T20:04:31.777+05:30  INFO 17004 --- [petcare-backend] [restartedMain] com.pets.petcare.PetcareApplication      : No active profile set, falling back to 1 default profile: "default"
-2025-12-22T20:04:32.039+05:30  INFO 17004 --- [petcare-backend] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
-2025-12-22T20:04:32.099+05:30  INFO 17004 --- [petcare-backend] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 58 ms. Found 15 JPA repository interfaces.
-2025-12-22T20:04:32.260+05:30  INFO 17004 --- [petcare-backend] [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
-2025-12-22T20:04:32.263+05:30  INFO 17004 --- [petcare-backend] [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
-2025-12-22T20:04:32.263+05:30  INFO 17004 --- [petcare-backend] [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.49]
-2025-12-22T20:04:32.281+05:30  INFO 17004 --- [petcare-backend] [restartedMain] o.a.c.c.C.[Tomcat-2].[localhost].[/]     : Initializing Spring embedded WebApplicationContext
-2025-12-22T20:04:32.282+05:30  INFO 17004 --- [petcare-backend] [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 502 ms
-2025-12-22T20:04:32.312+05:30 DEBUG 17004 --- [petcare-backend] [restartedMain] c.p.p.security.JwtAuthenticationFilter   : Filter 'jwtAuthenticationFilter' configured for use
-2025-12-22T20:04:32.363+05:30  INFO 17004 --- [petcare-backend] [restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
-2025-12-22T20:04:32.368+05:30  INFO 17004 --- [petcare-backend] [restartedMain] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
-2025-12-22T20:04:32.386+05:30  INFO 17004 --- [petcare-backend] [restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
-2025-12-22T20:04:32.388+05:30  INFO 17004 --- [petcare-backend] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Starting...
-2025-12-22T20:04:32.405+05:30  INFO 17004 --- [petcare-backend] [restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-2 - Added connection com.mysql.cj.jdbc.ConnectionImpl@598ac9a7
-2025-12-22T20:04:32.406+05:30  INFO 17004 --- [petcare-backend] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Start completed.
-2025-12-22T20:04:32.407+05:30  WARN 17004 --- [petcare-backend] [restartedMain] org.hibernate.orm.deprecation            : HHH90000025: MySQL8Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
-2025-12-22T20:04:32.407+05:30  WARN 17004 --- [petcare-backend] [restartedMain] org.hibernate.orm.deprecation            : HHH90000026: MySQL8Dialect has been deprecated; use org.hibernate.dialect.MySQLDialect instead
-2025-12-22T20:04:32.408+05:30  INFO 17004 --- [petcare-backend] [restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+2025-12-27T10:42:59.072+05:30  INFO 18748 --- [petcare-backend] [restartedMain] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+2025-12-27T10:42:59.151+05:30  WARN 18748 --- [petcare-backend] [restartedMain] thorizationManagerRequestMatcherRegistry : One of the patterns in [GET, /api/products/**] is missing a leading slash. This is discouraged; please include the leading slash in all your request matcher patterns. In future versions of Spring Security, leaving out the leading slash will result in an exception.
+2025-12-27T10:42:59.436+05:30  INFO 18748 --- [petcare-backend] [restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
+2025-12-27T10:42:59.457+05:30  INFO 18748 --- [petcare-backend] [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2025-12-27T10:42:59.469+05:30  INFO 18748 --- [petcare-backend] [restartedMain] com.pets.petcare.PetcareApplication      : Started PetcareApplication in 6.106 seconds (process running for 6.431)
+2025-12-27T10:44:07.814+05:30  INFO 18748 --- [petcare-backend] [http-nio-8080-exec-2] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-12-27T10:44:07.814+05:30  INFO 18748 --- [petcare-backend] [http-nio-8080-exec-2] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2025-12-27T10:44:07.814+05:30  INFO 18748 --- [petcare-backend] [http-nio-8080-exec-2] o.s.web.servlet.DispatcherServlet        : Completed initialization in 0 ms
+2025-12-27T10:44:08.242+05:30  INFO 18748 --- [petcare-backend] [http-nio-8080-exec-4] com.pets.petcare.service.EmailService    : Generating OTP for bhargavi123ammu@gmail.com: 431007
+2025-12-27T10:44:14.105+05:30  INFO 18748 --- [petcare-backend] [http-nio-8080-exec-4] com.pets.petcare.service.EmailService    : OTP email sent successfully to: bhargavi123ammu@gmail.com
+2025-12-27T10:44:14.106+05:30  INFO 18748 --- [petcare-backend] [http-nio-8080-exec-4] com.pets.petcare.service.OtpService      : OTP generated and sent to: bhargavi123ammu@gmail.com
+2025-12-27T10:44:40.154+05:30  INFO 18748 --- [petcare-backend] [http-nio-8080-exec-1] com.pets.petcare.service.OtpService      : OTP verified successfully for email: bhargavi123ammu@gmail.com
+2025-12-27T10:44:40.203+05:30  INFO 18748 --- [petcare-backend] [http-nio-8080-exec-1] com.pets.petcare.service.AuthService     : User logged in successfully: bhargavi123ammu@gmail.com
+2025-12-27T10:46:00.874+05:30  INFO 18748 --- [petcare-backend] [http-nio-8080-exec-4] com.pets.petcare.service.PetService      : Pet created: Ramu for owner: bhargavi123ammu@gmail.com
+2025-12-27T10:46:01.013+05:30  INFO 18748 --- [petcare-backend] [http-nio-8080-exec-1] com.pets.petcare.service.PetService      : Photo uploaded for pet: Ramu
+2025-12-27T10:46:31.089+05:30  INFO 18748 --- [petcare-backend] [http-nio-8080-exec-2] com.pets.petcare.service.PetService      : Pet updated: Ramu
+2025-12-27T10:46:31.171+05:30  INFO 18748 --- [petcare-backend] [http-nio-8080-exec-1] c.p.p.service.HealthMeasurementService   : Health measurement added for pet: Ramu
+2025-12-27T10:47:14.288+05:30  INFO 18748 --- [petcare-backend] [http-nio-8080-exec-6] c.p.petcare.service.VaccinationService   : Vaccination added for pet: Ramu
+2025-12-27T10:47:14.328+05:30  INFO 18748 --- [petcare-backend] [http-nio-8080-exec-5] c.pets.petcare.service.ReminderService   : Reminder added for pet: Ramu
+2025-12-27T10:47:40.619+05:30  INFO 18748 --- [petcare-backend] [http-nio-8080-exec-3] com.pets.petcare.service.PetService      : Pet updated: Ramu
+2025-12-27T10:47:40.657+05:30  INFO 18748 --- [petcare-backend] [http-nio-8080-exec-8] c.p.p.service.HealthMeasurementService   : Health measurement added for pet: Ramu
+2025-12-27T10:50:56.280+05:30  INFO 18748 --- [petcare-backend] [http-nio-8080-exec-10] c.p.petcare.controller.OrderController   : Fetching orders for user: bhargavi123ammu@gmail.com
+2025-12-27T10:50:56.280+05:30  INFO 18748 --- [petcare-backend] [http-nio-8080-exec-10] com.pets.petcare.service.OrderService    : Fetching orders for user: bhargavi123ammu@gmail.com
+2025-12-27T10:50:56.306+05:30  INFO 18748 --- [petcare-backend] [http-nio-8080-exec-3] c.p.petcare.controller.OrderController   : Fetching orders for user: bhargavi123ammu@gmail.com
+2025-12-27T10:50:56.308+05:30  INFO 18748 --- [petcare-backend] [http-nio-8080-exec-3] com.pets.petcare.service.OrderService    : Fetching orders for user: bhargavi123ammu@gmail.com
+2025-12-27T10:51:03.767+05:30  WARN 18748 --- [petcare-backend] [http-nio-8080-exec-9] o.h.engine.jdbc.spi.SqlExceptionHelper   : SQL Error: 1364, SQLState: HY000
+2025-12-27T10:51:03.767+05:30 ERROR 18748 --- [petcare-backend] [http-nio-8080-exec-9] o.h.engine.jdbc.spi.SqlExceptionHelper   : Field 'reference_number' doesn't have a default value
+2025-12-27T10:51:03.775+05:30  WARN 18748 --- [petcare-backend] [http-nio-8080-exec-9] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.orm.jpa.JpaSystemException: could not execute statement [Field 'reference_number' doesn't have a default value] [insert into appointments (appointment_date,created_at,duration_minutes,meeting_link,notes,pet_id,prescription,reason,slot_id,status,type,updated_at,veterinarian_id) values (?,?,?,?,?,?,?,?,?,?,?,?,?)]]
+2025-12-27T10:51:26.134+05:30  WARN 18748 --- [petcare-backend] [http-nio-8080-exec-5] o.h.engine.jdbc.spi.SqlExceptionHelper   : SQL Error: 1364, SQLState: HY000
+2025-12-27T10:51:26.134+05:30 ERROR 18748 --- [petcare-backend] [http-nio-8080-exec-5] o.h.engine.jdbc.spi.SqlExceptionHelper   : Field 'reference_number' doesn't have a default value
+2025-12-27T10:51:26.134+05:30  WARN 18748 --- [petcare-backend] [http-nio-8080-exec-5] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.orm.jpa.JpaSystemException: could not execute statement [Field 'reference_number' doesn't have a default value] [insert into appointments (appointment_date,created_at,duration_minutes,meeting_link,notes,pet_id,prescription,reason,slot_id,status,type,updated_at,veterinarian_id) values (?,?,?,?,?,?,?,?,?,?,?,?,?)]]
+2025-12-27T10:52:40.133+05:30  INFO 18748 --- [petcare-backend] [File Watcher] rtingClassPathChangeChangedEventListener : Restarting due to 1 class path change (0 additions, 0 deletions, 1 modification)
+2025-12-27T10:52:40.141+05:30  INFO 18748 --- [petcare-backend] [Thread-5] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2025-12-27T10:52:40.387+05:30  INFO 18748 --- [petcare-backend] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2025-12-27T10:52:40.399+05:30  INFO 18748 --- [petcare-backend] [Thread-5] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-12-27T10:52:40.409+05:30  INFO 18748 --- [petcare-backend] [Thread-5] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2025-12-27T10:52:40.413+05:30  INFO 18748 --- [petcare-backend] [Thread-5] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2025-12-27T10:52:40.519+05:30  INFO 18748 --- [petcare-backend] [restartedMain] com.pets.petcare.PetcareApplication      : Starting PetcareApplication using Java 17.0.15 with PID 18748 (C:\Users\bharg\Desktop\bhargavi-Project-PetCare\petcare\target\classes started by bharg in C:\Users\bharg\Desktop\bhargavi-Project-PetCare\petcare)
+2025-12-27T10:52:40.519+05:30 DEBUG 18748 --- [petcare-backend] [restartedMain] com.pets.petcare.PetcareApplication      : Running with Spring Boot v3.5.8, Spring v6.2.14
+2025-12-27T10:52:40.519+05:30  INFO 18748 --- [petcare-backend] [restartedMain] com.pets.petcare.PetcareApplication      : No active profile set, falling back to 1 default profile: "default"
+2025-12-27T10:52:40.901+05:30  INFO 18748 --- [petcare-backend] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-12-27T10:52:41.002+05:30  INFO 18748 --- [petcare-backend] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 96 ms. Found 15 JPA repository interfaces.
+2025-12-27T10:52:41.177+05:30  INFO 18748 --- [petcare-backend] [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2025-12-27T10:52:41.177+05:30  INFO 18748 --- [petcare-backend] [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-12-27T10:52:41.187+05:30  INFO 18748 --- [petcare-backend] [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.49]
+2025-12-27T10:52:41.204+05:30  INFO 18748 --- [petcare-backend] [restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-12-27T10:52:41.205+05:30  INFO 18748 --- [petcare-backend] [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 686 ms
+2025-12-27T10:52:41.226+05:30 DEBUG 18748 --- [petcare-backend] [restartedMain] c.p.p.security.JwtAuthenticationFilter   : Filter 'jwtAuthenticationFilter' configured for use
+2025-12-27T10:52:41.273+05:30  INFO 18748 --- [petcare-backend] [restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-12-27T10:52:41.273+05:30  INFO 18748 --- [petcare-backend] [restartedMain] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-12-27T10:52:41.306+05:30  INFO 18748 --- [petcare-backend] [restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-12-27T10:52:41.309+05:30  INFO 18748 --- [petcare-backend] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Starting...
+2025-12-27T10:52:41.327+05:30  INFO 18748 --- [petcare-backend] [restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-2 - Added connection com.mysql.cj.jdbc.ConnectionImpl@2326fca3
+2025-12-27T10:52:41.327+05:30  INFO 18748 --- [petcare-backend] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Start completed.
+2025-12-27T10:52:41.332+05:30  WARN 18748 --- [petcare-backend] [restartedMain] org.hibernate.orm.deprecation            : HHH90000025: MySQL8Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-12-27T10:52:41.333+05:30  WARN 18748 --- [petcare-backend] [restartedMain] org.hibernate.orm.deprecation            : HHH90000026: MySQL8Dialect has been deprecated; use org.hibernate.dialect.MySQLDialect instead
+2025-12-27T10:52:41.334+05:30  INFO 18748 --- [petcare-backend] [restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
 	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-2)']
 	Database driver: undefined/unknown
 	Database version: 8.0
@@ -81,55 +102,47 @@ This generated password is for development use only. Your security configuration
 	Isolation level: undefined/unknown
 	Minimum pool size: undefined/unknown
 	Maximum pool size: undefined/unknown
-2025-12-22T20:04:32.652+05:30  INFO 17004 --- [petcare-backend] [restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
-2025-12-22T20:04:32.764+05:30  INFO 17004 --- [petcare-backend] [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
-2025-12-22T20:04:33.870+05:30  WARN 17004 --- [petcare-backend] [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
-2025-12-22T20:04:34.192+05:30  WARN 17004 --- [petcare-backend] [restartedMain] .s.s.UserDetailsServiceAutoConfiguration : 
+2025-12-27T10:52:41.569+05:30  INFO 18748 --- [petcare-backend] [restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-12-27T10:52:41.704+05:30  INFO 18748 --- [petcare-backend] [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-12-27T10:52:42.306+05:30  WARN 18748 --- [petcare-backend] [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-12-27T10:52:42.468+05:30  WARN 18748 --- [petcare-backend] [restartedMain] .s.s.UserDetailsServiceAutoConfiguration : 
 
-Using generated security password: 51ffeed7-39f2-45ba-b742-05cdd1094f30
+Using generated security password: 2e7836c8-2baa-4950-9bde-3a2da1b23cec
 
 This generated password is for development use only. Your security configuration must be updated before running your application in production.
 
-2025-12-22T20:04:34.198+05:30  INFO 17004 --- [petcare-backend] [restartedMain] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
-2025-12-22T20:04:34.236+05:30  WARN 17004 --- [petcare-backend] [restartedMain] thorizationManagerRequestMatcherRegistry : One of the patterns in [GET, /api/products/**] is missing a leading slash. This is discouraged; please include the leading slash in all your request matcher patterns. In future versions of Spring Security, leaving out the leading slash will result in an exception.
-2025-12-22T20:04:34.550+05:30  INFO 17004 --- [petcare-backend] [restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
-2025-12-22T20:04:34.574+05:30  INFO 17004 --- [petcare-backend] [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
-2025-12-22T20:04:34.582+05:30  INFO 17004 --- [petcare-backend] [restartedMain] com.pets.petcare.PetcareApplication      : Started PetcareApplication in 2.831 seconds (process running for 47.767)
-2025-12-22T20:04:34.594+05:30  INFO 17004 --- [petcare-backend] [restartedMain] .ConditionEvaluationDeltaLoggingListener : Condition evaluation unchanged
-2025-12-22T20:04:37.751+05:30  INFO 17004 --- [petcare-backend] [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat-2].[localhost].[/]     : Initializing Spring DispatcherServlet 'dispatcherServlet'
-2025-12-22T20:04:37.752+05:30  INFO 17004 --- [petcare-backend] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
-2025-12-22T20:04:37.754+05:30  INFO 17004 --- [petcare-backend] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 2 ms
-2025-12-22T20:04:38.128+05:30  INFO 17004 --- [petcare-backend] [http-nio-8080-exec-2] com.pets.petcare.service.EmailService    : Generating OTP for bhargaviammu@yopmail.com: 002392
-2025-12-22T20:04:49.801+05:30  INFO 17004 --- [petcare-backend] [http-nio-8080-exec-2] com.pets.petcare.service.EmailService    : OTP email sent successfully to: bhargaviammu@yopmail.com
-2025-12-22T20:04:49.802+05:30  INFO 17004 --- [petcare-backend] [http-nio-8080-exec-2] com.pets.petcare.service.OtpService      : OTP generated and sent to: bhargaviammu@yopmail.com
-2025-12-22T20:05:05.005+05:30  INFO 17004 --- [petcare-backend] [http-nio-8080-exec-4] com.pets.petcare.service.OtpService      : OTP verified successfully for email: bhargaviammu@yopmail.com
-2025-12-22T20:05:05.031+05:30  INFO 17004 --- [petcare-backend] [http-nio-8080-exec-4] com.pets.petcare.service.AuthService     : User logged in successfully: bhargaviammu@yopmail.com
-2025-12-22T20:09:03.713+05:30  INFO 17004 --- [petcare-backend] [File Watcher] rtingClassPathChangeChangedEventListener : Restarting due to 4 class path changes (0 additions, 0 deletions, 4 modifications)
-2025-12-22T20:09:03.716+05:30  INFO 17004 --- [petcare-backend] [Thread-7] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
-2025-12-22T20:09:04.279+05:30  INFO 17004 --- [petcare-backend] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
-2025-12-22T20:09:04.282+05:30  INFO 17004 --- [petcare-backend] [Thread-7] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
-2025-12-22T20:09:04.282+05:30  INFO 17004 --- [petcare-backend] [Thread-7] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Shutdown initiated...
-2025-12-22T20:09:04.289+05:30  INFO 17004 --- [petcare-backend] [Thread-7] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Shutdown completed.
-2025-12-22T20:09:04.389+05:30  INFO 17004 --- [petcare-backend] [restartedMain] com.pets.petcare.PetcareApplication      : Starting PetcareApplication using Java 17.0.15 with PID 17004 (C:\Users\bharg\Desktop\Project-PetCare\petcare\target\classes started by bharg in C:\Users\bharg\Desktop\Project-PetCare\petcare)
-2025-12-22T20:09:04.389+05:30 DEBUG 17004 --- [petcare-backend] [restartedMain] com.pets.petcare.PetcareApplication      : Running with Spring Boot v3.5.8, Spring v6.2.14
-2025-12-22T20:09:04.389+05:30  INFO 17004 --- [petcare-backend] [restartedMain] com.pets.petcare.PetcareApplication      : No active profile set, falling back to 1 default profile: "default"
-2025-12-22T20:09:04.759+05:30  INFO 17004 --- [petcare-backend] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
-2025-12-22T20:09:04.847+05:30  INFO 17004 --- [petcare-backend] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 85 ms. Found 15 JPA repository interfaces.
-2025-12-22T20:09:05.017+05:30  INFO 17004 --- [petcare-backend] [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
-2025-12-22T20:09:05.018+05:30  INFO 17004 --- [petcare-backend] [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
-2025-12-22T20:09:05.019+05:30  INFO 17004 --- [petcare-backend] [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.49]
-2025-12-22T20:09:05.038+05:30  INFO 17004 --- [petcare-backend] [restartedMain] o.a.c.c.C.[Tomcat-2].[localhost].[/]     : Initializing Spring embedded WebApplicationContext
-2025-12-22T20:09:05.038+05:30  INFO 17004 --- [petcare-backend] [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 644 ms
-2025-12-22T20:09:05.072+05:30 DEBUG 17004 --- [petcare-backend] [restartedMain] c.p.p.security.JwtAuthenticationFilter   : Filter 'jwtAuthenticationFilter' configured for use
-2025-12-22T20:09:05.149+05:30  INFO 17004 --- [petcare-backend] [restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
-2025-12-22T20:09:05.153+05:30  INFO 17004 --- [petcare-backend] [restartedMain] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
-2025-12-22T20:09:05.161+05:30  INFO 17004 --- [petcare-backend] [restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
-2025-12-22T20:09:05.162+05:30  INFO 17004 --- [petcare-backend] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-3 - Starting...
-2025-12-22T20:09:05.179+05:30  INFO 17004 --- [petcare-backend] [restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-3 - Added connection com.mysql.cj.jdbc.ConnectionImpl@5dcff1e7
-2025-12-22T20:09:05.179+05:30  INFO 17004 --- [petcare-backend] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-3 - Start completed.
-2025-12-22T20:09:05.179+05:30  WARN 17004 --- [petcare-backend] [restartedMain] org.hibernate.orm.deprecation            : HHH90000025: MySQL8Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
-2025-12-22T20:09:05.180+05:30  WARN 17004 --- [petcare-backend] [restartedMain] org.hibernate.orm.deprecation            : HHH90000026: MySQL8Dialect has been deprecated; use org.hibernate.dialect.MySQLDialect instead
-2025-12-22T20:09:05.180+05:30  INFO 17004 --- [petcare-backend] [restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+2025-12-27T10:52:42.484+05:30  INFO 18748 --- [petcare-backend] [restartedMain] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+2025-12-27T10:52:42.502+05:30  WARN 18748 --- [petcare-backend] [restartedMain] thorizationManagerRequestMatcherRegistry : One of the patterns in [GET, /api/products/**] is missing a leading slash. This is discouraged; please include the leading slash in all your request matcher patterns. In future versions of Spring Security, leaving out the leading slash will result in an exception.
+2025-12-27T10:52:42.656+05:30  INFO 18748 --- [petcare-backend] [restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
+2025-12-27T10:52:42.672+05:30  INFO 18748 --- [petcare-backend] [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2025-12-27T10:52:42.690+05:30  INFO 18748 --- [petcare-backend] [restartedMain] com.pets.petcare.PetcareApplication      : Started PetcareApplication in 2.203 seconds (process running for 589.646)
+2025-12-27T10:52:42.702+05:30  INFO 18748 --- [petcare-backend] [restartedMain] .ConditionEvaluationDeltaLoggingListener : Condition evaluation unchanged
+2025-12-27T10:52:46.289+05:30  INFO 18748 --- [petcare-backend] [File Watcher] rtingClassPathChangeChangedEventListener : Restarting due to 1 class path change (0 additions, 0 deletions, 1 modification)
+2025-12-27T10:52:46.289+05:30  INFO 18748 --- [petcare-backend] [Thread-7] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2025-12-27T10:52:46.534+05:30  INFO 18748 --- [petcare-backend] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2025-12-27T10:52:46.536+05:30  INFO 18748 --- [petcare-backend] [Thread-7] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-12-27T10:52:46.536+05:30  INFO 18748 --- [petcare-backend] [Thread-7] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Shutdown initiated...
+2025-12-27T10:52:46.546+05:30  INFO 18748 --- [petcare-backend] [Thread-7] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Shutdown completed.
+2025-12-27T10:52:46.655+05:30  INFO 18748 --- [petcare-backend] [restartedMain] com.pets.petcare.PetcareApplication      : Starting PetcareApplication using Java 17.0.15 with PID 18748 (C:\Users\bharg\Desktop\bhargavi-Project-PetCare\petcare\target\classes started by bharg in C:\Users\bharg\Desktop\bhargavi-Project-PetCare\petcare)
+2025-12-27T10:52:46.655+05:30 DEBUG 18748 --- [petcare-backend] [restartedMain] com.pets.petcare.PetcareApplication      : Running with Spring Boot v3.5.8, Spring v6.2.14
+2025-12-27T10:52:46.655+05:30  INFO 18748 --- [petcare-backend] [restartedMain] com.pets.petcare.PetcareApplication      : No active profile set, falling back to 1 default profile: "default"
+2025-12-27T10:52:47.084+05:30  INFO 18748 --- [petcare-backend] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-12-27T10:52:47.188+05:30  INFO 18748 --- [petcare-backend] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 115 ms. Found 15 JPA repository interfaces.
+2025-12-27T10:52:47.407+05:30  INFO 18748 --- [petcare-backend] [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2025-12-27T10:52:47.421+05:30  INFO 18748 --- [petcare-backend] [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-12-27T10:52:47.421+05:30  INFO 18748 --- [petcare-backend] [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.49]
+2025-12-27T10:52:47.455+05:30  INFO 18748 --- [petcare-backend] [restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-12-27T10:52:47.456+05:30  INFO 18748 --- [petcare-backend] [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 795 ms
+2025-12-27T10:52:47.486+05:30 DEBUG 18748 --- [petcare-backend] [restartedMain] c.p.p.security.JwtAuthenticationFilter   : Filter 'jwtAuthenticationFilter' configured for use
+2025-12-27T10:52:47.556+05:30  INFO 18748 --- [petcare-backend] [restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-12-27T10:52:47.560+05:30  INFO 18748 --- [petcare-backend] [restartedMain] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-12-27T10:52:47.574+05:30  INFO 18748 --- [petcare-backend] [restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-12-27T10:52:47.576+05:30  INFO 18748 --- [petcare-backend] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-3 - Starting...
+2025-12-27T10:52:47.601+05:30  INFO 18748 --- [petcare-backend] [restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-3 - Added connection com.mysql.cj.jdbc.ConnectionImpl@73b90921
+2025-12-27T10:52:47.601+05:30  INFO 18748 --- [petcare-backend] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-3 - Start completed.
+2025-12-27T10:52:47.602+05:30  WARN 18748 --- [petcare-backend] [restartedMain] org.hibernate.orm.deprecation            : HHH90000025: MySQL8Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-12-27T10:52:47.602+05:30  WARN 18748 --- [petcare-backend] [restartedMain] org.hibernate.orm.deprecation            : HHH90000026: MySQL8Dialect has been deprecated; use org.hibernate.dialect.MySQLDialect instead
+2025-12-27T10:52:47.604+05:30  INFO 18748 --- [petcare-backend] [restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
 	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-3)']
 	Database driver: undefined/unknown
 	Database version: 8.0
@@ -137,27 +150,77 @@ This generated password is for development use only. Your security configuration
 	Isolation level: undefined/unknown
 	Minimum pool size: undefined/unknown
 	Maximum pool size: undefined/unknown
-2025-12-22T20:09:05.439+05:30  INFO 17004 --- [petcare-backend] [restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
-2025-12-22T20:09:05.521+05:30  INFO 17004 --- [petcare-backend] [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
-2025-12-22T20:09:06.396+05:30  WARN 17004 --- [petcare-backend] [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
-2025-12-22T20:09:06.567+05:30  WARN 17004 --- [petcare-backend] [restartedMain] .s.s.UserDetailsServiceAutoConfiguration : 
+2025-12-27T10:52:47.953+05:30  INFO 18748 --- [petcare-backend] [restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-12-27T10:52:48.222+05:30  INFO 18748 --- [petcare-backend] [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-12-27T10:52:49.038+05:30  WARN 18748 --- [petcare-backend] [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-12-27T10:52:49.233+05:30  WARN 18748 --- [petcare-backend] [restartedMain] .s.s.UserDetailsServiceAutoConfiguration : 
 
-Using generated security password: 58a4dcc7-634f-423a-8a14-70d6197debca
+Using generated security password: ead78318-1441-4449-8b3c-5d17451920e4
 
 This generated password is for development use only. Your security configuration must be updated before running your application in production.
 
-2025-12-22T20:09:06.569+05:30  INFO 17004 --- [petcare-backend] [restartedMain] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
-2025-12-22T20:09:06.599+05:30  WARN 17004 --- [petcare-backend] [restartedMain] thorizationManagerRequestMatcherRegistry : One of the patterns in [GET, /api/products/**] is missing a leading slash. This is discouraged; please include the leading slash in all your request matcher patterns. In future versions of Spring Security, leaving out the leading slash will result in an exception.
-2025-12-22T20:09:06.841+05:30  INFO 17004 --- [petcare-backend] [restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
-2025-12-22T20:09:06.864+05:30  INFO 17004 --- [petcare-backend] [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
-2025-12-22T20:09:06.872+05:30  INFO 17004 --- [petcare-backend] [restartedMain] com.pets.petcare.PetcareApplication      : Started PetcareApplication in 2.519 seconds (process running for 320.056)
-2025-12-22T20:09:06.879+05:30  INFO 17004 --- [petcare-backend] [restartedMain] .ConditionEvaluationDeltaLoggingListener : Condition evaluation unchanged
-2025-12-22T20:12:27.787+05:30  INFO 17004 --- [petcare-backend] [http-nio-8080-exec-2] o.a.c.c.C.[Tomcat-2].[localhost].[/]     : Initializing Spring DispatcherServlet 'dispatcherServlet'
-2025-12-22T20:12:27.788+05:30  INFO 17004 --- [petcare-backend] [http-nio-8080-exec-2] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
-2025-12-22T20:12:27.792+05:30  INFO 17004 --- [petcare-backend] [http-nio-8080-exec-2] o.s.web.servlet.DispatcherServlet        : Completed initialization in 3 ms
-2025-12-22T20:13:06.435+05:30  INFO 17004 --- [petcare-backend] [http-nio-8080-exec-5] c.p.petcare.controller.OrderController   : Fetching orders for user: bhargaviammu@yopmail.com
-2025-12-22T20:13:06.438+05:30  INFO 17004 --- [petcare-backend] [http-nio-8080-exec-5] com.pets.petcare.service.OrderService    : Fetching orders for user: bhargaviammu@yopmail.com
-2025-12-22T20:13:06.478+05:30  INFO 17004 --- [petcare-backend] [http-nio-8080-exec-3] c.p.petcare.controller.OrderController   : Fetching orders for user: bhargaviammu@yopmail.com
-2025-12-22T20:13:06.479+05:30  INFO 17004 --- [petcare-backend] [http-nio-8080-exec-3] com.pets.petcare.service.OrderService    : Fetching orders for user: bhargaviammu@yopmail.com
-2025-12-22T21:21:22.184+05:30  WARN 17004 --- [petcare-backend] [HikariPool-3:housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-3 - Thread starvation or clock leap detected (housekeeper delta=10m45s897ms734µs).
-2025-12-22T21:41:52.454+05:30  WARN 17004 --- [petcare-backend] [HikariPool-3:housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-3 - Thread starvation or clock leap detected (housekeeper delta=16m29s970ms255µs200ns).
+2025-12-27T10:52:49.233+05:30  INFO 18748 --- [petcare-backend] [restartedMain] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+2025-12-27T10:52:49.257+05:30  WARN 18748 --- [petcare-backend] [restartedMain] thorizationManagerRequestMatcherRegistry : One of the patterns in [GET, /api/products/**] is missing a leading slash. This is discouraged; please include the leading slash in all your request matcher patterns. In future versions of Spring Security, leaving out the leading slash will result in an exception.
+2025-12-27T10:52:49.416+05:30  INFO 18748 --- [petcare-backend] [restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
+2025-12-27T10:52:49.434+05:30  INFO 18748 --- [petcare-backend] [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2025-12-27T10:52:49.441+05:30  INFO 18748 --- [petcare-backend] [restartedMain] com.pets.petcare.PetcareApplication      : Started PetcareApplication in 2.817 seconds (process running for 596.396)
+2025-12-27T10:52:49.451+05:30  INFO 18748 --- [petcare-backend] [restartedMain] .ConditionEvaluationDeltaLoggingListener : Condition evaluation unchanged
+2025-12-27T10:53:03.455+05:30  INFO 18748 --- [petcare-backend] [File Watcher] rtingClassPathChangeChangedEventListener : Restarting due to 1 class path change (0 additions, 0 deletions, 1 modification)
+2025-12-27T10:53:03.458+05:30  INFO 18748 --- [petcare-backend] [Thread-11] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2025-12-27T10:53:03.810+05:30  INFO 18748 --- [petcare-backend] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2025-12-27T10:53:03.817+05:30  INFO 18748 --- [petcare-backend] [Thread-11] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-12-27T10:53:03.817+05:30  INFO 18748 --- [petcare-backend] [Thread-11] com.zaxxer.hikari.HikariDataSource       : HikariPool-3 - Shutdown initiated...
+2025-12-27T10:53:03.833+05:30  INFO 18748 --- [petcare-backend] [Thread-11] com.zaxxer.hikari.HikariDataSource       : HikariPool-3 - Shutdown completed.
+2025-12-27T10:53:04.006+05:30  INFO 18748 --- [petcare-backend] [restartedMain] com.pets.petcare.PetcareApplication      : Starting PetcareApplication using Java 17.0.15 with PID 18748 (C:\Users\bharg\Desktop\bhargavi-Project-PetCare\petcare\target\classes started by bharg in C:\Users\bharg\Desktop\bhargavi-Project-PetCare\petcare)
+2025-12-27T10:53:04.008+05:30 DEBUG 18748 --- [petcare-backend] [restartedMain] com.pets.petcare.PetcareApplication      : Running with Spring Boot v3.5.8, Spring v6.2.14
+2025-12-27T10:53:04.008+05:30  INFO 18748 --- [petcare-backend] [restartedMain] com.pets.petcare.PetcareApplication      : No active profile set, falling back to 1 default profile: "default"
+2025-12-27T10:53:05.086+05:30  INFO 18748 --- [petcare-backend] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-12-27T10:53:05.276+05:30  INFO 18748 --- [petcare-backend] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 184 ms. Found 15 JPA repository interfaces.
+2025-12-27T10:53:05.563+05:30  INFO 18748 --- [petcare-backend] [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2025-12-27T10:53:05.565+05:30  INFO 18748 --- [petcare-backend] [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-12-27T10:53:05.565+05:30  INFO 18748 --- [petcare-backend] [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.49]
+2025-12-27T10:53:05.625+05:30  INFO 18748 --- [petcare-backend] [restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-12-27T10:53:05.625+05:30  INFO 18748 --- [petcare-backend] [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1613 ms
+2025-12-27T10:53:05.678+05:30 DEBUG 18748 --- [petcare-backend] [restartedMain] c.p.p.security.JwtAuthenticationFilter   : Filter 'jwtAuthenticationFilter' configured for use
+2025-12-27T10:53:05.784+05:30  INFO 18748 --- [petcare-backend] [restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-12-27T10:53:05.791+05:30  INFO 18748 --- [petcare-backend] [restartedMain] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-12-27T10:53:05.809+05:30  INFO 18748 --- [petcare-backend] [restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-12-27T10:53:05.811+05:30  INFO 18748 --- [petcare-backend] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-4 - Starting...
+2025-12-27T10:53:05.843+05:30  INFO 18748 --- [petcare-backend] [restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-4 - Added connection com.mysql.cj.jdbc.ConnectionImpl@78d680f6
+2025-12-27T10:53:05.843+05:30  INFO 18748 --- [petcare-backend] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-4 - Start completed.
+2025-12-27T10:53:05.845+05:30  WARN 18748 --- [petcare-backend] [restartedMain] org.hibernate.orm.deprecation            : HHH90000025: MySQL8Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-12-27T10:53:05.845+05:30  WARN 18748 --- [petcare-backend] [restartedMain] org.hibernate.orm.deprecation            : HHH90000026: MySQL8Dialect has been deprecated; use org.hibernate.dialect.MySQLDialect instead
+2025-12-27T10:53:05.845+05:30  INFO 18748 --- [petcare-backend] [restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-4)']
+	Database driver: undefined/unknown
+	Database version: 8.0
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-12-27T10:53:06.320+05:30  INFO 18748 --- [petcare-backend] [restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-12-27T10:53:06.573+05:30  INFO 18748 --- [petcare-backend] [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-12-27T10:53:07.836+05:30  WARN 18748 --- [petcare-backend] [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-12-27T10:53:08.243+05:30  WARN 18748 --- [petcare-backend] [restartedMain] .s.s.UserDetailsServiceAutoConfiguration : 
+
+Using generated security password: a137fd76-bf69-4956-9de8-c558166e9c27
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2025-12-27T10:53:08.245+05:30  INFO 18748 --- [petcare-backend] [restartedMain] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+2025-12-27T10:53:08.303+05:30  WARN 18748 --- [petcare-backend] [restartedMain] thorizationManagerRequestMatcherRegistry : One of the patterns in [GET, /api/products/**] is missing a leading slash. This is discouraged; please include the leading slash in all your request matcher patterns. In future versions of Spring Security, leaving out the leading slash will result in an exception.
+2025-12-27T10:53:08.711+05:30  INFO 18748 --- [petcare-backend] [restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
+2025-12-27T10:53:08.762+05:30  INFO 18748 --- [petcare-backend] [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2025-12-27T10:53:08.775+05:30  INFO 18748 --- [petcare-backend] [restartedMain] com.pets.petcare.PetcareApplication      : Started PetcareApplication in 4.831 seconds (process running for 615.73)
+2025-12-27T10:53:08.791+05:30  INFO 18748 --- [petcare-backend] [restartedMain] .ConditionEvaluationDeltaLoggingListener : Condition evaluation unchanged
+2025-12-27T10:54:05.458+05:30  INFO 18748 --- [petcare-backend] [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-12-27T10:54:05.459+05:30  INFO 18748 --- [petcare-backend] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2025-12-27T10:54:05.460+05:30  INFO 18748 --- [petcare-backend] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2025-12-27T10:54:05.500+05:30  INFO 18748 --- [petcare-backend] [http-nio-8080-exec-2] com.pets.petcare.service.EmailService    : Generating OTP for bhargavi123ammu@gmail.com: 910351
+2025-12-27T10:54:10.867+05:30  INFO 18748 --- [petcare-backend] [http-nio-8080-exec-2] com.pets.petcare.service.EmailService    : OTP email sent successfully to: bhargavi123ammu@gmail.com
+2025-12-27T10:54:10.867+05:30  INFO 18748 --- [petcare-backend] [http-nio-8080-exec-2] com.pets.petcare.service.OtpService      : OTP generated and sent to: bhargavi123ammu@gmail.com
+2025-12-27T10:54:26.375+05:30  INFO 18748 --- [petcare-backend] [http-nio-8080-exec-3] com.pets.petcare.service.OtpService      : OTP verified successfully for email: bhargavi123ammu@gmail.com
+2025-12-27T10:54:26.385+05:30  INFO 18748 --- [petcare-backend] [http-nio-8080-exec-3] com.pets.petcare.service.AuthService     : User logged in successfully: bhargavi123ammu@gmail.com
+2025-12-27T10:54:59.879+05:30  WARN 18748 --- [petcare-backend] [http-nio-8080-exec-9] o.h.engine.jdbc.spi.SqlExceptionHelper   : SQL Error: 1364, SQLState: HY000
+2025-12-27T10:54:59.880+05:30 ERROR 18748 --- [petcare-backend] [http-nio-8080-exec-9] o.h.engine.jdbc.spi.SqlExceptionHelper   : Field 'reference_number' doesn't have a default value
+2025-12-27T10:54:59.889+05:30  WARN 18748 --- [petcare-backend] [http-nio-8080-exec-9] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.orm.jpa.JpaSystemException: could not execute statement [Field 'reference_number' doesn't have a default value] [insert into appointments (appointment_date,created_at,duration_minutes,meeting_link,notes,pet_id,prescription,reason,slot_id,status,type,updated_at,veterinarian_id) values (?,?,?,?,?,?,?,?,?,?,?,?,?)]]

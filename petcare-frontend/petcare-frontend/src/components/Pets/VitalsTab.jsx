@@ -43,7 +43,7 @@ const VitalsTab = ({ measurements }) => {
       id: m.id
     }))
     .filter(d => d.value !== null && d.value !== 0)
-    .reverse(); // Reverse to show oldest to newest (left to right)
+    .sort((a, b) => new Date(a.date) - new Date(b.date)); // Sort oldest to newest
 
   const maxValue = chartData.length > 0 ? Math.max(...chartData.map(d => d.value)) : 0;
   const minValue = chartData.length > 0 ? Math.min(...chartData.map(d => d.value)) : 0;

@@ -134,29 +134,32 @@ public class EmailService {
 
     public void sendAppointmentConfirmationEmail(String to, String ownerName, String vetName, String dateTime,
             String type, String meetingLink) {
+        String subject = "✅ Appointment Confirmed with " + vetName;
+        String body = "Hello " + ownerName + ",\n\n" +
+                "Your appointment has been confirmed!\n\n" +
+                "Vet: " + vetName + "\n" +
+                "Time: " + dateTime + "\n" +
+                "Type: " + type + "\n";
+
+        if (meetingLink != null && !meetingLink.isEmpty()) {
+            body += "Meeting Link: " + meetingLink + "\n";
+        }
+
+        body += "\nPlease arrive/join 5 minutes early.\n\n" +
+                "Best regards,\n" +
+                "Pet Care Team";
+
         try {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setTo(to);
-            message.setSubject("✅ Appointment Confirmed with " + vetName);
-            String body = "Hello " + ownerName + ",\n\n" +
-                    "Your appointment has been confirmed!\n\n" +
-                    "Vet: " + vetName + "\n" +
-                    "Time: " + dateTime + "\n" +
-                    "Type: " + type + "\n";
-
-            if (meetingLink != null && !meetingLink.isEmpty()) {
-                body += "Meeting Link: " + meetingLink + "\n";
-            }
-
-            body += "\nPlease arrive/join 5 minutes early.\n\n" +
-                    "Best regards,\n" +
-                    "Pet Care Team";
-
+            message.setSubject(subject);
             message.setText(body);
             mailSender.send(message);
             log.info("Appointment confirmation email sent to: {}", to);
         } catch (Exception e) {
             log.error("Failed to send appointment confirmation email", e);
+            // For development: log the email content so testers can see it
+            log.info("[DEV-EMAIL] Appointment confirmation for {}: subject={}, body={}", to, subject, body);
         }
     }
 
@@ -216,31 +219,33 @@ public class EmailService {
      */
     public void sendVetBookingNotification(String to, String vetName, String petName, String ownerName,
             String appointmentTime, String type, String reason) {
+        String subject = "🆕 New Appointment Booking";
+        String body = "Hello Dr. " + vetName + ",\n\n" +
+                "You have a new appointment booking:\n\n" +
+                "Pet: " + petName + "\n" +
+                "Owner: " + ownerName + "\n" +
+                "Time: " + appointmentTime + "\n" +
+                "Type: " + type + "\n";
+
+        if (reason != null && !reason.isEmpty()) {
+            body += "Reason: " + reason + "\n";
+        }
+
+        body += "\nPlease log in to your dashboard to view details.\n\n" +
+                "Best regards,\n" +
+                "Pet Care Team";
+
         try {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setTo(to);
-            message.setSubject("🆕 New Appointment Booking");
-
-            String body = "Hello Dr. " + vetName + ",\n\n" +
-                    "You have a new appointment booking:\n\n" +
-                    "Pet: " + petName + "\n" +
-                    "Owner: " + ownerName + "\n" +
-                    "Time: " + appointmentTime + "\n" +
-                    "Type: " + type + "\n";
-
-            if (reason != null && !reason.isEmpty()) {
-                body += "Reason: " + reason + "\n";
-            }
-
-            body += "\nPlease log in to your dashboard to view details.\n\n" +
-                    "Best regards,\n" +
-                    "Pet Care Team";
-
+            message.setSubject(subject);
             message.setText(body);
             mailSender.send(message);
             log.info("Vet booking notification sent to: {}", to);
         } catch (Exception e) {
             log.error("Failed to send vet booking notification", e);
+            // For development: log the email content
+            log.info("[DEV-EMAIL] Vet booking notification for {}: subject={}, body={}", to, subject, body);
         }
     }
 
