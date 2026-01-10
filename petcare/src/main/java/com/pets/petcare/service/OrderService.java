@@ -1,304 +1,320 @@
 package com.pets.petcare.service;
 
-import com.pets.petcare.dto.OrderRequest;
+import com.pets.petcare.dto.CheckoutRequest;
 import com.pets.petcare.dto.OrderResponse;
+import com.pets.petcare.dto.ProductResponse;
 import com.pets.petcare.entity.*;
-import com.pets.petcare.exception.ResourceNotFoundException;
 import com.pets.petcare.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
-@Transactional
 public class OrderService {
-    
+
     private final OrderRepository orderRepository;
-    private final UserRepository userRepository;
+    private final OrderItemRepository orderItemRepository;
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
+    private final ProductRepository productRepository;
+    private final UserRepository userRepository;
     private final ProductService productService;
-    
+
     /**
-     * Create order from cart
+     * Create order from cart (checkout)
      */
-    public OrderResponse createOrderFromCart(OrderRequest request, String userEmail) {
-        log.info("Creating order from cart for user: {}", userEmail);
-        
-        User user = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-        
+    @Transactional
+    public OrderResponse createOrder(String userEmail, CheckoutRequest request) {
+        User user = getUserByEmail(userEmail);
         Cart cart = cartRepository.findByUser(user)
-                .orElseThrow(() -> new ResourceNotFoundException("Cart not found"));
-        
+                .orElseThrow(() -> new RuntimeException("Cart not found"));
+
         List<CartItem> cartItems = cartItemRepository.findByCart(cart);
         if (cartItems.isEmpty()) {
             throw new RuntimeException("Cart is empty");
         }
-        
+
+        // Validate stock availability
+        for (CartItem cartItem : cartItems) {
+            Product product = cartItem.getProduct();
+            if (product.getStock() < cartItem.getQuantity()) {
+                throw new RuntimeException("Insufficient stock for product: " + product.getTitle());
+            }
+        }
+
         // Create order
         Order order = new Order();
+        order.setOrderNumber(generateOrderNumber());
         order.setUser(user);
+        order.setStatus(Order.OrderStatus.PENDING);
+
+        // Set shipping information
+        order.setShippingName(request.getShippingName());
         order.setShippingAddress(request.getShippingAddress());
-        order.setStatus(Order.OrderStatus.PLACED);
-        
-        // Calculate total and create order items
-        BigDecimal totalAmount = BigDecimal.ZERO;
+        order.setShippingCity(request.getShippingCity());
+        order.setShippingState(request.getShippingState());
+        order.setShippingZipCode(request.getShippingZipCode());
+        order.setShippingPhone(request.getShippingPhone());
+
+        // Set payment information
+        order.setPaymentMethod(request.getPaymentMethod());
+        order.setPaymentTransactionId(request.getPaymentTransactionId());
+        order.setPaymentStatus(Order.PaymentStatus.PENDING);
+
+        order.setNotes(request.getNotes());
+
+        // Calculate totals
+        BigDecimal subtotal = cartItems.stream()
+                .map(CartItem::getTotalPrice)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal shippingCost = calculateShippingCost(subtotal);
+        BigDecimal tax = calculateTax(subtotal);
+        BigDecimal totalAmount = subtotal.add(shippingCost).add(tax);
+
+        order.setSubtotal(subtotal);
+        order.setShippingCost(shippingCost);
+        order.setTax(tax);
+        order.setTotalAmount(totalAmount);
+
         Order savedOrder = orderRepository.save(order);
-        
+
+        // Create order items and update product stock
         for (CartItem cartItem : cartItems) {
-            // Check stock availability
-            if (cartItem.getProduct().getStockQuantity() < cartItem.getQuantity()) {
-                throw new RuntimeException("Insufficient stock for product: " + cartItem.getProduct().getTitle());
-            }
-            
-            // Create order item
             OrderItem orderItem = new OrderItem();
             orderItem.setOrder(savedOrder);
             orderItem.setProduct(cartItem.getProduct());
             orderItem.setQuantity(cartItem.getQuantity());
-            orderItem.setPrice(cartItem.getProduct().getPrice());
-            
-            BigDecimal itemTotal = cartItem.getProduct().getPrice()
-                    .multiply(BigDecimal.valueOf(cartItem.getQuantity()));
-            totalAmount = totalAmount.add(itemTotal);
-            
-            // Reduce stock
-            productService.reduceStock(cartItem.getProduct().getId(), cartItem.getQuantity());
+            orderItem.setUnitPrice(cartItem.getUnitPrice());
+            orderItem.setTotalPrice(cartItem.getTotalPrice());
+            orderItemRepository.save(orderItem);
+
+            // Update product stock
+            Product product = cartItem.getProduct();
+            product.setStock(product.getStock() - cartItem.getQuantity());
+            productRepository.save(product);
         }
-        
-        // Update order total
-        savedOrder.setTotalAmount(totalAmount);
-        savedOrder = orderRepository.save(savedOrder);
-        
+
         // Clear cart
         cartItemRepository.deleteByCart(cart);
-        
-        log.info("Order created successfully with ID: {}", savedOrder.getId());
-        return convertToResponse(savedOrder);
+
+        log.info("Order created: {} for user: {}", savedOrder.getOrderNumber(), userEmail);
+
+        return mapToResponse(savedOrder);
     }
-    
+
     /**
-     * Get orders by user
+     * Get user orders
      */
-    @Transactional(readOnly = true)
-    public List<OrderResponse> getOrdersByUser(String userEmail) {
-        log.info("Fetching orders for user: {}", userEmail);
-        
-        User user = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-        
-        List<Order> orders = orderRepository.findByUserOrderByCreatedAtDesc(user);
-        return orders.stream()
-                .map(this::convertToResponse)
-                .collect(Collectors.toList());
+    public Page<OrderResponse> getUserOrders(String userEmail, int page, int size) {
+        User user = getUserByEmail(userEmail);
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+
+        return orderRepository.findByUserOrderByCreatedAtDesc(user, pageable)
+                .map(this::mapToResponse);
     }
-    
-    /**
-     * Get orders for vendor
-     */
-    @Transactional(readOnly = true)
-    public List<OrderResponse> getOrdersForVendor(String vendorEmail) {
-        log.info("Fetching orders for vendor: {}", vendorEmail);
-        
-        User vendor = userRepository.findByEmail(vendorEmail)
-                .orElseThrow(() -> new ResourceNotFoundException("Vendor not found"));
-        
-        List<Order> orders = orderRepository.findOrdersForVendor(vendor);
-        return orders.stream()
-                .map(this::convertToResponse)
-                .collect(Collectors.toList());
-    }
-    
+
     /**
      * Get order by ID
      */
-    @Transactional(readOnly = true)
-    public OrderResponse getOrderById(Long orderId, String userEmail) {
-        log.info("Fetching order by ID: {} for user: {}", orderId, userEmail);
-        
+    public OrderResponse getOrderById(String userEmail, Long orderId) {
+        User user = getUserByEmail(userEmail);
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new ResourceNotFoundException("Order not found with ID: " + orderId));
-        
-        // Verify user access
-        if (!order.getUser().getEmail().equals(userEmail)) {
-            throw new RuntimeException("You can only view your own orders");
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        if (!order.getUser().getId().equals(user.getId())) {
+            throw new RuntimeException("Order does not belong to user");
         }
-        
-        return convertToResponse(order);
+
+        return mapToResponse(order);
     }
-    
+
     /**
-     * Update order status
+     * Get order by order number
      */
-    public OrderResponse updateOrderStatus(Long orderId, Order.OrderStatus status, String vendorEmail) {
-        log.info("Updating order ID: {} to status: {} by vendor: {}", orderId, status, vendorEmail);
-        
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new ResourceNotFoundException("Order not found with ID: " + orderId));
-        
-        // Verify vendor has products in this order
-        User vendor = userRepository.findByEmail(vendorEmail)
-                .orElseThrow(() -> new ResourceNotFoundException("Vendor not found"));
-        
-        boolean hasVendorProducts = order.getOrderItems().stream()
-                .anyMatch(item -> item.getProduct().getVendor().equals(vendor));
-        
-        if (!hasVendorProducts) {
-            throw new RuntimeException("You can only update orders containing your products");
+    public OrderResponse getOrderByNumber(String userEmail, String orderNumber) {
+        User user = getUserByEmail(userEmail);
+        Order order = orderRepository.findByOrderNumber(orderNumber)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        if (!order.getUser().getId().equals(user.getId())) {
+            throw new RuntimeException("Order does not belong to user");
         }
-        
-        order.setStatus(status);
-        Order updatedOrder = orderRepository.save(order);
-        
-        log.info("Order status updated successfully: {}", orderId);
-        return convertToResponse(updatedOrder);
+
+        return mapToResponse(order);
     }
-    
+
     /**
      * Cancel order
      */
-    public OrderResponse cancelOrder(Long orderId, String userEmail) {
-        log.info("Cancelling order ID: {} by user: {}", orderId, userEmail);
-        
+    @Transactional
+    public OrderResponse cancelOrder(String userEmail, Long orderId) {
+        User user = getUserByEmail(userEmail);
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new ResourceNotFoundException("Order not found with ID: " + orderId));
-        
-        // Verify user ownership
-        if (!order.getUser().getEmail().equals(userEmail)) {
-            throw new RuntimeException("You can only cancel your own orders");
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        if (!order.getUser().getId().equals(user.getId())) {
+            throw new RuntimeException("Order does not belong to user");
         }
-        
-        // Check if order can be cancelled
-        if (order.getStatus() == Order.OrderStatus.SHIPPED || 
-            order.getStatus() == Order.OrderStatus.DELIVERED ||
-            order.getStatus() == Order.OrderStatus.CANCELLED) {
-            throw new RuntimeException("Order cannot be cancelled in current status: " + order.getStatus());
+
+        if (order.getStatus() != Order.OrderStatus.PENDING &&
+                order.getStatus() != Order.OrderStatus.CONFIRMED) {
+            throw new RuntimeException("Order cannot be cancelled");
         }
-        
-        // Restore stock
-        for (OrderItem item : order.getOrderItems()) {
-            Product product = item.getProduct();
-            product.setStockQuantity(product.getStockQuantity() + item.getQuantity());
-        }
-        
+
         order.setStatus(Order.OrderStatus.CANCELLED);
-        Order cancelledOrder = orderRepository.save(order);
-        
-        log.info("Order cancelled successfully: {}", orderId);
-        return convertToResponse(cancelledOrder);
+        Order savedOrder = orderRepository.save(order);
+
+        // Restore product stock
+        List<OrderItem> orderItems = orderItemRepository.findByOrder(order);
+        for (OrderItem orderItem : orderItems) {
+            Product product = orderItem.getProduct();
+            product.setStock(product.getStock() + orderItem.getQuantity());
+            productRepository.save(product);
+        }
+
+        log.info("Order cancelled: {} for user: {}", order.getOrderNumber(), userEmail);
+
+        return mapToResponse(savedOrder);
     }
-    
+
     /**
-     * Get vendor statistics
+     * Generate unique order number
      */
-    @Transactional(readOnly = true)
-    public VendorOrderStats getVendorOrderStats(String vendorEmail) {
-        log.info("Fetching vendor order statistics for: {}", vendorEmail);
-        
-        User vendor = userRepository.findByEmail(vendorEmail)
-                .orElseThrow(() -> new ResourceNotFoundException("Vendor not found"));
-        
-        long totalOrders = orderRepository.countOrdersForVendor(vendor);
-        long pendingOrders = orderRepository.countPendingOrdersForVendor(vendor);
-        
-        List<Order.OrderStatus> revenueStatuses = List.of(
-                Order.OrderStatus.PAID, 
-                Order.OrderStatus.PACKED, 
-                Order.OrderStatus.SHIPPED, 
-                Order.OrderStatus.DELIVERED
-        );
-        
-        BigDecimal totalRevenue = orderRepository.calculateVendorRevenue(vendor, revenueStatuses);
-        
-        return VendorOrderStats.builder()
-                .totalOrders(totalOrders)
-                .pendingOrders(pendingOrders)
-                .totalRevenue(totalRevenue != null ? totalRevenue : BigDecimal.ZERO)
-                .build();
+    private String generateOrderNumber() {
+        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+        return "ORD-" + timestamp + "-" + (int) (Math.random() * 1000);
     }
-    
+
     /**
-     * Convert Order entity to OrderResponse DTO
+     * Calculate shipping cost
      */
-    private OrderResponse convertToResponse(Order order) {
+    private BigDecimal calculateShippingCost(BigDecimal subtotal) {
+        // Free shipping for orders over $50
+        if (subtotal.compareTo(BigDecimal.valueOf(50)) >= 0) {
+            return BigDecimal.ZERO;
+        }
+        return BigDecimal.valueOf(5.99); // Standard shipping
+    }
+
+    /**
+     * Calculate tax
+     */
+    private BigDecimal calculateTax(BigDecimal subtotal) {
+        // 8% tax rate
+        return subtotal.multiply(BigDecimal.valueOf(0.08));
+    }
+
+    /**
+     * Get user by email
+     */
+    private User getUserByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
+    /**
+     * Map Order to OrderResponse
+     */
+    private OrderResponse mapToResponse(Order order) {
+        List<OrderItem> orderItems = orderItemRepository.findByOrder(order);
+
+        List<OrderResponse.OrderItemResponse> itemResponses = orderItems.stream()
+                .map(this::mapOrderItemToResponse)
+                .collect(Collectors.toList());
+
+        int totalItemsCount = orderItems.stream()
+                .mapToInt(OrderItem::getQuantity)
+                .sum();
+
         return OrderResponse.builder()
                 .id(order.getId())
-                .userId(order.getUser().getId())
-                .userName(order.getUser().getName())
-                .totalAmount(order.getTotalAmount())
+                .orderNumber(order.getOrderNumber())
                 .status(order.getStatus())
+                .items(itemResponses)
+                .subtotal(order.getSubtotal())
+                .shippingCost(order.getShippingCost())
+                .tax(order.getTax())
+                .totalAmount(order.getTotalAmount())
+                .totalItems(totalItemsCount)
+                .shippingName(order.getShippingName())
                 .shippingAddress(order.getShippingAddress())
-                .paymentId(order.getPaymentId())
-                .trackingNumber(order.getTrackingNumber())
-                .orderItems(order.getOrderItems().stream()
-                        .map(this::convertOrderItemToResponse)
-                        .collect(Collectors.toList()))
+                .shippingCity(order.getShippingCity())
+                .shippingState(order.getShippingState())
+                .shippingZipCode(order.getShippingZipCode())
+                .shippingPhone(order.getShippingPhone())
+                .paymentMethod(order.getPaymentMethod())
+                .paymentStatus(order.getPaymentStatus())
+                .paymentTransactionId(order.getPaymentTransactionId())
+                .shippedAt(order.getShippedAt())
+                .deliveredAt(order.getDeliveredAt())
+                .notes(order.getNotes())
                 .createdAt(order.getCreatedAt())
                 .updatedAt(order.getUpdatedAt())
                 .build();
     }
-    
+
     /**
-     * Convert OrderItem to response
+     * Map OrderItem to OrderItemResponse
      */
-    private OrderResponse.OrderItemResponse convertOrderItemToResponse(OrderItem item) {
+    private OrderResponse.OrderItemResponse mapOrderItemToResponse(OrderItem orderItem) {
+        ProductResponse productResponse = productService.getProductById(orderItem.getProduct().getId());
+
         return OrderResponse.OrderItemResponse.builder()
-                .id(item.getId())
-                .productId(item.getProduct().getId())
-                .productTitle(item.getProduct().getTitle())
-                .productImageUrl(item.getProduct().getImageUrl())
-                .quantity(item.getQuantity())
-                .price(item.getPrice())
+                .id(orderItem.getId())
+                .product(productResponse)
+                .quantity(orderItem.getQuantity())
+                .unitPrice(orderItem.getUnitPrice())
+                .totalPrice(orderItem.getTotalPrice())
                 .build();
     }
-    
+
+    // Admin methods for AdminService compatibility
+
     /**
-     * Get all orders for admin
+     * Get all orders for admin management
      */
-    @Transactional(readOnly = true)
     public List<Order> getAllOrdersForAdmin() {
-        log.info("Fetching all orders for admin");
         return orderRepository.findAll();
     }
-    
+
     /**
-     * Update order status (admin)
+     * Update order status
      */
+    @Transactional
     public Order updateOrderStatus(Long orderId, Order.OrderStatus status) {
-        log.info("Admin updating order ID: {} to status: {}", orderId, status);
-        
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new ResourceNotFoundException("Order not found with ID: " + orderId));
-        
+                .orElseThrow(() -> new RuntimeException("Order not found with id: " + orderId));
+
         order.setStatus(status);
+
+        // Set timestamps based on status
+        if (status == Order.OrderStatus.SHIPPED && order.getShippedAt() == null) {
+            order.setShippedAt(LocalDateTime.now());
+        } else if (status == Order.OrderStatus.DELIVERED && order.getDeliveredAt() == null) {
+            order.setDeliveredAt(LocalDateTime.now());
+        }
+
         return orderRepository.save(order);
     }
-    
+
     /**
      * Get orders by status
      */
-    @Transactional(readOnly = true)
     public List<Order> getOrdersByStatus(Order.OrderStatus status) {
-        log.info("Fetching orders by status: {}", status);
-        return orderRepository.findByStatusOrderByCreatedAtDesc(status);
-    }
-    
-    /**
-     * Vendor Order Statistics DTO
-     */
-    @lombok.Data
-    @lombok.Builder
-    public static class VendorOrderStats {
-        private long totalOrders;
-        private long pendingOrders;
-        private BigDecimal totalRevenue;
+        return orderRepository.findByStatus(status);
     }
 }

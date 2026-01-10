@@ -170,8 +170,8 @@
 }
 
 .vet-secondary-btn {
-  background: rgba(255, 255, 255, 0.25);
-  color: white;
+  background: white;
+  color: black;
   border: 2px solid white;
   backdrop-filter: blur(5px);
 }
@@ -180,6 +180,12 @@
 .vet-secondary-btn:hover {
   transform: translateY(-3px);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.vet-secondary-btn:hover {
+  background: #f5f5f5;
+  border-color: white;
+  color: black;
 }
 
 .vet-primary-btn:active,
@@ -1052,5 +1058,469 @@
   .vet-section-header .vet-primary-btn {
     width: 100%;
     justify-content: center;
+  }
+}
+
+/* ==================== PENDING APPROVALS SECTION ==================== */
+.vet-pending-section {
+  padding: 2rem;
+}
+
+.vet-pending-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.vet-pending-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: var(--vet-glass-bg);
+  border: var(--vet-glass-border);
+  border-radius: 16px;
+  box-shadow: var(--vet-glass-shadow);
+  transition: var(--vet-transition);
+  border-left: 4px solid var(--vet-warning);
+}
+
+.vet-pending-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(44, 95, 124, 0.15);
+}
+
+.vet-pending-image {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.vet-pending-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.vet-pending-image-placeholder {
+  font-size: 1.5rem;
+}
+
+.vet-pending-content {
+  flex: 1;
+}
+
+.vet-pending-content h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--vet-primary);
+}
+
+.vet-pending-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.vet-approve-btn {
+  background: linear-gradient(135deg, var(--vet-success) 0%, #40c057 100%);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--vet-transition);
+  font-size: 0.9rem;
+}
+
+.vet-approve-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(81, 207, 102, 0.3);
+}
+
+.vet-reject-btn {
+  background: linear-gradient(135deg, var(--vet-danger) 0%, #fa5252 100%);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--vet-transition);
+  font-size: 0.9rem;
+}
+
+.vet-reject-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+}
+
+.vet-danger-btn {
+  background: linear-gradient(135deg, var(--vet-danger) 0%, #fa5252 100%);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--vet-transition);
+}
+
+.vet-danger-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+}
+
+.vet-empty-state {
+  text-align: center;
+  padding: 3rem;
+  color: var(--vet-primary);
+}
+
+.vet-empty-state h3 {
+  font-size: 1.5rem;
+  margin: 1rem 0 0.5rem 0;
+  font-weight: 600;
+}
+
+.vet-empty-state p {
+  color: #666;
+  font-size: 1rem;
+}
+
+/* ==================== MODAL IMPROVEMENTS ==================== */
+.vet-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.vet-modal-content {
+  background: white;
+  border-radius: 16px;
+  padding: 0;
+  max-width: 500px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.vet-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 1px solid #eee;
+}
+
+.vet-modal-header h3 {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--vet-primary);
+}
+
+.vet-modal-body {
+  padding: 1.5rem;
+}
+
+.vet-close-btn {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: #666;
+  padding: 0.5rem;
+  border-radius: 50%;
+  transition: var(--vet-transition);
+}
+
+.vet-close-btn:hover {
+  background: #f5f5f5;
+  color: var(--vet-danger);
+}
+/* ==================== MEDICAL RECORDS SECTION ==================== */
+.vet-medical-records-section {
+  padding: 2rem;
+}
+
+.vet-records-placeholder {
+  background: var(--vet-glass-bg);
+  border-radius: 16px;
+  padding: 2rem;
+  text-align: center;
+  color: var(--vet-primary);
+}
+
+.vet-medical-viewer {
+  background: white;
+  border-radius: 16px;
+  box-shadow: var(--vet-glass-shadow);
+  overflow: hidden;
+}
+
+.vet-medical-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 1px solid #eee;
+  background: linear-gradient(135deg, var(--vet-accent) 0%, #E6F3FF 100%);
+}
+
+.vet-pet-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.vet-pet-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.vet-pet-placeholder {
+  font-size: 1.5rem;
+}
+
+.vet-medical-tabs {
+  display: flex;
+  background: #f8f9fa;
+  border-bottom: 1px solid #eee;
+  overflow-x: auto;
+}
+
+.vet-tab {
+  padding: 1rem 1.5rem;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-weight: 500;
+  color: #666;
+  border-bottom: 3px solid transparent;
+  transition: var(--vet-transition);
+  white-space: nowrap;
+}
+
+.vet-tab:hover {
+  background: rgba(44, 95, 124, 0.1);
+  color: var(--vet-primary);
+}
+
+.vet-tab-active {
+  color: var(--vet-primary);
+  border-bottom-color: var(--vet-primary);
+  background: white;
+}
+
+.vet-medical-content {
+  padding: 2rem;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+/* ==================== MEDICAL OVERVIEW ==================== */
+.vet-medical-overview {
+  space-y: 1.5rem;
+}
+
+.vet-overview-card {
+  background: var(--vet-glass-bg);
+  padding: 1.5rem;
+  border-radius: 12px;
+  text-align: center;
+  border: var(--vet-glass-border);
+}
+
+.vet-overview-card h4 {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.vet-overview-section {
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 12px;
+}
+
+.vet-overview-section h4 {
+  margin: 0 0 1rem 0;
+  font-weight: 600;
+  color: var(--vet-primary);
+}
+
+.vet-record-item {
+  padding: 0.75rem;
+  background: white;
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+  border-left: 3px solid var(--vet-accent);
+}
+
+.vet-record-item:last-child {
+  margin-bottom: 0;
+}
+
+/* ==================== MEDICAL RECORDS LIST ==================== */
+.vet-records-list,
+.vet-vaccinations-list,
+.vet-measurements-list,
+.vet-appointments-history {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.vet-record-card,
+.vet-vaccination-card,
+.vet-measurement-card,
+.vet-appointment-history-card {
+  background: var(--vet-glass-bg);
+  border: var(--vet-glass-border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  transition: var(--vet-transition);
+}
+
+.vet-record-card:hover,
+.vet-vaccination-card:hover,
+.vet-measurement-card:hover,
+.vet-appointment-history-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(44, 95, 124, 0.15);
+}
+
+.vet-record-header,
+.vet-vaccination-header,
+.vet-measurement-header,
+.vet-appointment-history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #eee;
+}
+
+.vet-record-header h4,
+.vet-vaccination-header h4,
+.vet-measurement-header h4,
+.vet-appointment-history-header h4 {
+  margin: 0;
+  font-weight: 600;
+  color: var(--vet-primary);
+}
+
+.vet-record-date,
+.vet-vaccination-date,
+.vet-measurement-date,
+.vet-appointment-date {
+  font-size: 0.9rem;
+  color: #666;
+  background: #f0f0f0;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+}
+
+.vet-record-content,
+.vet-vaccination-content,
+.vet-measurement-content,
+.vet-appointment-history-content {
+  line-height: 1.6;
+}
+
+.vet-record-content p,
+.vet-vaccination-content p,
+.vet-measurement-content p,
+.vet-appointment-history-content p {
+  margin: 0.5rem 0;
+}
+
+.vet-meeting-link {
+  color: var(--vet-secondary);
+  text-decoration: none;
+  font-weight: 600;
+  margin-left: 0.5rem;
+}
+
+.vet-meeting-link:hover {
+  text-decoration: underline;
+}
+
+/* ==================== LOADING STATES ==================== */
+.vet-loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.vet-loading-spinner {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  text-align: center;
+  font-weight: 600;
+  color: var(--vet-primary);
+}
+
+/* ==================== RESPONSIVE DESIGN ==================== */
+@media (max-width: 768px) {
+  .vet-medical-header {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+
+  .vet-medical-tabs {
+    flex-wrap: wrap;
+  }
+
+  .vet-tab {
+    flex: 1;
+    min-width: 120px;
+  }
+
+  .vet-medical-content {
+    padding: 1rem;
+  }
+
+  .vet-record-header,
+  .vet-vaccination-header,
+  .vet-measurement-header,
+  .vet-appointment-history-header {
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: center;
   }
 }

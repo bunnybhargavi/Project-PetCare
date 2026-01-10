@@ -22,6 +22,7 @@ public class AppointmentSlot {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "veterinarian_id", nullable = false)
+    @com.fasterxml.jackson.annotation.JsonIgnore
     private Veterinarian veterinarian;
 
     @Column(nullable = false)
@@ -37,7 +38,13 @@ public class AppointmentSlot {
     // What kind of appointment is this slot suitable for?
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private SlotType supportedType = SlotType.BOTH;
+    private SlotType mode = SlotType.BOTH;
+
+    @Column(nullable = false)
+    private Integer capacity = 1; // How many appointments this slot can handle
+
+    @Column(nullable = false)
+    private Integer bookedCount = 0; // Current number of bookings
 
     public enum SlotStatus {
         AVAILABLE,
@@ -46,7 +53,7 @@ public class AppointmentSlot {
     }
 
     public enum SlotType {
-        VIDEO,
+        TELECONSULT,
         IN_CLINIC,
         BOTH
     }

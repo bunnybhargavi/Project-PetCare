@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
-@Service
+// @Service // Disabled - using MarketplaceSampleDataService instead
 @RequiredArgsConstructor
 @Slf4j
 public class SampleDataService implements CommandLineRunner {
@@ -40,7 +40,7 @@ public class SampleDataService implements CommandLineRunner {
 
     private void createSampleData() {
         // Create sample users
-        User admin = createUser("admin@petcare.com", "Admin User", User.Role.ADMIN);
+        createUser("admin@petcare.com", "Admin User", User.Role.ADMIN);
         User vendor1 = createUser("vendor1@petcare.com", "Pet Supplies Co", User.Role.VENDOR);
         User vendor2 = createUser("vendor2@petcare.com", "Healthy Pets Store", User.Role.VENDOR);
         User customer1 = createUser("customer1@petcare.com", "John Doe", User.Role.OWNER);
@@ -96,77 +96,106 @@ public class SampleDataService implements CommandLineRunner {
 
     private List<Product> createSampleProducts(User vendor1, User vendor2) {
         List<Product> products = Arrays.asList(
-                createProduct(vendor1, "Premium Dog Food", "High-quality nutrition for adult dogs",
-                        new BigDecimal("45.99"), 50, Product.ProductCategory.FOOD, "Royal Canine"),
+                createProduct("Premium Dog Food", "High-quality nutrition for adult dogs",
+                        new BigDecimal("45.99"), 50, Product.Category.FOOD, "Royal Canine"),
 
-                createProduct(vendor1, "Cat Scratching Post", "Durable sisal rope scratching post",
-                        new BigDecimal("29.99"), 25, Product.ProductCategory.TOYS, "PetFun"),
+                createProduct("Cat Scratching Post", "Durable sisal rope scratching post",
+                        new BigDecimal("29.99"), 25, Product.Category.TOYS, "PetFun"),
 
-                createProduct(vendor2, "Dog Vitamins", "Daily multivitamin supplements for dogs",
-                        new BigDecimal("19.99"), 100, Product.ProductCategory.MEDICINE, "VitaPet"),
+                createProduct("Dog Vitamins", "Daily multivitamin supplements for dogs",
+                        new BigDecimal("19.99"), 100, Product.Category.HEALTH, "VitaPet"),
 
-                createProduct(vendor2, "Leather Dog Collar", "Genuine leather collar with brass buckle",
-                        new BigDecimal("24.99"), 30, Product.ProductCategory.ACCESSORIES, "LeatherCraft"),
+                createProduct("Leather Dog Collar", "Genuine leather collar with brass buckle",
+                        new BigDecimal("24.99"), 30, Product.Category.ACCESSORIES, "LeatherCraft"),
 
-                createProduct(vendor1, "Pet Shampoo", "Gentle, hypoallergenic pet shampoo",
-                        new BigDecimal("12.99"), 75, Product.ProductCategory.GROOMING, "CleanPaws"),
+                createProduct("Pet Shampoo", "Gentle, hypoallergenic pet shampoo",
+                        new BigDecimal("12.99"), 75, Product.Category.GROOMING, "CleanPaws"),
 
-                createProduct(vendor2, "Interactive Puzzle Toy", "Mental stimulation toy for dogs",
-                        new BigDecimal("18.99"), 40, Product.ProductCategory.TOYS, "BrainGames"),
+                createProduct("Interactive Puzzle Toy", "Mental stimulation toy for dogs",
+                        new BigDecimal("18.99"), 40, Product.Category.TOYS, "BrainGames"),
 
-                createProduct(vendor1, "First Aid Kit", "Complete pet first aid emergency kit",
-                        new BigDecimal("39.99"), 20, Product.ProductCategory.HEALTHCARE, "SafePet"),
+                createProduct("First Aid Kit", "Complete pet first aid emergency kit",
+                        new BigDecimal("39.99"), 20, Product.Category.HEALTH, "SafePet"),
 
-                createProduct(vendor2, "Training Treats", "High-value training treats for dogs",
-                        new BigDecimal("8.99"), 60, Product.ProductCategory.TRAINING, "GoodDog"));
+                createProduct("Training Treats", "High-value training treats for dogs",
+                        new BigDecimal("8.99"), 60, Product.Category.TRAINING, "GoodDog"));
 
         return productRepository.saveAll(products);
     }
 
-    private Product createProduct(User vendor, String title, String description,
-            BigDecimal price, Integer stock, Product.ProductCategory category, String brand) {
+    private Product createProduct(String title, String description,
+            BigDecimal price, Integer stock, Product.Category category, String brand) {
         Product product = new Product();
-        product.setVendor(vendor);
         product.setTitle(title);
         product.setDescription(description);
         product.setPrice(price);
-        product.setStockQuantity(stock);
+        product.setStock(stock);
         product.setCategory(category);
         product.setBrand(brand);
-        product.setIsActive(true);
+        product.setActive(true);
         product.setRating(4.0 + Math.random()); // Random rating between 4.0-5.0
         product.setReviewCount((int) (Math.random() * 50) + 10); // Random reviews 10-60
-        product.setTags(category.name().toLowerCase() + ",pet," + brand.toLowerCase());
         return product;
     }
 
     private void createSampleOrders(User customer1, User customer2, List<Product> products) {
         // Order 1 - Completed
         Order order1 = new Order();
+        order1.setOrderNumber("ORD-20240101120000-001");
         order1.setUser(customer1);
         order1.setTotalAmount(new BigDecimal("75.98"));
+        order1.setSubtotal(new BigDecimal("70.98"));
+        order1.setShippingCost(new BigDecimal("4.99"));
+        order1.setTax(new BigDecimal("0.01"));
         order1.setStatus(Order.OrderStatus.DELIVERED);
-        order1.setShippingAddress("123 Main St, Anytown, USA");
-        order1.setPaymentId("pay_123456");
-        order1.setTrackingNumber("TRK123456789");
+        order1.setShippingName("John Doe");
+        order1.setShippingAddress("123 Main St");
+        order1.setShippingCity("Anytown");
+        order1.setShippingState("CA");
+        order1.setShippingZipCode("12345");
+        order1.setShippingPhone("555-123-4567");
+        order1.setPaymentMethod(Order.PaymentMethod.CREDIT_CARD);
+        order1.setPaymentStatus(Order.PaymentStatus.PAID);
+        order1.setPaymentTransactionId("pay_123456");
         orderRepository.save(order1);
 
         // Order 2 - Pending
         Order order2 = new Order();
+        order2.setOrderNumber("ORD-20240101120001-002");
         order2.setUser(customer2);
         order2.setTotalAmount(new BigDecimal("44.98"));
-        order2.setStatus(Order.OrderStatus.PLACED);
-        order2.setShippingAddress("456 Oak Ave, Another City, USA");
+        order2.setSubtotal(new BigDecimal("41.98"));
+        order2.setShippingCost(new BigDecimal("2.99"));
+        order2.setTax(new BigDecimal("0.01"));
+        order2.setStatus(Order.OrderStatus.PENDING);
+        order2.setShippingName("Jane Smith");
+        order2.setShippingAddress("456 Oak Ave");
+        order2.setShippingCity("Another City");
+        order2.setShippingState("NY");
+        order2.setShippingZipCode("67890");
+        order2.setShippingPhone("555-987-6543");
+        order2.setPaymentMethod(Order.PaymentMethod.PAYPAL);
+        order2.setPaymentStatus(Order.PaymentStatus.PENDING);
         orderRepository.save(order2);
 
         // Order 3 - Shipped
         Order order3 = new Order();
+        order3.setOrderNumber("ORD-20240101120002-003");
         order3.setUser(customer1);
         order3.setTotalAmount(new BigDecimal("32.99"));
+        order3.setSubtotal(new BigDecimal("29.99"));
+        order3.setShippingCost(new BigDecimal("2.99"));
+        order3.setTax(new BigDecimal("0.01"));
         order3.setStatus(Order.OrderStatus.SHIPPED);
-        order3.setShippingAddress("123 Main St, Anytown, USA");
-        order3.setPaymentId("pay_789012");
-        order3.setTrackingNumber("TRK987654321");
+        order3.setShippingName("John Doe");
+        order3.setShippingAddress("123 Main St");
+        order3.setShippingCity("Anytown");
+        order3.setShippingState("CA");
+        order3.setShippingZipCode("12345");
+        order3.setShippingPhone("555-123-4567");
+        order3.setPaymentMethod(Order.PaymentMethod.CREDIT_CARD);
+        order3.setPaymentStatus(Order.PaymentStatus.PAID);
+        order3.setPaymentTransactionId("pay_789012");
         orderRepository.save(order3);
 
         log.info("Created {} sample orders", 3);
@@ -175,27 +204,27 @@ public class SampleDataService implements CommandLineRunner {
     private void createSampleAppointments(Veterinarian vet, Pet pet1, Pet pet2) {
         // Get all pets in the system and create appointments for them
         List<Pet> allPets = petRepository.findAll();
-        
+
         if (allPets.isEmpty()) {
             log.info("No pets found, skipping appointment creation");
             return;
         }
-        
+
         // Create appointments for the first few pets
         for (int i = 0; i < Math.min(allPets.size(), 3); i++) {
             Pet pet = allPets.get(i);
-            
+
             // Upcoming appointment
             Appointment appointment1 = new Appointment();
             appointment1.setPet(pet);
             appointment1.setVeterinarian(vet);
             appointment1.setAppointmentDate(LocalDateTime.now().plusDays(1 + i));
-            appointment1.setType(Appointment.AppointmentType.VIDEO);
+            appointment1.setType(Appointment.AppointmentType.TELECONSULT);
             appointment1.setStatus(Appointment.AppointmentStatus.CONFIRMED);
             appointment1.setReason("Regular checkup for " + pet.getName());
-            appointment1.setMeetingLink("https://meet.jit.si/PetCare-" + pet.getId());
+            appointment1.setMeetingLink("https://meet.google.com/new?authuser=0&hs=179&pli=1&ijlm=" + pet.getId());
             appointmentRepository.save(appointment1);
-            
+
             // Today's appointment (only for first pet)
             if (i == 0) {
                 Appointment appointment2 = new Appointment();

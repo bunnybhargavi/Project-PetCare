@@ -15,14 +15,21 @@ import VetDashboard from './components/Dashboard/VetDashboard';
 import ProfilePage from './components/Profile/ProfilePage';
 import Navbar from './components/Layout/Navbar';
 import PetList from './components/Pets/PetList';
-import CommunityPage from './components/Community/CommunityPage';
 import FindVetPage from './components/Vets/FindVetPage';
+import PatientsPage from './components/Vets/PatientsPage';
 
 // Marketplace Components
 import ShopPage from './components/Marketplace/ShopPage';
 import OrdersPage from './components/Marketplace/OrdersPage';
-import VendorDashboard from './components/Marketplace/VendorDashboard';
 import CartPage from './components/Marketplace/CartPage';
+
+// Shop Components
+import Shop from './components/Shop/Shop';
+
+// Vendor Components
+import VendorLogin from './components/Vendor/VendorLogin';
+import VendorRegister from './components/Vendor/VendorRegister';
+import VendorDashboard from './components/Vendor/VendorDashboard';
 
 // Admin Components
 import AdminPanel from './components/Admin/AdminPanel';
@@ -45,7 +52,7 @@ const ProtectedRoute = ({ children }) => {
   return isAuthenticated ? children : <Navigate to="/login" />;
 };
 
-// Public Route Component (redirect if already logged in)
+// Public Route Component (for auth pages - redirect to dashboard if already logged in)
 const PublicRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
 
@@ -60,7 +67,20 @@ const PublicRoute = ({ children }) => {
     );
   }
 
-  return !isAuthenticated ? children : <Navigate to="/dashboard" />;
+  return isAuthenticated ? <Navigate to="/dashboard" /> : children;
+};
+
+// Shop Route Component (only for non-vets)
+const ShopRoute = () => {
+  const { user } = useAuth();
+  return user?.role !== 'VET' ? (
+    <>
+      <Navbar />
+      <Shop />
+    </>
+  ) : (
+    <Navigate to="/dashboard" />
+  );
 };
 
 // Dashboard Route (role-based)
@@ -163,16 +183,6 @@ function App() {
               }
             />
 
-            {/* Community Route */}
-            <Route
-              path="/community"
-              element={
-                <ProtectedRoute>
-                  <CommunityPage />
-                </ProtectedRoute>
-              }
-            />
-
             {/* Find a Vet Route */}
             <Route
               path="/find-vet"
@@ -183,9 +193,27 @@ function App() {
               }
             />
 
+            {/* Patients Route - For Vets */}
+            <Route
+              path="/patients"
+              element={
+                <ProtectedRoute>
+                  <PatientsPage />
+                </ProtectedRoute>
+              }
+            />
+
             {/* Marketplace Routes */}
             <Route
               path="/shop"
+              element={
+                <ProtectedRoute>
+                  <ShopRoute />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/marketplace"
               element={
                 <ProtectedRoute>
                   <ShopPage />
@@ -216,6 +244,11 @@ function App() {
                 </ProtectedRoute>
               }
             />
+
+            {/* Vendor Routes */}
+            <Route path="/vendor/login" element={<VendorLogin />} />
+            <Route path="/vendor/register" element={<VendorRegister />} />
+            <Route path="/vendor/dashboard" element={<VendorDashboard />} />
 
             {/* Admin Routes */}
             <Route

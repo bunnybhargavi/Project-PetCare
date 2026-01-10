@@ -1,12 +1,13 @@
 package com.pets.petcare.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 /**
  * OrderItem Entity - Individual items in an order
@@ -17,24 +18,29 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderItem {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", nullable = false)
-    @JsonBackReference
     private Order order;
-    
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
-    @JsonManagedReference
     private Product product;
-    
+
     @Column(nullable = false)
     private Integer quantity;
-    
+
     @Column(nullable = false, precision = 10, scale = 2)
-    private BigDecimal price; // Store historical price
+    private BigDecimal unitPrice; // Price at the time of order
+
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal totalPrice;
+
+    @CreationTimestamp
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
 }

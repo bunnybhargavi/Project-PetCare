@@ -7,7 +7,14 @@ import orderService from '../../services/orderService';
 const CartPage = () => {
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [shippingAddress, setShippingAddress] = useState('');
+  const [shippingInfo, setShippingInfo] = useState({
+    shippingName: '',
+    shippingAddress: '',
+    shippingCity: '',
+    shippingState: '',
+    shippingZipCode: '',
+    shippingPhone: ''
+  });
 
   const loadCart = async () => {
     setLoading(true);
@@ -61,19 +68,26 @@ const CartPage = () => {
   };
 
   const handleCheckout = async () => {
-    if (!shippingAddress.trim()) {
-      alert('Please enter a shipping address');
+    if (!shippingInfo.shippingName.trim() || !shippingInfo.shippingAddress.trim() || 
+        !shippingInfo.shippingCity.trim() || !shippingInfo.shippingState.trim() || 
+        !shippingInfo.shippingZipCode.trim()) {
+      alert('Please fill in all required shipping information');
       return;
     }
 
     try {
-      await orderService.createOrder({
-        shippingAddress
-      });
+      await orderService.createOrder(shippingInfo);
       
       alert('Order placed successfully!');
       setCartItems([]);
-      setShippingAddress('');
+      setShippingInfo({
+        shippingName: '',
+        shippingAddress: '',
+        shippingCity: '',
+        shippingState: '',
+        shippingZipCode: '',
+        shippingPhone: ''
+      });
     } catch (error) {
       console.error('Checkout failed:', error);
       alert('Checkout failed. Please try again.');
@@ -223,25 +237,104 @@ const CartPage = () => {
                     </div>
                   </div>
 
-                  {/* Shipping Address */}
+                  {/* Shipping Information */}
                   <div className="mb-6">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Shipping Address *
-                    </label>
-                    <textarea
-                      rows={3}
-                      value={shippingAddress}
-                      onChange={(e) => setShippingAddress(e.target.value)}
-                      placeholder="Enter your complete shipping address..."
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      required
-                    />
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Shipping Information</h3>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Full Name *
+                        </label>
+                        <input
+                          type="text"
+                          value={shippingInfo.shippingName}
+                          onChange={(e) => setShippingInfo({...shippingInfo, shippingName: e.target.value})}
+                          placeholder="Enter your full name"
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          required
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Phone Number
+                        </label>
+                        <input
+                          type="tel"
+                          value={shippingInfo.shippingPhone}
+                          onChange={(e) => setShippingInfo({...shippingInfo, shippingPhone: e.target.value})}
+                          placeholder="Enter your phone number"
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="mt-4">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Street Address *
+                      </label>
+                      <textarea
+                        rows={2}
+                        value={shippingInfo.shippingAddress}
+                        onChange={(e) => setShippingInfo({...shippingInfo, shippingAddress: e.target.value})}
+                        placeholder="Enter your street address"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        required
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          City *
+                        </label>
+                        <input
+                          type="text"
+                          value={shippingInfo.shippingCity}
+                          onChange={(e) => setShippingInfo({...shippingInfo, shippingCity: e.target.value})}
+                          placeholder="City"
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          required
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          State *
+                        </label>
+                        <input
+                          type="text"
+                          value={shippingInfo.shippingState}
+                          onChange={(e) => setShippingInfo({...shippingInfo, shippingState: e.target.value})}
+                          placeholder="State"
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          required
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          ZIP Code *
+                        </label>
+                        <input
+                          type="text"
+                          value={shippingInfo.shippingZipCode}
+                          onChange={(e) => setShippingInfo({...shippingInfo, shippingZipCode: e.target.value})}
+                          placeholder="ZIP Code"
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          required
+                        />
+                      </div>
+                    </div>
                   </div>
 
                   {/* Checkout Button */}
                   <button
                     onClick={handleCheckout}
-                    disabled={!shippingAddress.trim()}
+                    disabled={!shippingInfo.shippingName.trim() || !shippingInfo.shippingAddress.trim() || 
+                             !shippingInfo.shippingCity.trim() || !shippingInfo.shippingState.trim() || 
+                             !shippingInfo.shippingZipCode.trim()}
                     className="w-full py-4 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
                     <FaCreditCard size={18} />

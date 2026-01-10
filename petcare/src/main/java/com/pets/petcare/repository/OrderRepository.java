@@ -2,6 +2,8 @@ package com.pets.petcare.repository;
 
 import com.pets.petcare.entity.Order;
 import com.pets.petcare.entity.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -10,81 +12,53 @@ import org.springframework.stereotype.Repository;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
     
-    // Find orders by user
+    Optional<Order> findByOrderNumber(String orderNumber);
+    
+    List<Order> findByUser(User user);
+    Page<Order> findByUser(User user, Pageable pageable);
+    
     List<Order> findByUserOrderByCreatedAtDesc(User user);
+    Page<Order> findByUserOrderByCreatedAtDesc(User user, Pageable pageable);
     
-    // Find orders by status
-    List<Order> findByStatusOrderByCreatedAtDesc(Order.OrderStatus status);
+    List<Order> findByStatus(Order.OrderStatus status);
+    Page<Order> findByStatus(Order.OrderStatus status, Pageable pageable);
     
-    // Find orders by user and status
-    List<Order> findByUserAndStatusOrderByCreatedAtDesc(User user, Order.OrderStatus status);
+    List<Order> findByUserAndStatus(User user, Order.OrderStatus status);
     
-    // Find orders by date range
-    @Query("SELECT o FROM Order o WHERE o.createdAt >= :startDate AND o.createdAt <= :endDate " +
-           "ORDER BY o.createdAt DESC")
-    List<Order> findOrdersByDateRange(@Param("startDate") LocalDateTime startDate,
-                                      @Param("endDate") LocalDateTime endDate);
+    @Query("SELECT o FROM Order o WHERE o.createdAt BETWEEN :startDate AND :endDate")
+    List<Order> findByDateRange(@Param("startDate") LocalDateTime startDate, 
+                               @Param("endDate") LocalDateTime endDate);
     
-    // Find orders for vendor (orders containing vendor's products)
-    @Query("SELECT DISTINCT o FROM Order o " +
-           "JOIN o.orderItems oi " +
-           "WHERE oi.product.vendor = :vendor " +
-           "ORDER BY o.createdAt DESC")
-    List<Order> findOrdersForVendor(@Param("vendor") User vendor);
-    
-    // Find orders for vendor by status
-    @Query("SELECT DISTINCT o FROM Order o " +
-           "JOIN o.orderItems oi " +
-           "WHERE oi.product.vendor = :vendor AND o.status = :status " +
-           "ORDER BY o.createdAt DESC")
-    List<Order> findOrdersForVendorByStatus(@Param("vendor") User vendor, 
-                                            @Param("status") Order.OrderStatus status);
-    
-    // Calculate total revenue for vendor
-    @Query("SELECT COALESCE(SUM(oi.price * oi.quantity), 0) FROM OrderItem oi " +
-           "JOIN oi.order o " +
-           "WHERE oi.product.vendor = :vendor AND o.status IN :statuses")
-    BigDecimal calculateVendorRevenue(@Param("vendor") User vendor, 
-                                      @Param("statuses") List<Order.OrderStatus> statuses);
-    
-    // Count orders for vendor
-    @Query("SELECT COUNT(DISTINCT o) FROM Order o " +
-           "JOIN o.orderItems oi " +
-           "WHERE oi.product.vendor = :vendor")
-    long countOrdersForVendor(@Param("vendor") User vendor);
-    
-    // Count pending orders for vendor
-    @Query("SELECT COUNT(DISTINCT o) FROM Order o " +
-           "JOIN o.orderItems oi " +
-           "WHERE oi.product.vendor = :vendor AND o.status = 'PLACED'")
-    long countPendingOrdersForVendor(@Param("vendor") User vendor);
-    
-    // Admin statistics methods
+    @Query("SELECT COUNT(o) FROM Order o WHERE o.user = :user")
+    Long countByUser(@Param("user") User user);
+
+    // Admin methods for statistics
     long countByStatus(Order.OrderStatus status);
     
-    @Query("SELECT COALESCE(SUM(o.totalAmount), 0) FROM Order o WHERE o.status = :status")
+    @Query("SELECT SUM(o.totalAmount) FROM Order o WHERE o.status = :status")
     BigDecimal sumTotalAmountByStatus(@Param("status") Order.OrderStatus status);
     
-    @Query("SELECT COALESCE(SUM(o.totalAmount), 0) FROM Order o WHERE o.status = :status " +
-           "AND o.createdAt >= :startDate AND o.createdAt <= :endDate")
+    @Query("SELECT SUM(o.totalAmount) FROM Order o WHERE o.status = :status AND o.createdAt BETWEEN :startDate AND :endDate")
     BigDecimal sumTotalAmountByStatusAndDateRange(@Param("status") Order.OrderStatus status,
                                                   @Param("startDate") LocalDateTime startDate,
                                                   @Param("endDate") LocalDateTime endDate);
     
-    // Vendor-specific statistics
-    @Query("SELECT COUNT(DISTINCT o) FROM Order o JOIN o.orderItems oi WHERE oi.product.vendor.id = :vendorId")
-    long countByVendorId(@Param("vendorId") Long vendorId);
+    // Vendor-specific methods
+    @Query("SELECT o.status, COUNT(o), SUM(o.totalAmount) FROM Order o " +
+           "JOIN o.items oi JOIN oi.product p " +
+           "WHERE p.vendor.id = :vendorId " +
+           "GROUP BY o.status")
+    List<Object[]> getVendorOrderStats(@Param("vendorId") Long vendorId);
     
-    @Query("SELECT COUNT(DISTINCT o) FROM Order o JOIN o.orderItems oi " +
-           "WHERE oi.product.vendor.id = :vendorId AND o.status = :status")
-    long countByVendorIdAndStatus(@Param("vendorId") Long vendorId, @Param("status") Order.OrderStatus status);
-    
-    @Query("SELECT COALESCE(SUM(oi.price * oi.quantity), 0) FROM OrderItem oi " +
-           "JOIN oi.order o WHERE oi.product.vendor.id = :vendorId AND o.status = :status")
-    BigDecimal sumTotalAmountByVendorIdAndStatus(@Param("vendorId") Long vendorId, 
-                                                 @Param("status") Order.OrderStatus status);
+    @Query("SELECT o.id, o.orderNumber, o.user.name, o.user.email, o.status, o.paymentStatus, o.totalAmount, " +
+           "oi.id, oi.product.id, oi.product.title, oi.quantity, oi.unitPrice, oi.totalPrice " +
+           "FROM Order o JOIN o.items oi JOIN oi.product p " +
+           "WHERE p.vendor.id = :vendorId " +
+           "ORDER BY o.createdAt DESC")
+    List<Object[]> getVendorOrders(@Param("vendorId") Long vendorId);
 }

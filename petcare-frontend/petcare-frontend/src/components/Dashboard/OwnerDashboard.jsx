@@ -6,10 +6,13 @@ import {
   FaHeart,
   FaPlus,
   FaSearch,
-  FaShoppingCart,
   FaTimes,
   FaUser,
   FaTrash,
+  FaShoppingCart,
+  FaFilter,
+  FaStar,
+  FaTag,
 } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
@@ -22,6 +25,10 @@ import AddPetModal from '../Pets/AddPetModal';
 import PetProfile from '../Pets/PetProfile';
 import { appointmentService } from '../../services/appointmentService';
 import { vetService } from '../../services/vetService';
+import { productService } from '../../services/productService';
+import { cartService } from '../../services/cartService';
+import { orderService } from '../../services/orderService';
+import CheckoutModal from '../Shop/CheckoutModal';
 import styles from './OwnerDashboard.module.css';
 
 const carouselImages = [
@@ -204,10 +211,11 @@ const OwnerDashboard = () => {
   const menuItems = [
     { id: 'overview', icon: FaHeart, label: 'Overview', emoji: '🏠', badge: null },
     { id: 'pets', icon: FaHeart, label: 'My Pets', emoji: '🐾', badge: navBadges.pets },
+    { id: 'shop', icon: FaShoppingCart, label: 'Shop', emoji: '🛒', badge: null },
+    { id: 'orders', icon: FaShoppingCart, label: 'My Orders', emoji: '📦', badge: null },
     { id: 'appointments', icon: FaCalendarAlt, label: 'Appointments', emoji: '📅', badge: navBadges.appointments },
     { id: 'health', icon: FaChartLine, label: 'Health', emoji: '📊', badge: navBadges.health },
     { id: 'reminders', icon: FaBell, label: 'Reminders', emoji: '🔔', badge: navBadges.reminders },
-    { id: 'marketplace', icon: FaShoppingCart, label: 'Shop', emoji: '🛒', badge: null },
     { id: 'profile', icon: FaUser, label: 'Profile', emoji: '👤', badge: null },
   ];
 
@@ -336,6 +344,8 @@ const OwnerDashboard = () => {
               styles={styles}
             />
           )}
+          {activeSection === 'shop' && <ShopSection styles={styles} />}
+          {activeSection === 'orders' && <OrdersSection styles={styles} />}
           {activeSection === 'appointments' && (
             <AppointmentsSection pets={pets} styles={styles} />
           )}
@@ -344,9 +354,6 @@ const OwnerDashboard = () => {
           )}
           {activeSection === 'reminders' && (
             <RemindersSection pets={pets} styles={styles} />
-          )}
-          {activeSection === 'marketplace' && (
-            <ComingSoonSection icon="🛒" title="Marketplace" styles={styles} />
           )}
           {activeSection === 'profile' && <ProfileSection user={user} navigate={navigate} styles={styles} />}
         </div>
@@ -727,8 +734,8 @@ const ProfileSection = ({ user, navigate, styles }) => (
       </button>
       <button
         onClick={() => {
-          localStorage.removeItem('token');
-          localStorage.removeItem('user');
+          sessionStorage.removeItem('token');
+          sessionStorage.removeItem('user');
           window.location.href = '/login';
         }}
         className={styles.secondaryBtn}
@@ -1058,10 +1065,10 @@ const AppointmentBookingModal = ({ pets, onClose, styles }) => {
         slotId: selectedSlot?.id,
         veterinarianId: selectedVet.id,
         dateTime: appointmentDateTime.toISOString(),
-        type: selectedSlot?.supportedType === 'IN_CLINIC' ? 'IN_CLINIC' : 'VIDEO',
+        type: selectedSlot?.mode === 'IN_CLINIC' ? 'IN_CLINIC' : 'TELECONSULT',
         reason
       });
-      alert('Appointment Booked Successfully! Confirmation email sent.');
+      alert('Appointment Requested Successfully! Status: PENDING. Please wait for Vet approval.');
       onClose();
     } catch (e) {
       alert('Booking Failed: ' + (e.response?.data?.message || e.message));
@@ -1136,7 +1143,7 @@ const AppointmentBookingModal = ({ pets, onClose, styles }) => {
                   {slots.length === 0 && <p className="col-span-3 text-gray-500">No slots available. (Using fallback booking)</p>}
 
                   {(slots.length > 0 ? slots : [
-                    { id: null, startTime: new Date(new Date().setHours(10, 0, 0, 0)).toISOString(), supportedType: 'VIDEO' }, // Mock
+                    { id: null, startTime: new Date(new Date().setHours(10, 0, 0, 0)).toISOString(), mode: 'TELECONSULT' }, // Mock
                   ]).map((slot, idx) => (
                     <div key={slot.id || idx}
                       onClick={() => setSelectedSlot(slot)}
@@ -1184,7 +1191,7 @@ const AppointmentsSection = ({ pets, styles }) => {
         if (realAppts && realAppts.length > 0) {
           allAppointments.push(...realAppts.map(a => ({
             type: 'appointment',
-            title: 'Vet Visit: ' + (a.type === 'VIDEO' ? 'Teleconsult' : 'In-Clinic'),
+            title: 'Vet Visit: ' + (a.type === 'TELECONSULT' ? 'Teleconsult' : 'In-Clinic'),
             date: a.appointmentDate,
             petName: pet.name,
             petId: pet.id,
@@ -1295,6 +1302,991 @@ const AppointmentsSection = ({ pets, styles }) => {
           </div>
         )}
       </div>
+    </div>
+  );
+};
+
+// Shop Section - Pet product catalog similar to reference image
+const ShopSection = ({ styles }) => {
+  const [products, setProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [priceRange, setPriceRange] = useState({ min: 0, max: 10000 });
+  const [selectedBrand, setSelectedBrand] = useState('all');
+  const [availability, setAvailability] = useState('all');
+  const [productSource, setProductSource] = useState('all');
+  const [sortBy, setSortBy] = useState('name');
+  const [cart, setCart] = useState(null);
+  const [showCheckout, setShowCheckout] = useState(false);
+
+  const categories = [
+    { value: 'all', label: 'All Categories', emoji: '🌟' },
+    { value: 'FOOD', label: 'Food & Treats', emoji: '🍖' },
+    { value: 'TOYS', label: 'Toys', emoji: '🧸' },
+    { value: 'HEALTH', label: 'Health & Wellness', emoji: '💊' },
+    { value: 'GROOMING', label: 'Grooming', emoji: '🛁' },
+    { value: 'ACCESSORIES', label: 'Accessories', emoji: '🎀' },
+    { value: 'BEDS', label: 'Beds & Furniture', emoji: '🛏️' },
+    { value: 'TRAINING', label: 'Training', emoji: '🎯' },
+    { value: 'TRAVEL', label: 'Travel', emoji: '🧳' }
+  ];
+
+  const productSources = [
+    { value: 'all', label: 'All Products', emoji: '🌟' },
+    { value: 'vendor', label: 'Vendor Products', emoji: '🏪' },
+    { value: 'admin', label: 'Store Products', emoji: '🏬' }
+  ];
+
+  const brands = ['all', 'Royal Canin', 'Pedigree', 'Farmina', 'Hill\'s', 'Purina', 'Whiskas'];
+
+  // Load products and cart
+  useEffect(() => {
+    loadProducts();
+    loadCart();
+  }, []);
+
+  // Filter products when filters change
+  useEffect(() => {
+    filterProducts();
+  }, [products, searchTerm, selectedCategory, priceRange, selectedBrand, availability, productSource, sortBy]);
+
+  const loadProducts = async () => {
+    try {
+      setLoading(true);
+      console.log('🔍 Loading products from API...');
+      const response = await productService.getAllProducts(0, 500);
+      console.log('📦 Raw API response:', response);
+      const productList = response.content || [];
+      console.log('📋 Product list:', productList);
+      console.log('🏪 Vendor products found:', productList.filter(p => p.vendorId !== null));
+      console.log('🏬 Admin products found:', productList.filter(p => p.vendorId === null));
+      // Show all products from vendors and admin
+      setProducts(productList);
+    } catch (error) {
+      console.error('Failed to load products:', error);
+      setProducts([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadCart = async () => {
+    try {
+      const response = await cartService.getCart();
+      setCart(response.data);
+    } catch (error) {
+      console.error('Failed to load cart:', error);
+    }
+  };
+
+  const filterProducts = () => {
+    let filtered = [...products];
+    console.log('🔍 Starting filter with products:', products.length);
+    console.log('🎯 Current filters:', { searchTerm, selectedCategory, selectedBrand, priceRange, availability, productSource, sortBy });
+
+    // Search filter
+    if (searchTerm.trim()) {
+      const search = searchTerm.toLowerCase();
+      filtered = filtered.filter(product =>
+        product.title.toLowerCase().includes(search) ||
+        product.description.toLowerCase().includes(search) ||
+        product.brand?.toLowerCase().includes(search)
+      );
+      console.log('🔍 After search filter:', filtered.length);
+    }
+
+    // Category filter
+    if (selectedCategory !== 'all') {
+      filtered = filtered.filter(product => product.category === selectedCategory);
+      console.log('📂 After category filter:', filtered.length);
+    }
+
+    // Brand filter
+    if (selectedBrand !== 'all') {
+      filtered = filtered.filter(product => product.brand === selectedBrand);
+      console.log('🏷️ After brand filter:', filtered.length);
+    }
+
+    // Price range filter
+    filtered = filtered.filter(product => {
+      const price = product.discountedPrice || product.price;
+      return price >= priceRange.min && price <= priceRange.max;
+    });
+    console.log('💰 After price filter:', filtered.length);
+
+    // Availability filter
+    if (availability === 'in-stock') {
+      filtered = filtered.filter(product => product.inStock);
+      console.log('📦 After availability filter (in-stock):', filtered.length);
+    } else if (availability === 'out-of-stock') {
+      filtered = filtered.filter(product => !product.inStock);
+      console.log('📦 After availability filter (out-of-stock):', filtered.length);
+    }
+
+    // Product source filter
+    if (productSource === 'vendor') {
+      filtered = filtered.filter(product => product.vendorId !== null);
+      console.log('🏪 After vendor filter:', filtered.length);
+    } else if (productSource === 'admin') {
+      filtered = filtered.filter(product => product.vendorId === null);
+      console.log('🏬 After admin filter:', filtered.length);
+    }
+
+    // Sort products
+    filtered.sort((a, b) => {
+      switch (sortBy) {
+        case 'price-low':
+          return (a.discountedPrice || a.price) - (b.discountedPrice || b.price);
+        case 'price-high':
+          return (b.discountedPrice || b.price) - (a.discountedPrice || a.price);
+        case 'rating':
+          return (b.rating || 0) - (a.rating || 0);
+        case 'discount':
+          return (b.discountPercentage || 0) - (a.discountPercentage || 0);
+        default:
+          return a.title.localeCompare(b.title);
+      }
+    });
+
+    console.log('✅ Final filtered products:', filtered.length);
+    console.log('🏪 Vendor products in final list:', filtered.filter(p => p.vendorId !== null));
+    setFilteredProducts(filtered);
+  };
+
+  const handleAddToCart = async (productId) => {
+    try {
+      await cartService.addToCart(productId, 1);
+      await loadCart();
+      alert('Product added to cart! 🐾');
+    } catch (error) {
+      console.error('Failed to add to cart:', error);
+      alert('Failed to add product to cart');
+    }
+  };
+
+  const clearFilters = () => {
+    setSearchTerm('');
+    setSelectedCategory('all');
+    setPriceRange({ min: 0, max: 10000 });
+    setSelectedBrand('all');
+    setAvailability('all');
+    setProductSource('all');
+    setSortBy('name');
+  };
+
+  return (
+    <div className="pet-shop-dashboard">
+      {/* Header */}
+      <div className="pet-shop-header-dashboard">
+        <div className="title-section">
+          <h2 className="pet-shop-title-dashboard">
+            <span className="paw-icon">🐾</span>
+            Pet Paradise Shop
+            <span className="paw-icon">🐾</span>
+          </h2>
+          <p className="pet-shop-subtitle-dashboard">Everything your furry friends need! 💕</p>
+          {cart && cart.totalItems > 0 && (
+            <div className="cart-summary-dashboard">
+              <span className="cart-info">
+                <FaShoppingCart />
+                {cart.totalItems} items in cart - ₹{cart.totalAmount?.toFixed(2)}
+              </span>
+              <button
+                onClick={() => setShowCheckout(true)}
+                className="pet-btn-primary"
+                style={{
+                  marginLeft: '15px',
+                  padding: '8px 20px',
+                  fontSize: '0.9rem',
+                  borderRadius: '12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}
+              >
+                Checkout 🐾
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="pet-shop-main-dashboard">
+        {/* Left Sidebar with Filters */}
+        <div className="pet-filters-sidebar-dashboard">
+          <div className="sidebar-header">
+            <h3 className="filter-title">
+              <span className="bone-icon">🦴</span>
+              Filter & Find
+            </h3>
+          </div>
+
+          {/* Search Section */}
+          <div className="filter-section">
+            <div className="section-divider">
+              <span className="paw-divider">🐾</span>
+            </div>
+            <h4 className="section-title">Search Products</h4>
+            <div className="pet-search-container">
+              <FaSearch className="search-icon" />
+              <input
+                type="text"
+                placeholder="Search for treats, toys..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pet-search-input"
+              />
+              {searchTerm && (
+                <button
+                  className="clear-search pet-button"
+                  onClick={() => setSearchTerm('')}
+                >
+                  <FaTimes />
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Categories Section */}
+          <div className="filter-section">
+            <div className="section-divider">
+              <span className="bone-divider">🦴</span>
+            </div>
+            <h4 className="section-title">Pet Categories</h4>
+            <div className="category-buttons">
+              {categories.map(cat => (
+                <button
+                  key={cat.value}
+                  className={`category-btn ${selectedCategory === cat.value ? 'active' : ''}`}
+                  onClick={() => setSelectedCategory(cat.value)}
+                >
+                  <span className="category-icon">{cat.emoji}</span>
+                  {cat.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Product Source Section */}
+          <div className="filter-section">
+            <div className="section-divider">
+              <span className="paw-divider">🐾</span>
+            </div>
+            <h4 className="section-title">Product Source</h4>
+            <div className="category-buttons">
+              {productSources.map(source => (
+                <button
+                  key={source.value}
+                  className={`category-btn ${productSource === source.value ? 'active' : ''}`}
+                  onClick={() => setProductSource(source.value)}
+                >
+                  <span className="category-icon">{source.emoji}</span>
+                  {source.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Price Range Section */}
+          <div className="filter-section">
+            <div className="section-divider">
+              <span className="paw-divider">🐾</span>
+            </div>
+            <h4 className="section-title">Price Range</h4>
+            <div className="pet-price-range">
+              <div className="price-display">
+                <span className="price-tag">💰 ₹{priceRange.min} - ₹{priceRange.max}</span>
+              </div>
+              <div className="price-sliders">
+                <input
+                  type="range"
+                  min="0"
+                  max="1000"
+                  value={priceRange.min}
+                  onChange={(e) => setPriceRange(prev => ({ ...prev, min: parseInt(e.target.value) }))}
+                  className="pet-price-slider min-slider"
+                />
+                <input
+                  type="range"
+                  min="0"
+                  max="1000"
+                  value={priceRange.max}
+                  onChange={(e) => setPriceRange(prev => ({ ...prev, max: parseInt(e.target.value) }))}
+                  className="pet-price-slider max-slider"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Quick Filters */}
+          <div className="filter-section">
+            <div className="section-divider">
+              <span className="bone-divider">🦴</span>
+            </div>
+            <h4 className="section-title">Quick Filters</h4>
+            <div className="quick-filter-pills">
+              <button
+                className={`filter-pill ${availability === 'in-stock' ? 'active stock' : ''}`}
+                onClick={() => setAvailability(availability === 'in-stock' ? 'all' : 'in-stock')}
+              >
+                <span className="pill-icon">✅</span>
+                In Stock Only
+              </button>
+              <button
+                className={`filter-pill ${sortBy === 'discount' ? 'active sale' : ''}`}
+                onClick={() => setSortBy(sortBy === 'discount' ? 'name' : 'discount')}
+              >
+                <span className="pill-icon">🏷️</span>
+                On Sale
+              </button>
+              <button
+                className={`filter-pill ${sortBy === 'rating' ? 'active rating' : ''}`}
+                onClick={() => setSortBy(sortBy === 'rating' ? 'name' : 'rating')}
+              >
+                <span className="pill-icon">⭐</span>
+                Top Rated
+              </button>
+            </div>
+          </div>
+
+          {/* Clear All Filters */}
+          {(searchTerm || selectedCategory !== 'all' || selectedBrand !== 'all' || availability !== 'all' || productSource !== 'all') && (
+            <div className="filter-section">
+              <button
+                className="clear-all-filters"
+                onClick={clearFilters}
+              >
+                <FaTimes />
+                Clear All Filters
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Main Content Area */}
+        <div className="pet-shop-content-dashboard">
+          {/* Top Controls */}
+          <div className="content-header">
+            <div className="results-info">
+              <h3 className="results-title">
+                <span className="bone-icon">🦴</span>
+                {filteredProducts.length} Pawsome Products
+                {searchTerm && <span className="search-term"> for "{searchTerm}"</span>}
+              </h3>
+            </div>
+
+            <div className="content-controls">
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="pet-sort-select"
+              >
+                <option value="name">🔤 Name A-Z</option>
+                <option value="price-low">💰 Price: Low to High</option>
+                <option value="price-high">💰 Price: High to Low</option>
+                <option value="rating">⭐ Highest Rated</option>
+                <option value="discount">🏷️ Best Deals</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Products Grid */}
+          <div className="pet-products-section">
+            {loading ? (
+              <div className="pet-loading">
+                <div className="loading-animation">
+                  <div className="bouncing-paws">
+                    <span className="paw">🐾</span>
+                    <span className="paw">🐾</span>
+                    <span className="paw">🐾</span>
+                  </div>
+                  <p>Finding pawsome products...</p>
+                </div>
+              </div>
+            ) : filteredProducts.length === 0 ? (
+              <div className="pet-empty-state">
+                <div className="empty-animation">
+                  <span className="sad-pet">🐕‍🦺</span>
+                  <div className="empty-paws">
+                    <span>🐾</span>
+                    <span>🐾</span>
+                    <span>🐾</span>
+                  </div>
+                </div>
+                <h4>No products found</h4>
+                <p>Try adjusting your search or filters to find what you're looking for!</p>
+                <button className="reset-filters-btn" onClick={clearFilters}>
+                  <span className="btn-icon">🔄</span>
+                  Reset All Filters
+                </button>
+              </div>
+            ) : (
+              <div className="pet-products-grid-dashboard">
+                {filteredProducts.map(product => (
+                  <DashboardProductCard
+                    key={product.id}
+                    product={product}
+                    onAddToCart={handleAddToCart}
+                    styles={styles}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {showCheckout && (
+        <CheckoutModal
+          cart={cart}
+          onClose={() => setShowCheckout(false)}
+          onOrderComplete={() => {
+            setShowCheckout(false);
+            loadCart();
+            alert('Order placed successfully! 🐾');
+          }}
+          onCartUpdate={loadCart}
+        />
+      )}
+    </div>
+  );
+};
+
+// Product Card Component
+const ProductCard = ({ product, onAddToCart, styles }) => {
+  const discountedPrice = product.discountedPrice || product.price;
+  const hasDiscount = product.discountPercentage > 0;
+
+  return (
+    <div className="bg-white border-2 border-gray-200 rounded-2xl overflow-hidden hover:shadow-xl hover:border-purple-300 transition-all duration-300 transform hover:scale-105">
+      {/* Product Image */}
+      <div className="relative h-48 bg-gray-100">
+        {product.images && product.images.length > 0 ? (
+          <img
+            src={product.images[0].startsWith('http') ? product.images[0] : `http://localhost:8080${product.images[0]}`}
+            alt={product.title}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-4xl">
+            📦
+          </div>
+        )}
+
+        {/* Discount Badge */}
+        {hasDiscount && (
+          <div className="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded-full text-xs font-bold">
+            -{product.discountPercentage}% OFF
+          </div>
+        )}
+
+        {/* Stock Status */}
+        <div className={`absolute top-2 right-2 px-2 py-1 rounded-full text-xs font-bold ${product.inStock ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+          }`}>
+          {product.inStock ? '✅ In Stock' : '❌ Out of Stock'}
+        </div>
+      </div>
+
+      {/* Product Info */}
+      <div className="p-4">
+        {/* Category */}
+        <div className="text-xs text-purple-600 font-semibold mb-1">
+          {product.categoryDisplayName || product.category}
+        </div>
+
+        {/* Title */}
+        <h4 className="font-bold text-gray-800 mb-2 line-clamp-2 h-12">
+          {product.title}
+        </h4>
+
+        {/* Brand */}
+        {product.brand && (
+          <p className="text-sm text-gray-600 mb-2">{product.brand}</p>
+        )}
+
+        {/* Rating */}
+        {product.rating && (
+          <div className="flex items-center gap-1 mb-2">
+            <div className="flex">
+              {[...Array(5)].map((_, i) => (
+                <FaStar
+                  key={i}
+                  className={i < Math.floor(product.rating) ? 'text-yellow-400' : 'text-gray-300'}
+                  size={12}
+                />
+              ))}
+            </div>
+            <span className="text-xs text-gray-600">({product.rating})</span>
+          </div>
+        )}
+
+        {/* Price */}
+        <div className="flex items-center gap-2 mb-3">
+          <span className="text-lg font-bold text-purple-600">
+            ₹{discountedPrice?.toFixed(2)}
+          </span>
+          {hasDiscount && (
+            <span className="text-sm text-gray-500 line-through">
+              ₹{product.price?.toFixed(2)}
+            </span>
+          )}
+        </div>
+
+        {/* Add to Cart Button */}
+        <button
+          onClick={() => onAddToCart(product.id)}
+          disabled={!product.inStock}
+          className={`w-full py-2 px-4 rounded-xl font-semibold transition-colors ${product.inStock
+            ? 'bg-purple-600 text-white hover:bg-purple-700'
+            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+            }`}
+        >
+          {product.inStock ? (
+            <>
+              <FaShoppingCart className="inline mr-2" />
+              Add to Cart
+            </>
+          ) : (
+            'Out of Stock'
+          )}
+        </button>
+      </div>
+    </div>
+  );
+};
+
+// Dashboard Product Card Component with Pet Theme
+const DashboardProductCard = ({ product, onAddToCart, styles }) => {
+  const discountedPrice = product.discountedPrice || product.price;
+  const hasDiscount = product.discountPercentage > 0;
+  const rating = product.rating || 0;
+  const isVendorProduct = product.vendorId !== null;
+
+  const renderPawRating = (rating) => {
+    const paws = [];
+    const fullPaws = Math.floor(rating);
+    const hasHalfPaw = rating % 1 >= 0.5;
+
+    for (let i = 0; i < 5; i++) {
+      if (i < fullPaws) {
+        paws.push(<span key={i} className="paw-rating full">🐾</span>);
+      } else if (i === fullPaws && hasHalfPaw) {
+        paws.push(<span key={i} className="paw-rating half">🐾</span>);
+      } else {
+        paws.push(<span key={i} className="paw-rating empty">🐾</span>);
+      }
+    }
+    return paws;
+  };
+
+  const handleVendorClick = () => {
+    if (isVendorProduct) {
+      // You can navigate to vendor profile or show vendor details
+      alert(`Visit ${product.vendorBusinessName || product.vendorName}'s Store! 🏪`);
+    }
+  };
+
+  return (
+    <div className="pet-product-card-dashboard">
+      {/* Product Image */}
+      <div className="pet-product-image-dashboard">
+        {product.images && product.images.length > 0 ? (
+          <img
+            src={product.images[0].startsWith('http') ? product.images[0] : `http://localhost:8080${product.images[0]}`}
+            alt={product.title}
+            className="product-img"
+          />
+        ) : (
+          <div className="no-image-placeholder">
+            <span className="placeholder-icon">📦</span>
+            <span className="placeholder-text">No Image</span>
+          </div>
+        )}
+
+        {/* Vendor Badge */}
+        {isVendorProduct && (
+          <div className="vendor-badge-dashboard">
+            <span className="vendor-icon">🏪</span>
+            <span className="vendor-text">Vendor</span>
+          </div>
+        )}
+
+        {/* Discount Badge */}
+        {hasDiscount && (
+          <div className="pet-discount-badge-dashboard">
+            <span className="discount-icon">🏷️</span>
+            <span className="discount-text">{product.discountPercentage}% OFF</span>
+          </div>
+        )}
+
+        {/* Stock Status */}
+        <div className={`pet-stock-badge-dashboard ${product.inStock ? 'in-stock' : 'out-of-stock'}`}>
+          <span className="stock-icon">{product.inStock ? '✅' : '❌'}</span>
+        </div>
+      </div>
+
+      {/* Product Info */}
+      <div className="pet-product-info-dashboard">
+        {/* Category */}
+        <div className="pet-product-category-dashboard">
+          <span className="category-icon">
+            {product.category === 'FOOD' && '🍖'}
+            {product.category === 'TOYS' && '🧸'}
+            {product.category === 'HEALTH' && '💊'}
+            {product.category === 'GROOMING' && '🛁'}
+            {product.category === 'ACCESSORIES' && '🎀'}
+            {product.category === 'BEDS' && '🛏️'}
+            {product.category === 'TRAINING' && '🎯'}
+            {product.category === 'TRAVEL' && '🧳'}
+            {!['FOOD', 'TOYS', 'HEALTH', 'GROOMING', 'ACCESSORIES', 'BEDS', 'TRAINING', 'TRAVEL'].includes(product.category) && '🐾'}
+          </span>
+          <span className="category-text">{product.categoryDisplayName || product.category}</span>
+        </div>
+
+        {/* Title */}
+        <h4 className="pet-product-title-dashboard">{product.title}</h4>
+
+        {/* Vendor Info */}
+        {isVendorProduct && (
+          <div className="pet-product-vendor-dashboard">
+            <span className="vendor-label">Sold by:</span>
+            <button
+              onClick={handleVendorClick}
+              className="vendor-link-dashboard"
+            >
+              <span className="vendor-shop-icon">🏪</span>
+              <span className="vendor-name">{product.vendorBusinessName || product.vendorName}</span>
+              <span className="visit-icon">→</span>
+            </button>
+          </div>
+        )}
+
+        {/* Brand */}
+        {product.brand && (
+          <p className="pet-product-brand-dashboard">
+            <span className="brand-icon">🏷️</span>
+            {product.brand}
+          </p>
+        )}
+
+        {/* Rating */}
+        {rating > 0 && (
+          <div className="pet-product-rating-dashboard">
+            <div className="paw-rating-container">
+              {renderPawRating(rating)}
+            </div>
+            <span className="rating-text">({rating.toFixed(1)})</span>
+          </div>
+        )}
+
+        {/* Price */}
+        <div className="pet-product-price-dashboard">
+          <span className="current-price">₹{discountedPrice?.toFixed(2)}</span>
+          {hasDiscount && (
+            <span className="original-price">₹{product.price?.toFixed(2)}</span>
+          )}
+        </div>
+
+        {/* Add to Cart Button */}
+        <button
+          onClick={() => onAddToCart(product.id)}
+          disabled={!product.inStock}
+          className={`pet-add-to-cart-dashboard ${!product.inStock ? 'disabled' : ''}`}
+        >
+          {product.inStock ? (
+            <>
+              <FaShoppingCart />
+              <span>Add to Cart</span>
+              <span className="paw-accent">🐾</span>
+            </>
+          ) : (
+            <>
+              <span className="sad-paw">🐾</span>
+              <span>Out of Stock</span>
+            </>
+          )}
+        </button>
+      </div>
+    </div>
+  );
+};
+
+// Orders Section Component
+const OrdersSection = ({ styles }) => {
+  const { user } = useAuth();
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState('all');
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        setLoading(true);
+        // Import orderService locally to avoid ESLint issues
+        const { orderService } = await import('../../services/orderService');
+        // Get user orders from orderService
+        const response = await orderService.getUserOrders(user.id);
+        if (response.success) {
+          // Handle paginated response
+          const ordersData = response.data?.content || response.data || [];
+          setOrders(ordersData);
+        }
+      } catch (error) {
+        console.error('Error fetching orders:', error);
+        setOrders([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (user?.id) {
+      fetchOrders();
+    }
+  }, [user]);
+
+  const getStatusConfig = (status) => {
+    const statusConfigs = {
+      'PENDING': {
+        bg: '#FEF3C7',
+        text: '#92400E',
+        border: '#F59E0B',
+        label: 'Pending',
+        icon: '⏳'
+      },
+      'CONFIRMED': {
+        bg: '#DBEAFE',
+        text: '#1E40AF',
+        border: '#3B82F6',
+        label: 'Confirmed',
+        icon: '✅'
+      },
+      'PROCESSING': {
+        bg: '#FED7AA',
+        text: '#C2410C',
+        border: '#F97316',
+        label: 'Processing',
+        icon: '⚙️'
+      },
+      'SHIPPED': {
+        bg: '#E0E7FF',
+        text: '#3730A3',
+        border: '#6366F1',
+        label: 'Shipped',
+        icon: '🚚'
+      },
+      'DELIVERED': {
+        bg: '#D1FAE5',
+        text: '#065F46',
+        border: '#10B981',
+        label: 'Delivered',
+        icon: '📦'
+      },
+      'CANCELLED': {
+        bg: '#FEE2E2',
+        text: '#991B1B',
+        border: '#EF4444',
+        label: 'Cancelled',
+        icon: '❌'
+      }
+    };
+
+    return statusConfigs[status] || statusConfigs['PENDING'];
+  };
+
+  const getStatusBadge = (status) => {
+    const config = getStatusConfig(status);
+    return (
+      <span
+        className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold space-x-1"
+        style={{
+          backgroundColor: config.bg,
+          color: config.text
+        }}
+      >
+        <span>{config.icon}</span>
+        <span>{config.label}</span>
+      </span>
+    );
+  };
+
+  const filteredOrders = orders.filter(order => {
+    if (filter === 'all') return true;
+    return order.status === filter;
+  });
+
+  const filterOptions = [
+    { value: 'all', label: 'All Orders', icon: '📋' },
+    { value: 'PENDING', label: 'Pending', icon: '⏳' },
+    { value: 'CONFIRMED', label: 'Confirmed', icon: '✅' },
+    { value: 'PROCESSING', label: 'Processing', icon: '⚙️' },
+    { value: 'SHIPPED', label: 'Shipped', icon: '🚚' },
+    { value: 'DELIVERED', label: 'Delivered', icon: '📦' },
+    { value: 'CANCELLED', label: 'Cancelled', icon: '❌' }
+  ];
+
+  if (loading) {
+    return (
+      <div className={styles.sectionContainer}>
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-purple-600 mx-auto mb-4"></div>
+            <p className="text-lg font-medium text-purple-600">Loading your orders...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className={styles.sectionContainer}>
+      {/* Header */}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-8">
+        <div>
+          <h2 className="text-3xl font-bold text-purple-600 mb-2">
+            📦 My Orders
+          </h2>
+          <p className="text-gray-600 text-lg">Track your orders and delivery status</p>
+        </div>
+
+        {/* Filter Pills */}
+        <div className="flex flex-wrap gap-2">
+          {filterOptions.map((option) => (
+            <button
+              key={option.value}
+              onClick={() => setFilter(option.value)}
+              className={`px-4 py-2 rounded-full font-medium transition-all duration-200 hover:scale-105 flex items-center space-x-2 ${filter === option.value
+                ? 'text-white shadow-lg'
+                : 'text-gray-600 bg-white border border-gray-200 hover:border-gray-300'
+                }`}
+              style={{
+                background: filter === option.value
+                  ? 'linear-gradient(135deg, #7C3F8C 0%, #E91E63 100%)'
+                  : 'white',
+                boxShadow: filter === option.value
+                  ? '0 4px 16px rgba(124, 63, 140, 0.3)'
+                  : '0 2px 8px rgba(0, 0, 0, 0.05)'
+              }}
+            >
+              <span>{option.icon}</span>
+              <span>{option.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Orders List */}
+      {filteredOrders.length === 0 ? (
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-16 text-center relative overflow-hidden">
+          <div className="text-9xl mb-6 animate-bounce">📦</div>
+          <h3 className="text-3xl font-bold mb-4 text-purple-600">No orders found</h3>
+          <p className="text-gray-600 text-lg max-w-md mx-auto">
+            {filter === 'all'
+              ? 'You haven\'t placed any orders yet. Start shopping to see your orders here!'
+              : `No orders with status "${filterOptions.find(f => f.value === filter)?.label}" found`
+            }
+          </p>
+        </div>
+      ) : (
+        <div className="space-y-6">
+          {filteredOrders.map((order) => {
+            const statusConfig = getStatusConfig(order.status);
+            return (
+              <div
+                key={order.id}
+                className="bg-white rounded-2xl shadow-lg border-l-4 overflow-hidden transition-all duration-200 hover:shadow-xl"
+                style={{
+                  borderLeftColor: statusConfig.border,
+                  boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)'
+                }}
+              >
+                <div className="p-8">
+                  {/* Order Header */}
+                  <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-6">
+                    <div className="flex items-center space-x-4">
+                      <div
+                        className="w-16 h-16 rounded-2xl flex items-center justify-center text-white text-xl font-bold"
+                        style={{ background: 'linear-gradient(135deg, #7C3F8C 0%, #E91E63 100%)' }}
+                      >
+                        📦
+                      </div>
+                      <div>
+                        <h3 className="text-xl font-bold text-gray-900">#{order.orderNumber}</h3>
+                        <p className="text-sm text-gray-500">
+                          Ordered on {new Date(order.createdAt).toLocaleDateString()}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col lg:flex-row lg:items-center gap-4">
+                      <div className="text-right">
+                        <p className="text-3xl font-bold text-purple-600">
+                          ₹{order.totalAmount?.toFixed(2)}
+                        </p>
+                        <p className="text-sm text-gray-500">Total Amount</p>
+                      </div>
+                      <div>
+                        {getStatusBadge(order.status)}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Order Items */}
+                  <div className="border-t border-gray-100 pt-6 mb-6">
+                    <h4 className="font-semibold text-gray-900 mb-4 flex items-center space-x-2">
+                      <span>📦</span>
+                      <span>Order Items:</span>
+                    </h4>
+                    <div className="space-y-3">
+                      {order.items?.map((item, idx) => (
+                        <div key={idx} className="flex items-center justify-between bg-gray-50 rounded-xl p-4">
+                          <div className="flex items-center space-x-4">
+                            <div className="w-12 h-12 bg-gradient-to-br from-purple-100 to-pink-100 rounded-xl flex items-center justify-center">
+                              <span className="text-xl">📦</span>
+                            </div>
+                            <div>
+                              <p className="font-semibold text-gray-900">{item.product?.title || 'Product'}</p>
+                              <p className="text-sm text-gray-600">Quantity: {item.quantity}</p>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <p className="font-bold text-gray-900 text-lg">₹{item.totalPrice?.toFixed(2)}</p>
+                            <p className="text-sm text-gray-600">₹{item.unitPrice?.toFixed(2)} each</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Shipping Information */}
+                  <div className="flex flex-col lg:flex-row lg:items-center justify-between pt-6 border-t border-gray-100 gap-4">
+                    <div className="flex items-center space-x-3 text-gray-600">
+                      <span className="text-xl">🚚</span>
+                      <span className="font-medium">Shipping to:</span>
+                      <span>{order.shippingAddress}, {order.shippingCity}</span>
+                    </div>
+
+                    <div className="flex items-center space-x-3 text-gray-600">
+                      <span className="text-xl">💳</span>
+                      <span className="font-medium">Payment:</span>
+                      <span
+                        className="px-3 py-1 rounded-full text-sm font-semibold"
+                        style={{
+                          backgroundColor: order.paymentStatus === 'PAID' ? '#D1FAE5' : '#FEE2E2',
+                          color: order.paymentStatus === 'PAID' ? '#065F46' : '#991B1B'
+                        }}
+                      >
+                        {order.paymentStatus}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };

@@ -1,134 +1,88 @@
 import api from './api';
 
 const productService = {
-  // Get all active products
-  getAllProducts: async () => {
-    try {
-      const response = await api.get('/products');
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching products:', error);
-      throw error;
-    }
-  },
+    // Get all products with pagination and sorting
+    getAllProducts: async (page = 0, size = 12, sortBy = 'createdAt', sortDir = 'desc') => {
+        const { data } = await api.get(`/products?page=${page}&size=${size}&sortBy=${sortBy}&sortDir=${sortDir}`);
+        return data;
+    },
 
-  // Search products with filters
-  searchProducts: async (filters = {}) => {
-    try {
-      const params = new URLSearchParams();
-      
-      if (filters.category && filters.category !== 'ALL') {
-        params.append('category', filters.category);
-      }
-      if (filters.minPrice) {
-        params.append('minPrice', filters.minPrice);
-      }
-      if (filters.maxPrice) {
-        params.append('maxPrice', filters.maxPrice);
-      }
-      if (filters.searchTerm) {
-        params.append('searchTerm', filters.searchTerm);
-      }
-      if (filters.page !== undefined) {
-        params.append('page', filters.page);
-      }
-      if (filters.size !== undefined) {
-        params.append('size', filters.size);
-      }
+    // Get products by category
+    getProductsByCategory: async (category, page = 0, size = 12) => {
+        const { data } = await api.get(`/products/category/${category}?page=${page}&size=${size}`);
+        return data;
+    },
 
-      const response = await api.get(`/products/search?${params.toString()}`);
-      return response.data;
-    } catch (error) {
-      console.error('Error searching products:', error);
-      throw error;
-    }
-  },
+    // Search products
+    searchProducts: async (query, page = 0, size = 12) => {
+        const { data } = await api.get(`/products/search?query=${encodeURIComponent(query)}&page=${page}&size=${size}`);
+        return data;
+    },
 
-  // Get products by category
-  getProductsByCategory: async (category) => {
-    try {
-      const response = await api.get(`/products/category/${category}`);
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching products by category:', error);
-      throw error;
-    }
-  },
+    // Filter products by price range
+    getProductsByPriceRange: async (minPrice, maxPrice, page = 0, size = 12) => {
+        const { data } = await api.get(`/products/filter/price?minPrice=${minPrice}&maxPrice=${maxPrice}&page=${page}&size=${size}`);
+        return data;
+    },
 
-  // Get product by ID
-  getProductById: async (productId) => {
-    try {
-      const response = await api.get(`/products/${productId}`);
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching product:', error);
-      throw error;
-    }
-  },
+    // Filter products by category and price range
+    getProductsByCategoryAndPriceRange: async (category, minPrice, maxPrice, page = 0, size = 12) => {
+        const { data } = await api.get(`/products/filter/category-price?category=${category}&minPrice=${minPrice}&maxPrice=${maxPrice}&page=${page}&size=${size}`);
+        return data;
+    },
 
-  // Get vendor's products
-  getMyProducts: async () => {
-    try {
-      const response = await api.get('/products/vendor/my-products');
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching vendor products:', error);
-      throw error;
-    }
-  },
+    // Get featured products
+    getFeaturedProducts: async (page = 0, size = 8) => {
+        const { data } = await api.get(`/products/featured?page=${page}&size=${size}`);
+        return data;
+    },
 
-  // Create new product (vendor only)
-  createProduct: async (productData) => {
-    try {
-      const response = await api.post('/products', productData);
-      return response.data;
-    } catch (error) {
-      console.error('Error creating product:', error);
-      throw error;
-    }
-  },
+    // Get product by ID
+    getProductById: async (id) => {
+        const { data } = await api.get(`/products/${id}`);
+        return data;
+    },
 
-  // Update product (vendor only)
-  updateProduct: async (productId, productData) => {
-    try {
-      const response = await api.put(`/products/${productId}`, productData);
-      return response.data;
-    } catch (error) {
-      console.error('Error updating product:', error);
-      throw error;
-    }
-  },
+    // Get all categories
+    getAllCategories: async () => {
+        const { data } = await api.get('/products/categories');
+        return data;
+    },
 
-  // Delete product (vendor only)
-  deleteProduct: async (productId) => {
-    try {
-      await api.delete(`/products/${productId}`);
-    } catch (error) {
-      console.error('Error deleting product:', error);
-      throw error;
-    }
-  },
+    // Admin endpoints
+    createProduct: async (productData) => {
+        const { data } = await api.post('/products/admin', productData);
+        return data;
+    },
 
-  // Update stock quantity (vendor only)
-  updateStock: async (productId, quantity) => {
-    try {
-      await api.patch(`/products/${productId}/stock?quantity=${quantity}`);
-    } catch (error) {
-      console.error('Error updating stock:', error);
-      throw error;
-    }
-  },
+    updateProduct: async (id, productData) => {
+        const { data } = await api.put(`/products/admin/${id}`, productData);
+        return data;
+    },
 
-  // Get vendor statistics
-  getVendorStats: async () => {
-    try {
-      const response = await api.get('/products/vendor/stats');
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching vendor stats:', error);
-      throw error;
+    // Vendor specific methods
+    getMyProducts: async () => {
+        // For now, return all products as we don't have a specific endpoint yet
+        // In a real app, this would filter by the logged-in vendor's ID
+        const { data } = await api.get('/products?page=0&size=100');
+        return data.content || [];
+    },
+
+    getVendorStats: async () => {
+        // Mock stats for now
+        return {
+            totalProducts: 0,
+            views: 0,
+            rating: 0
+        };
+    },
+
+    deleteProduct: async (id) => {
+        const { data } = await api.delete(`/products/admin/${id}`);
+        return data;
     }
-  }
 };
 
+// Export both named and default for compatibility
+export { productService };
 export default productService;

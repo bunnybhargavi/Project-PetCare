@@ -11,16 +11,32 @@ import java.util.List;
 @Data
 @Builder
 public class OrderResponse {
-    
     private Long id;
-    private Long userId;
-    private String userName;
-    private BigDecimal totalAmount;
+    private String orderNumber;
     private Order.OrderStatus status;
+    private List<OrderItemResponse> items;
+    private BigDecimal subtotal;
+    private BigDecimal shippingCost;
+    private BigDecimal tax;
+    private BigDecimal totalAmount;
+    private Integer totalItems;
+    
+    // Shipping Information
+    private String shippingName;
     private String shippingAddress;
-    private String paymentId;
-    private String trackingNumber;
-    private List<OrderItemResponse> orderItems;
+    private String shippingCity;
+    private String shippingState;
+    private String shippingZipCode;
+    private String shippingPhone;
+    
+    // Payment Information
+    private Order.PaymentMethod paymentMethod;
+    private Order.PaymentStatus paymentStatus;
+    private String paymentTransactionId;
+    
+    private LocalDateTime shippedAt;
+    private LocalDateTime deliveredAt;
+    private String notes;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     
@@ -28,10 +44,9 @@ public class OrderResponse {
     @Builder
     public static class OrderItemResponse {
         private Long id;
-        private Long productId;
-        private String productTitle;
-        private String productImageUrl;
+        private ProductResponse product;
         private Integer quantity;
-        private BigDecimal price;
+        private BigDecimal unitPrice;
+        private BigDecimal totalPrice;
     }
 }

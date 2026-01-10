@@ -26,7 +26,8 @@ public class Appointment {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pet_id", nullable = false)
-    @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler", "appointments", "medicalRecords", "vaccinations", "healthMeasurements", "reminders" })
+    @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler", "appointments", "medicalRecords", "vaccinations",
+            "healthMeasurements", "reminders" })
     private Pet pet;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -59,10 +60,21 @@ public class Appointment {
     private String meetingLink; // For Teleconsult
 
     @Column(columnDefinition = "TEXT")
+    private String clinicAddress; // For IN_CLINIC appointments
+
+    @Column(columnDefinition = "TEXT")
+    private String parkingInfo; // Parking information for IN_CLINIC
+
+    private String directionsUrl; // Google Maps or similar directions URL
+
+    @Column(columnDefinition = "TEXT")
     private String notes; // Vet notes
 
     @Column(columnDefinition = "TEXT")
     private String prescription;
+
+    @Column(name = "reference_number", unique = true)
+    private String referenceNumber;
 
     @CreationTimestamp
     @Column(updatable = false)
@@ -72,8 +84,9 @@ public class Appointment {
     private LocalDateTime updatedAt;
 
     public enum AppointmentType {
-        VIDEO,
-        IN_CLINIC
+        TELECONSULT,
+        IN_CLINIC,
+        VIDEO
     }
 
     public enum AppointmentStatus {

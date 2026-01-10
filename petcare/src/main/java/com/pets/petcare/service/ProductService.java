@@ -3,14 +3,13 @@ package com.pets.petcare.service;
 import com.pets.petcare.dto.ProductRequest;
 import com.pets.petcare.dto.ProductResponse;
 import com.pets.petcare.entity.Product;
-import com.pets.petcare.entity.User;
-import com.pets.petcare.exception.ResourceNotFoundException;
 import com.pets.petcare.repository.ProductRepository;
-import com.pets.petcare.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,260 +20,207 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-@Transactional
 public class ProductService {
-    
+
     private final ProductRepository productRepository;
-    private final UserRepository userRepository;
-    
+
     /**
-     * Create a new product
+     * Get all active products with pagination
      */
-    public ProductResponse createProduct(ProductRequest request, String vendorEmail) {
-        log.info("Creating product: {} by vendor: {}", request.getTitle(), vendorEmail);
+    public Page<ProductResponse> getAllProducts(int page, int size, String sortBy, String sortDir) {
+        Sort sort = sortDir.equalsIgnoreCase("desc") ? 
+            Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+        Pageable pageable = PageRequest.of(page, size, sort);
         
-        User vendor = userRepository.findByEmail(vendorEmail)
-                .orElseThrow(() -> new ResourceNotFoundException("Vendor not found"));
+        Page<Product> products = productRepository.findByActiveTrue(pageable);
         
-        Product product = new Product();
-        product.setVendor(vendor);
-        product.setTitle(request.getTitle());
-        product.setDescription(request.getDescription());
-        product.setPrice(request.getPrice());
-        product.setStockQuantity(request.getStockQuantity());
-        product.setCategory(request.getCategory());
-        product.setImageUrl(request.getImageUrl());
-        product.setTags(request.getTags());
-        product.setBrand(request.getBrand());
-        product.setIsActive(true);
+        // Debug logging to help identify visibility issues
+        log.info("Loading products - Total active products found: {}", products.getTotalElements());
+        log.info("Vendor products in result: {}", 
+            products.getContent().stream()
+                .filter(p -> p.getVendor() != null)
+                .count());
+        log.info("Admin products in result: {}", 
+            products.getContent().stream()
+                .filter(p -> p.getVendor() == null)
+                .count());
         
-        Product savedProduct = productRepository.save(product);
-        log.info("Product created successfully with ID: {}", savedProduct.getId());
-        
-        return convertToResponse(savedProduct);
+        return products.map(this::mapToResponse);
     }
-    
-    /**
-     * Get all active products
-     */
-    @Transactional(readOnly = true)
-    public List<ProductResponse> getAllActiveProducts() {
-        log.info("Fetching all active products");
-        List<Product> products = productRepository.findByIsActiveTrueOrderByCreatedAtDesc();
-        return products.stream()
-                .map(this::convertToResponse)
-                .collect(Collectors.toList());
-    }
-    
+
     /**
      * Get products by category
      */
-    @Transactional(readOnly = true)
-    public List<ProductResponse> getProductsByCategory(Product.ProductCategory category) {
-        log.info("Fetching products by category: {}", category);
-        List<Product> products = productRepository.findByCategoryAndIsActiveTrueOrderByCreatedAtDesc(category);
-        return products.stream()
-                .map(this::convertToResponse)
-                .collect(Collectors.toList());
+    public Page<ProductResponse> getProductsByCategory(Product.Category category, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        return productRepository.findByCategoryAndActiveTrue(category, pageable)
+                .map(this::mapToResponse);
     }
-    
+
     /**
-     * Search products with filters
+     * Search products
      */
-    @Transactional(readOnly = true)
-    public Page<ProductResponse> searchProducts(Product.ProductCategory category,
-                                                BigDecimal minPrice,
-                                                BigDecimal maxPrice,
-                                                String searchTerm,
-                                                Pageable pageable) {
-        log.info("Searching products with filters - category: {}, minPrice: {}, maxPrice: {}, searchTerm: {}", 
-                category, minPrice, maxPrice, searchTerm);
-        
-        Page<Product> products = productRepository.findProductsWithFilters(
-                category, minPrice, maxPrice, searchTerm, pageable);
-        
-        return products.map(this::convertToResponse);
+    public Page<ProductResponse> searchProducts(String query, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("rating").descending());
+        return productRepository.searchProducts(query, pageable)
+                .map(this::mapToResponse);
     }
-    
+
+    /**
+     * Filter products by price range
+     */
+    public Page<ProductResponse> getProductsByPriceRange(BigDecimal minPrice, BigDecimal maxPrice, 
+                                                        int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("price").ascending());
+        return productRepository.findByPriceRange(minPrice, maxPrice, pageable)
+                .map(this::mapToResponse);
+    }
+
+    /**
+     * Filter products by category and price range
+     */
+    public Page<ProductResponse> getProductsByCategoryAndPriceRange(Product.Category category,
+                                                                   BigDecimal minPrice, 
+                                                                   BigDecimal maxPrice,
+                                                                   int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("price").ascending());
+        return productRepository.findByCategoryAndPriceRange(category, minPrice, maxPrice, pageable)
+                .map(this::mapToResponse);
+    }
+
+    /**
+     * Get featured products
+     */
+    public Page<ProductResponse> getFeaturedProducts(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return productRepository.findFeaturedProducts(pageable)
+                .map(this::mapToResponse);
+    }
+
     /**
      * Get product by ID
      */
-    @Transactional(readOnly = true)
-    public ProductResponse getProductById(Long productId) {
-        log.info("Fetching product by ID: {}", productId);
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new ResourceNotFoundException("Product not found with ID: " + productId));
-        
-        return convertToResponse(product);
+    public ProductResponse getProductById(Long id) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
+        return mapToResponse(product);
     }
-    
+
     /**
-     * Get products by vendor
+     * Create new product (Admin only)
      */
-    @Transactional(readOnly = true)
-    public List<ProductResponse> getProductsByVendor(String vendorEmail) {
-        log.info("Fetching products by vendor: {}", vendorEmail);
-        User vendor = userRepository.findByEmail(vendorEmail)
-                .orElseThrow(() -> new ResourceNotFoundException("Vendor not found"));
+    @Transactional
+    public ProductResponse createProduct(ProductRequest request) {
+        Product product = new Product();
+        mapRequestToEntity(request, product);
         
-        List<Product> products = productRepository.findByVendorOrderByCreatedAtDesc(vendor);
-        return products.stream()
-                .map(this::convertToResponse)
-                .collect(Collectors.toList());
+        Product savedProduct = productRepository.save(product);
+        log.info("Product created: {} with ID: {}", savedProduct.getTitle(), savedProduct.getId());
+        
+        return mapToResponse(savedProduct);
     }
-    
+
     /**
-     * Update product
+     * Update product (Admin only)
      */
-    public ProductResponse updateProduct(Long productId, ProductRequest request, String vendorEmail) {
-        log.info("Updating product ID: {} by vendor: {}", productId, vendorEmail);
+    @Transactional
+    public ProductResponse updateProduct(Long id, ProductRequest request) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
         
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new ResourceNotFoundException("Product not found with ID: " + productId));
+        mapRequestToEntity(request, product);
+        Product updatedProduct = productRepository.save(product);
         
-        // Verify vendor ownership
-        if (!product.getVendor().getEmail().equals(vendorEmail)) {
-            throw new RuntimeException("You can only update your own products");
-        }
+        log.info("Product updated: {} with ID: {}", updatedProduct.getTitle(), updatedProduct.getId());
         
+        return mapToResponse(updatedProduct);
+    }
+
+    /**
+     * Delete product (Admin only)
+     */
+    @Transactional
+    public void deleteProduct(Long id) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
+        
+        product.setActive(false); // Soft delete
+        productRepository.save(product);
+        
+        log.info("Product soft deleted: {} with ID: {}", product.getTitle(), product.getId());
+    }
+
+    /**
+     * Get all categories
+     */
+    public List<Product.Category> getAllCategories() {
+        return List.of(Product.Category.values());
+    }
+
+    /**
+     * Map ProductRequest to Product entity
+     */
+    private void mapRequestToEntity(ProductRequest request, Product product) {
         product.setTitle(request.getTitle());
         product.setDescription(request.getDescription());
         product.setPrice(request.getPrice());
-        product.setStockQuantity(request.getStockQuantity());
+        product.setStock(request.getStock());
         product.setCategory(request.getCategory());
-        product.setImageUrl(request.getImageUrl());
-        product.setTags(request.getTags());
+        product.setImages(request.getImages());
+        product.setActive(request.getActive());
+        product.setDiscountPercentage(request.getDiscountPercentage());
         product.setBrand(request.getBrand());
-        
-        Product updatedProduct = productRepository.save(product);
-        log.info("Product updated successfully: {}", updatedProduct.getId());
-        
-        return convertToResponse(updatedProduct);
+        product.setSku(request.getSku());
     }
-    
+
     /**
-     * Delete product (soft delete by setting isActive to false)
+     * Map Product entity to ProductResponse
      */
-    public void deleteProduct(Long productId, String vendorEmail) {
-        log.info("Deleting product ID: {} by vendor: {}", productId, vendorEmail);
-        
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new ResourceNotFoundException("Product not found with ID: " + productId));
-        
-        // Verify vendor ownership
-        if (!product.getVendor().getEmail().equals(vendorEmail)) {
-            throw new RuntimeException("You can only delete your own products");
-        }
-        
-        product.setIsActive(false);
-        productRepository.save(product);
-        log.info("Product soft deleted successfully: {}", productId);
-    }
-    
-    /**
-     * Update stock quantity
-     */
-    public void updateStock(Long productId, Integer quantity) {
-        log.info("Updating stock for product ID: {} to quantity: {}", productId, quantity);
-        
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new ResourceNotFoundException("Product not found with ID: " + productId));
-        
-        product.setStockQuantity(quantity);
-        productRepository.save(product);
-        log.info("Stock updated successfully for product: {}", productId);
-    }
-    
-    /**
-     * Reduce stock quantity (for orders)
-     */
-    public void reduceStock(Long productId, Integer quantity) {
-        log.info("Reducing stock for product ID: {} by quantity: {}", productId, quantity);
-        
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new ResourceNotFoundException("Product not found with ID: " + productId));
-        
-        if (product.getStockQuantity() < quantity) {
-            throw new RuntimeException("Insufficient stock. Available: " + product.getStockQuantity() + ", Required: " + quantity);
-        }
-        
-        product.setStockQuantity(product.getStockQuantity() - quantity);
-        productRepository.save(product);
-        log.info("Stock reduced successfully for product: {}", productId);
-    }
-    
-    /**
-     * Get vendor statistics
-     */
-    @Transactional(readOnly = true)
-    public VendorStats getVendorStats(String vendorEmail) {
-        log.info("Fetching vendor statistics for: {}", vendorEmail);
-        
-        User vendor = userRepository.findByEmail(vendorEmail)
-                .orElseThrow(() -> new ResourceNotFoundException("Vendor not found"));
-        
-        long totalProducts = productRepository.countByVendorAndIsActiveTrue(vendor);
-        List<Product> lowStockProducts = productRepository.findLowStockProducts(5);
-        
-        return VendorStats.builder()
-                .totalProducts(totalProducts)
-                .lowStockCount(lowStockProducts.size())
-                .build();
-    }
-    
-    /**
-     * Convert Product entity to ProductResponse DTO
-     */
-    private ProductResponse convertToResponse(Product product) {
+    private ProductResponse mapToResponse(Product product) {
         return ProductResponse.builder()
                 .id(product.getId())
                 .title(product.getTitle())
                 .description(product.getDescription())
                 .price(product.getPrice())
-                .stockQuantity(product.getStockQuantity())
+                .discountedPrice(product.getDiscountedPrice())
+                .stock(product.getStock())
                 .category(product.getCategory())
-                .imageUrl(product.getImageUrl())
-                .isActive(product.getIsActive())
-                .tags(product.getTags())
+                .categoryDisplayName(product.getCategory().getDisplayName())
+                .images(product.getImages())
+                .active(product.getActive())
+                .discountPercentage(product.getDiscountPercentage())
                 .brand(product.getBrand())
+                .sku(product.getSku())
                 .rating(product.getRating())
                 .reviewCount(product.getReviewCount())
-                .vendorName(product.getVendor().getName())
-                .vendorId(product.getVendor().getId())
+                .inStock(product.isInStock())
                 .createdAt(product.getCreatedAt())
                 .updatedAt(product.getUpdatedAt())
+                // Vendor information
+                .vendorId(product.getVendor() != null ? product.getVendor().getId() : null)
+                .vendorName(product.getVendor() != null ? product.getVendor().getContactName() : null)
+                .vendorBusinessName(product.getVendor() != null ? product.getVendor().getBusinessName() : null)
                 .build();
     }
+
+    // Admin methods for AdminService compatibility
     
     /**
-     * Get all products for admin (including inactive)
+     * Get all products for admin management
      */
-    @Transactional(readOnly = true)
     public List<Product> getAllProductsForAdmin() {
-        log.info("Fetching all products for admin");
         return productRepository.findAll();
     }
-    
+
     /**
-     * Update product status (admin only)
+     * Update product status (activate/deactivate)
      */
+    @Transactional
     public Product updateProductStatus(Long productId, Boolean isActive) {
-        log.info("Updating product status - ID: {}, isActive: {}", productId, isActive);
-        
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new ResourceNotFoundException("Product not found with ID: " + productId));
+                .orElseThrow(() -> new RuntimeException("Product not found with id: " + productId));
         
-        product.setIsActive(isActive);
+        product.setActive(isActive);
         return productRepository.save(product);
-    }
-    
-    /**
-     * Vendor Statistics DTO
-     */
-    @lombok.Data
-    @lombok.Builder
-    public static class VendorStats {
-        private long totalProducts;
-        private long lowStockCount;
     }
 }

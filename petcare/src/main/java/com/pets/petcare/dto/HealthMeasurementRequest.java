@@ -1,27 +1,37 @@
 package com.pets.petcare.dto;
 
-import jakarta.validation.constraints.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 import java.time.LocalDate;
 
-/**
- * HealthMeasurementRequest - Add health vitals
- */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class HealthMeasurementRequest {
     
-    @NotNull(message = "Measurement date is required")
-    private LocalDate measurementDate;
+    @NotNull(message = "Vet ID is required")
+    private Long vetId;
     
-    @Positive(message = "Weight must be positive")
-    private Double weight; // in kg
+    @NotBlank(message = "Measurement type is required")
+    private String measurementType;
     
-    @DecimalMin(value = "35.0", message = "Temperature seems too low")
-    @DecimalMax(value = "45.0", message = "Temperature seems too high")
-    private Double temperature; // in Celsius
+    @NotBlank(message = "Value is required")
+    private String value;
     
-    @Size(max = 500)
+    private String unit;
+    
     private String notes;
+    
+    private LocalDate measurementDate; // Add measurement date field
+    
+    // Optional specific measurement fields
+    private Double weight;
+    private Double temperature;
+    private Double heartRate;
+    private String bloodPressure;
+    private Double bloodSugar;
+    private Double respiratoryRate;
 }

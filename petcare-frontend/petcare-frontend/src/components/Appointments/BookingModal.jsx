@@ -74,10 +74,10 @@ const BookingModal = ({ onClose, preSelectedVet = null }) => {
                 slotId: selectedSlot?.id,
                 veterinarianId: selectedVet.id,
                 dateTime: new Date().toISOString(), // Fallback if no slot
-                type: selectedSlot?.supportedType === 'IN_CLINIC' ? 'IN_CLINIC' : 'VIDEO', // Default logic
+                type: selectedSlot?.mode === 'IN_CLINIC' ? 'IN_CLINIC' : 'TELECONSULT', // Default logic
                 reason
             });
-            alert('Appointment Booked Successfully! Confirmation email sent.');
+            alert('Appointment Requested Successfully! Status: PENDING. Please wait for Vet approval.');
             onClose();
         } catch (e) {
             alert('Booking Failed: ' + (e.response?.data?.message || e.message));
@@ -164,7 +164,7 @@ const BookingModal = ({ onClose, preSelectedVet = null }) => {
                                             className={`p-2 border rounded-lg text-center text-sm cursor-pointer transition-all ${selectedSlot === slot ? 'bg-blue-600 text-white border-blue-600 shadow-md' : 'border-gray-200 hover:bg-gray-50'
                                                 }`}>
                                             {new Date(slot.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                            <div className="text-[10px] opacity-75">{slot.supportedType}</div>
+                                            <div className="text-[10px] opacity-75">{slot.mode}</div>
                                         </div>
                                     ))}
                                 </div>

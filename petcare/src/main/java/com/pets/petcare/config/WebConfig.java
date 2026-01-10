@@ -1,20 +1,26 @@
 package com.pets.petcare.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-/**
- * Serves uploaded files (e.g., profile photos) under /uploads/**.
- * Maps to the local uploads/ directory so files saved there are reachable via HTTP.
- */
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
+    @Value("${app.upload.dir:uploads}")
+    private String uploadDir;
+
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        // Serve uploaded images from /uploads/** URL pattern
         registry.addResourceHandler("/uploads/**")
-                .addResourceLocations("file:uploads/");
+                .addResourceLocations("file:" + uploadDir + "/")
+                .setCachePeriod(3600); // Cache for 1 hour
+        
+        // Also serve from classpath for default images
+        registry.addResourceHandler("/images/**")
+                .addResourceLocations("classpath:/static/images/")
+                .setCachePeriod(3600);
     }
 }
-

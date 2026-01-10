@@ -10,7 +10,7 @@ const OtpVerification = () => {
   const location = useLocation();
   const { login } = useAuth();
   const email = location.state?.email;
-  
+
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [loading, setLoading] = useState(false);
   const [resending, setResending] = useState(false);
@@ -50,7 +50,7 @@ const OtpVerification = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     const otpString = otp.join('');
     if (otpString.length !== 6) {
       toast.error('Please enter complete OTP');
@@ -64,15 +64,15 @@ const OtpVerification = () => {
       if (!userData) {
         userData = JSON.parse(sessionStorage.getItem('registrationData'));
       }
-      
+
       if (!userData) {
         throw new Error('Registration data not found. Please start signup again.');
       }
 
       const response = await authService.completeRegistration(email, otpString, userData);
       console.log('✅ OTP verification successful:', response);
-      
-      toast.success('Registration successful! Welcome to PetCare!');
+
+      toast.success('Registration successful! Welcome to PawHaven!');
       login(response.token, response);
       navigate('/dashboard');
     } catch (error) {
@@ -87,7 +87,7 @@ const OtpVerification = () => {
 
   const handleResend = async () => {
     if (timer > 0) return;
-    
+
     setResending(true);
     try {
       // Resend OTP by calling initiate again
@@ -105,7 +105,7 @@ const OtpVerification = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-500 via-teal-500 to-blue-500 p-4">
       <div className="absolute inset-0 bg-black/10"></div>
-      
+
       <div className="relative w-full max-w-md animate-scaleIn">
         <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
           {/* Header */}

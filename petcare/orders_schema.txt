@@ -1,0 +1,26 @@
+Field	Type	Null	Key	Default	Extra
+id	bigint	NO	PRI	NULL	auto_increment
+created_at	datetime(6)	YES		NULL	
+payment_id	varchar(255)	YES		NULL	
+shipping_address	varchar(255)	NO		NULL	
+status	varchar(255)	NO		PENDING	
+total_amount	decimal(10,2)	NO		NULL	
+tracking_number	varchar(255)	YES		NULL	
+updated_at	datetime(6)	YES		NULL	
+user_id	bigint	NO	MUL	NULL	
+delivered_at	datetime(6)	YES		NULL	
+notes	text	YES		NULL	
+order_number	varchar(255)	NO	UNI	NULL	
+payment_method	varchar(255)	YES		NULL	
+payment_status	varchar(255)	YES		PENDING	
+payment_transaction_id	varchar(255)	YES		NULL	
+shipped_at	datetime(6)	YES		NULL	
+shipping_city	varchar(255)	NO		NULL	
+shipping_cost	decimal(10,2)	NO		NULL	
+shipping_name	varchar(255)	NO		NULL	
+shipping_phone	varchar(255)	YES		NULL	
+shipping_state	varchar(255)	NO		NULL	
+shipping_zip_code	varchar(255)	NO		NULL	
+subtotal	decimal(10,2)	NO		NULL	
+tax	decimal(10,2)	NO		NULL	
+paypal_payment_id	varchar(255)	YES		NULL	

@@ -64,4 +64,13 @@ public class VeterinarianController {
     public ResponseEntity<List<Veterinarian>> findTeleconsultVets() {
         return ResponseEntity.ok(veterinarianService.findTeleconsultVets());
     }
+
+    /**
+     * Search vets with available slots
+     */
+    @PostMapping("/search-with-availability")
+    public ResponseEntity<List<com.pets.petcare.dto.VetWithSlotsResponse>> searchVetsWithAvailability(
+            @RequestBody com.pets.petcare.dto.VetAvailabilitySearchRequest request) {
+        return ResponseEntity.ok(veterinarianService.searchVetsWithAvailability(request));
+    }
 }

@@ -57,5 +57,63 @@ export const appointmentService = {
             prescription
         });
         return data;
+    },
+
+    // Get upcoming available slots for a vet
+    getUpcomingAvailableSlots: async (vetId) => {
+        const { data } = await api.get(`/appointments/slots/${vetId}/upcoming`);
+        return data;
+    },
+
+    // Get slots by date range
+    getSlotsByDateRange: async (vetId, startDate, endDate) => {
+        const { data } = await api.get(`/appointments/slots/${vetId}/range`, {
+            params: { startDate, endDate }
+        });
+        return data;
+    },
+
+    // Update a slot
+    updateSlot: async (slotId, slotData) => {
+        const { data } = await api.put(`/appointments/slots/${slotId}`, slotData);
+        return data;
+    },
+
+    // Delete a slot
+    deleteSlot: async (slotId) => {
+        await api.delete(`/appointments/slots/${slotId}`);
+    },
+
+    // Cancel appointment (owner side)
+    cancelAppointmentOwner: async (appointmentId) => {
+        await api.post(`/appointments/${appointmentId}/cancel`);
+    },
+
+    // Get appointments for owner
+    getOwnerAppointments: async (ownerId) => {
+        const { data } = await api.get(`/appointments/owner/${ownerId}`);
+        return data;
+    },
+
+    // Get pending appointments for vet (requiring approval)
+    getPendingAppointments: async (vetId) => {
+        const { data } = await api.get(`/appointments/vet/${vetId}/pending`);
+        return data;
+    },
+
+    // Approve a pending appointment
+    approveAppointment: async (appointmentId, vetNotes = '') => {
+        const { data } = await api.post(`/appointments/${appointmentId}/approve`, {
+            vetNotes
+        });
+        return data;
+    },
+
+    // Reject a pending appointment
+    rejectAppointment: async (appointmentId, rejectionReason = '') => {
+        const { data } = await api.post(`/appointments/${appointmentId}/reject`, {
+            rejectionReason
+        });
+        return data;
     }
 };

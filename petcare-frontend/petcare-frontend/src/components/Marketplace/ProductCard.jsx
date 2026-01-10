@@ -1,172 +1,193 @@
 import React, { useState } from 'react';
-import { FaStar, FaShoppingCart, FaHeart, FaEye } from 'react-icons/fa';
+import { FaShoppingCart, FaHeart, FaStar, FaEye } from 'react-icons/fa';
 
-const ProductCard = ({ product, onAddToCart }) => {
-  const [isHovered, setIsHovered] = useState(false);
-  const [isFavorite, setIsFavorite] = useState(false);
+const ProductCard = ({ product, onAddToCart, onViewDetails, cartLoading, viewMode = 'grid' }) => {
+    const [isLiked, setIsLiked] = useState(false);
+    const [quantity, setQuantity] = useState(1);
 
-  const getCategoryEmoji = (category) => {
-    const emojis = {
-      'FOOD': '🍖',
-      'TOYS': '🎾',
-      'MEDICINE': '💊',
-      'ACCESSORIES': '🎀',
-      'GROOMING': '🧴',
-      'HEALTHCARE': '🏥',
-      'TRAINING': '📚',
-      'OTHER': '📦'
+    const handleAddToCart = (e) => {
+        e.stopPropagation();
+        onAddToCart(product.id, quantity);
     };
-    return emojis[category] || '📦';
-  };
 
-  const renderStars = (rating) => {
-    const stars = [];
-    const fullStars = Math.floor(rating);
-    const hasHalfStar = rating % 1 !== 0;
+    const handleViewDetails = () => {
+        onViewDetails(product);
+    };
 
-    for (let i = 0; i < fullStars; i++) {
-      stars.push(<FaStar key={i} className="text-yellow-400" />);
-    }
+    const renderStars = (rating) => {
+        const stars = [];
+        const fullStars = Math.floor(rating);
+        const hasHalfStar = rating % 1 !== 0;
 
-    if (hasHalfStar) {
-      stars.push(<FaStar key="half" className="text-yellow-400 opacity-50" />);
-    }
+        for (let i = 0; i < fullStars; i++) {
+            stars.push(<FaStar key={i} className="star filled" />);
+        }
 
-    const emptyStars = 5 - Math.ceil(rating);
-    for (let i = 0; i < emptyStars; i++) {
-      stars.push(<FaStar key={`empty-${i}`} className="text-gray-300" />);
-    }
+        if (hasHalfStar) {
+            stars.push(<FaStar key="half" className="star half" />);
+        }
 
-    return stars;
-  };
+        const emptyStars = 5 - Math.ceil(rating);
+        for (let i = 0; i < emptyStars; i++) {
+            stars.push(<FaStar key={`empty-${i}`} className="star empty" />);
+        }
 
-  return (
-    <div
-      className="bg-white rounded-2xl shadow-lg overflow-hidden cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-xl"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      {/* Product Image */}
-      <div className="relative h-48 bg-gray-100 overflow-hidden">
-        <img
-          src={product.imageUrl || '/api/placeholder/300/200'}
-          alt={product.title}
-          className="w-full h-full object-cover transition-transform duration-500"
-          style={{
-            transform: isHovered ? 'scale(1.1)' : 'scale(1)'
-          }}
-        />
-        
-        {/* Category Badge */}
-        <div className="absolute top-3 left-3 px-3 py-1 bg-white/90 backdrop-blur-sm rounded-full text-sm font-semibold text-gray-700">
-          {getCategoryEmoji(product.category)} {product.category}
-        </div>
+        return stars;
+    };
 
-        {/* Favorite Button */}
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            setIsFavorite(!isFavorite);
-          }}
-          className={`absolute top-3 right-3 p-2 rounded-full backdrop-blur-sm transition-all duration-200 ${
-            isFavorite 
-              ? 'bg-red-500 text-white' 
-              : 'bg-white/90 text-gray-600 hover:bg-red-500 hover:text-white'
-          }`}
-        >
-          <FaHeart size={16} />
-        </button>
+    const getDiscountPercentage = () => {
+        if (product.discountPercentage && product.discountPercentage > 0) {
+            return Math.round(product.discountPercentage);
+        }
+        return 0;
+    };
 
-        {/* Stock Status */}
-        {product.stockQuantity <= 5 && product.stockQuantity > 0 && (
-          <div className="absolute bottom-3 left-3 px-2 py-1 bg-orange-500 text-white text-xs rounded-full">
-            Only {product.stockQuantity} left!
-          </div>
-        )}
+    return (
+        <div className={`product-card ${viewMode}`} onClick={handleViewDetails}>
+            <div className="product-image-container">
+                {(() => {
+                    // Prioritize vendor-uploaded images
+                    if (product.images && product.images.length > 0) {
+                        const imageUrl = product.images[0].startsWith('http') ? product.images[0] : `http://localhost:8080${product.images[0]}`;
+                        return (
+                            <img 
+                                src={imageUrl} 
+                                alt={product.title}
+                                className="product-image"
+                                onError={(e) => {
+                                    // Use a beautiful fallback image
+                                    e.target.src = `https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=400&h=300&fit=crop&auto=format`;
+                                }}
+                            />
+                        );
+                    } else {
+                        return (
+                            <div className="product-placeholder">
+                                <div className="placeholder-content">
+                                    <span className="placeholder-icon">🐾</span>
+                                    <span className="placeholder-text">Pet Product</span>
+                                </div>
+                            </div>
+                        );
+                    }
+                })()}
 
-        {product.stockQuantity === 0 && (
-          <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-            <span className="bg-red-500 text-white px-4 py-2 rounded-full font-semibold">
-              Out of Stock
-            </span>
-          </div>
-        )}
+                {getDiscountPercentage() > 0 && (
+                    <div className="discount-badge">
+                        -{getDiscountPercentage()}%
+                    </div>
+                )}
 
-        {/* Hover Actions */}
-        {isHovered && product.stockQuantity > 0 && (
-          <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
-            <div className="flex gap-2">
-              <button className="p-3 bg-white rounded-full text-gray-700 hover:bg-gray-100 transition-colors">
-                <FaEye size={18} />
-              </button>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onAddToCart(product);
-                }}
-                className="p-3 bg-blue-600 rounded-full text-white hover:bg-blue-700 transition-colors"
-              >
-                <FaShoppingCart size={18} />
-              </button>
+                <div className="product-overlay">
+                    <button 
+                        className="overlay-btn view-btn"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            handleViewDetails();
+                        }}
+                    >
+                        <FaEye />
+                    </button>
+                    <button 
+                        className={`overlay-btn like-btn ${isLiked ? 'liked' : ''}`}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setIsLiked(!isLiked);
+                        }}
+                    >
+                        <FaHeart />
+                    </button>
+                </div>
+
+                {!product.inStock && (
+                    <div className="out-of-stock-overlay">
+                        <span>Out of Stock</span>
+                    </div>
+                )}
             </div>
-          </div>
-        )}
-      </div>
 
-      {/* Product Info */}
-      <div className="p-4">
-        {/* Title */}
-        <h3 className="font-bold text-lg text-gray-900 mb-2 line-clamp-2">
-          {product.title}
-        </h3>
+            <div className="product-info">
+                <div className="product-brand">
+                    {product.brand || product.categoryDisplayName}
+                </div>
+                
+                <h3 className="product-title">{product.title}</h3>
+                
+                <div className="product-rating">
+                    <div className="stars">
+                        {renderStars(product.rating || 0)}
+                    </div>
+                    <span className="rating-text">
+                        ({product.reviewCount || 0} reviews)
+                    </span>
+                </div>
 
-        {/* Description */}
-        <p className="text-gray-600 text-sm mb-3 line-clamp-2">
-          {product.description}
-        </p>
+                <div className="product-price">
+                    {getDiscountPercentage() > 0 ? (
+                        <>
+                            <span className="discounted-price">
+                                ₹{product.discountedPrice?.toFixed(2)}
+                            </span>
+                            <span className="original-price">
+                                ₹{product.price?.toFixed(2)}
+                            </span>
+                        </>
+                    ) : (
+                        <span className="current-price">
+                            ₹{product.price?.toFixed(2)}
+                        </span>
+                    )}
+                </div>
 
-        {/* Rating */}
-        <div className="flex items-center gap-2 mb-3">
-          <div className="flex items-center">
-            {renderStars(product.rating)}
-          </div>
-          <span className="text-sm text-gray-600">
-            ({product.reviewCount} reviews)
-          </span>
+                <div className="product-stock">
+                    {product.inStock ? (
+                        <span className="in-stock">✅ In Stock ({product.stock} available)</span>
+                    ) : (
+                        <span className="out-of-stock">❌ Out of Stock</span>
+                    )}
+                </div>
+
+                <div className="product-actions">
+                    <div className="quantity-selector">
+                        <button 
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setQuantity(Math.max(1, quantity - 1));
+                            }}
+                            className="quantity-btn"
+                        >
+                            -
+                        </button>
+                        <span className="quantity">{quantity}</span>
+                        <button 
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setQuantity(Math.min(product.stock || 1, quantity + 1));
+                            }}
+                            className="quantity-btn"
+                        >
+                            +
+                        </button>
+                    </div>
+
+                    <button 
+                        className="add-to-cart-btn"
+                        onClick={handleAddToCart}
+                        disabled={!product.inStock || cartLoading}
+                    >
+                        {cartLoading ? (
+                            <span className="loading-spinner"></span>
+                        ) : (
+                            <>
+                                <FaShoppingCart />
+                                Add to Cart
+                            </>
+                        )}
+                    </button>
+                </div>
+            </div>
         </div>
-
-        {/* Price and Vendor */}
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <span className="text-2xl font-bold text-blue-600">
-              ${product.price}
-            </span>
-          </div>
-          <div className="text-right">
-            <p className="text-xs text-gray-500">Sold by</p>
-            <p className="text-sm font-semibold text-gray-700">{product.vendorName}</p>
-          </div>
-        </div>
-
-        {/* Add to Cart Button */}
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onAddToCart(product);
-          }}
-          disabled={product.stockQuantity === 0}
-          className={`w-full py-3 px-4 rounded-xl font-semibold transition-all duration-200 flex items-center justify-center gap-2 ${
-            product.stockQuantity === 0
-              ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-              : 'bg-blue-600 text-white hover:bg-blue-700 hover:shadow-lg transform hover:-translate-y-0.5'
-          }`}
-        >
-          <FaShoppingCart size={16} />
-          {product.stockQuantity === 0 ? 'Out of Stock' : 'Add to Cart'}
-        </button>
-      </div>
-    </div>
-  );
+    );
 };
 
 export default ProductCard;

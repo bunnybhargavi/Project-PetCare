@@ -45,7 +45,7 @@ const Signup = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) return;
 
     setLoading(true);
@@ -63,7 +63,7 @@ const Signup = () => {
       sessionStorage.setItem('registrationData', JSON.stringify(registrationData));
 
       await authService.initiateRegistration(registrationData);
-      
+
       toast.success('OTP sent to your email! Check your inbox.');
       navigate('/verify-otp', { state: { email: formData.email, userData: registrationData } });
     } catch (error) {
@@ -77,7 +77,7 @@ const Signup = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-500 via-purple-500 to-indigo-500 p-4">
       <div className="absolute inset-0 bg-black/10"></div>
-      
+
       <div className="relative w-full max-w-md animate-scaleIn">
         {/* Card */}
         <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
@@ -86,7 +86,7 @@ const Signup = () => {
             <div className="inline-flex items-center justify-center w-16 h-16 bg-white rounded-full mb-4">
               <FaPaw className="text-3xl text-purple-600" />
             </div>
-            <h1 className="text-3xl font-bold text-white mb-2">Join PetCare</h1>
+            <h1 className="text-3xl font-bold text-white mb-2">Join PawHaven</h1>
             <p className="text-purple-100">Create your free account today</p>
           </div>
 
@@ -102,11 +102,10 @@ const Signup = () => {
                   <button
                     type="button"
                     onClick={() => setFormData({ ...formData, role: 'OWNER' })}
-                    className={`p-4 border-2 rounded-lg transition-all ${
-                      formData.role === 'OWNER'
+                    className={`p-4 border-2 rounded-lg transition-all ${formData.role === 'OWNER'
                         ? 'border-indigo-600 bg-indigo-50'
                         : 'border-gray-300 hover:border-indigo-300'
-                    }`}
+                      }`}
                   >
                     <FaPaw className="mx-auto text-2xl mb-2 text-indigo-600" />
                     <div className="font-semibold">Pet Owner</div>
@@ -114,11 +113,10 @@ const Signup = () => {
                   <button
                     type="button"
                     onClick={() => setFormData({ ...formData, role: 'VET' })}
-                    className={`p-4 border-2 rounded-lg transition-all ${
-                      formData.role === 'VET'
+                    className={`p-4 border-2 rounded-lg transition-all ${formData.role === 'VET'
                         ? 'border-indigo-600 bg-indigo-50'
                         : 'border-gray-300 hover:border-indigo-300'
-                    }`}
+                      }`}
                   >
                     <FaUserMd className="mx-auto text-2xl mb-2 text-indigo-600" />
                     <div className="font-semibold">Veterinarian</div>

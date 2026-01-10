@@ -33,6 +33,12 @@ export const vetService = {
   getTeleconsultVets: async () => {
     const { data } = await api.get('/veterinarians/teleconsult');
     return data;
+  },
+
+  // Search vets with available slots
+  searchWithAvailability: async (searchParams) => {
+    const { data } = await api.post('/veterinarians/search-with-availability', searchParams);
+    return data;
   }
 };
 

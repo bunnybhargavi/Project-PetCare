@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from '../Layout/Navbar';
-import { 
-  FaCalendarAlt, FaCheckCircle, FaClock, FaVideo, 
+import {
+  FaCalendarAlt, FaCheckCircle, FaClock, FaVideo,
   FaClinicMedical, FaEdit, FaEye, FaUserMd, FaNotes,
   FaPrescriptionBottleAlt, FaCheck, FaTimes
 } from 'react-icons/fa';
@@ -30,7 +30,7 @@ const VetDashboard = () => {
         vetDashboardService.getUpcomingAppointments(vetId),
         vetDashboardService.getTodayAppointments(vetId)
       ]);
-      
+
       setStats(statsData);
       setAppointments([...todayAppointments, ...upcomingAppointments]);
     } catch (error) {
@@ -86,22 +86,20 @@ const VetDashboard = () => {
     <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow">
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
-          <div className={`p-2 rounded-lg ${
-            appointment.type === 'VIDEO' ? 'bg-blue-100 text-blue-600' : 'bg-green-100 text-green-600'
-          }`}>
-            {appointment.type === 'VIDEO' ? <FaVideo size={16} /> : <FaClinicMedical size={16} />}
+          <div className={`p-2 rounded-lg ${appointment.type === 'TELECONSULT' ? 'bg-blue-100 text-blue-600' : 'bg-green-100 text-green-600'
+            }`}>
+            {appointment.type === 'TELECONSULT' ? <FaVideo size={16} /> : <FaClinicMedical size={16} />}
           </div>
           <div>
             <h3 className="font-semibold text-gray-900">{appointment.pet?.name || 'Pet Name'}</h3>
             <p className="text-sm text-gray-600">{appointment.pet?.owner?.user?.name || 'Owner Name'}</p>
           </div>
         </div>
-        <span className={`px-3 py-1 text-xs font-semibold rounded-full ${
-          appointment.status === 'CONFIRMED' ? 'bg-green-100 text-green-800' :
-          appointment.status === 'PENDING' ? 'bg-yellow-100 text-yellow-800' :
-          appointment.status === 'COMPLETED' ? 'bg-blue-100 text-blue-800' :
-          'bg-gray-100 text-gray-800'
-        }`}>
+        <span className={`px-3 py-1 text-xs font-semibold rounded-full ${appointment.status === 'CONFIRMED' ? 'bg-green-100 text-green-800' :
+            appointment.status === 'PENDING' ? 'bg-yellow-100 text-yellow-800' :
+              appointment.status === 'COMPLETED' ? 'bg-blue-100 text-blue-800' :
+                'bg-gray-100 text-gray-800'
+          }`}>
           {appointment.status}
         </span>
       </div>
@@ -301,11 +299,10 @@ const VetDashboard = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors ${
-                  activeTab === tab.id
+                className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors ${activeTab === tab.id
                     ? 'bg-blue-600 text-white'
                     : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-                }`}
+                  }`}
               >
                 {tab.icon}
                 {tab.label}
@@ -332,7 +329,7 @@ const VetDashboard = () => {
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white rounded-2xl p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
               <h3 className="text-xl font-bold text-gray-900 mb-6">Complete Appointment</h3>
-              
+
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -341,7 +338,7 @@ const VetDashboard = () => {
                   <textarea
                     rows={4}
                     value={completionData.notes}
-                    onChange={(e) => setCompletionData({...completionData, notes: e.target.value})}
+                    onChange={(e) => setCompletionData({ ...completionData, notes: e.target.value })}
                     placeholder="Enter consultation notes, observations, and recommendations..."
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
@@ -354,7 +351,7 @@ const VetDashboard = () => {
                   <textarea
                     rows={3}
                     value={completionData.prescription}
-                    onChange={(e) => setCompletionData({...completionData, prescription: e.target.value})}
+                    onChange={(e) => setCompletionData({ ...completionData, prescription: e.target.value })}
                     placeholder="Enter medications, dosage, and instructions..."
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />

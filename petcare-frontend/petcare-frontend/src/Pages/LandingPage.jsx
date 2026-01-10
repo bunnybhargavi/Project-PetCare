@@ -3,7 +3,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaPaw, FaHeartbeat, FaCalendarAlt, FaShoppingCart, FaUserMd, FaBell, FaBone, FaHeart } from 'react-icons/fa';
+import { FaPaw, FaHeartbeat, FaCalendarAlt, FaShoppingCart, FaUserMd, FaBell, FaBone, FaHeart, FaHome } from 'react-icons/fa';
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -138,12 +138,16 @@ const LandingPage = () => {
           <div className="flex justify-between items-center h-20">
             {/* Logo */}
             <div className="flex items-center space-x-3 cursor-pointer group" onClick={() => navigate('/')}>
-              <div className="bg-gradient-to-br from-orange-400 to-pink-500 p-3 rounded-2xl shadow-lg group-hover:scale-110 transition-transform">
-                <FaPaw className="text-white text-3xl" />
+              {/* Composed Logo: House with Paw */}
+              <div className="relative flex items-center justify-center w-12 h-12 bg-white rounded-xl shadow-md p-1">
+                <FaHome className="text-teal-500 text-4xl" />
+                <div className="absolute inset-0 flex items-center justify-center pt-1">
+                  <FaPaw className="text-white text-lg" />
+                </div>
               </div>
               <div>
                 <span className="text-3xl font-black bg-gradient-to-r from-orange-500 via-pink-500 to-purple-500 bg-clip-text text-transparent">
-                  PetCare
+                  PawHaven
                 </span>
                 <div className="text-xs text-gray-500 font-semibold">Where Tails Wag & Purrs Happen</div>
               </div>
@@ -154,6 +158,33 @@ const LandingPage = () => {
               <a href="#features" className="text-gray-700 hover:text-orange-500 font-semibold transition-colors">Features</a>
               <a href="#how-it-works" className="text-gray-700 hover:text-orange-500 font-semibold transition-colors">How It Works</a>
               <a href="#testimonials" className="text-gray-700 hover:text-orange-500 font-semibold transition-colors">Happy Tails</a>
+
+              {/* Vendor Dropdown */}
+              <div className="relative group">
+                <button className="flex items-center space-x-1 text-gray-700 hover:text-orange-500 font-semibold transition-colors">
+                  <span>🏪 Vendor</span>
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+
+                {/* Vendor Dropdown Menu */}
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg py-2 ring-1 ring-black ring-opacity-5 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform group-hover:translate-y-0 translate-y-2">
+                  <button
+                    onClick={() => navigate('/vendor/login')}
+                    className="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 font-semibold transition-colors"
+                  >
+                    🔑 Vendor Login
+                  </button>
+                  <button
+                    onClick={() => navigate('/vendor/register')}
+                    className="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 font-semibold transition-colors"
+                  >
+                    📝 Become a Vendor
+                  </button>
+                </div>
+              </div>
+
               <button
                 onClick={() => navigate('/auth')}
                 className="px-6 py-3 bg-gradient-to-r from-orange-500 to-pink-500 text-white rounded-full font-bold shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200 flex items-center gap-2"
@@ -184,6 +215,24 @@ const LandingPage = () => {
               <a href="#features" className="block px-4 py-2 text-gray-700 hover:bg-orange-50 rounded-lg font-semibold">Features</a>
               <a href="#how-it-works" className="block px-4 py-2 text-gray-700 hover:bg-orange-50 rounded-lg font-semibold">How It Works</a>
               <a href="#testimonials" className="block px-4 py-2 text-gray-700 hover:bg-orange-50 rounded-lg font-semibold">Happy Tails</a>
+
+              {/* Mobile Vendor Options */}
+              <div className="border-t border-gray-200 pt-3 mt-3">
+                <div className="px-4 py-2 text-sm font-bold text-gray-500 uppercase tracking-wide">Vendor Portal</div>
+                <button
+                  onClick={() => navigate('/vendor/login')}
+                  className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-orange-50 rounded-lg font-semibold"
+                >
+                  🔑 Vendor Login
+                </button>
+                <button
+                  onClick={() => navigate('/vendor/register')}
+                  className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-orange-50 rounded-lg font-semibold"
+                >
+                  📝 Become a Vendor
+                </button>
+              </div>
+
               <button onClick={() => navigate('/auth')} className="w-full px-4 py-2 bg-gradient-to-r from-orange-500 to-pink-500 text-white rounded-lg font-bold">
                 Join Free!
               </button>
@@ -221,7 +270,7 @@ const LandingPage = () => {
                   Start Free Today!
                 </button>
               </div>
-              
+
               {/* Stats */}
               <div className="flex items-center gap-8 flex-wrap">
                 <div className="bg-white rounded-2xl p-4 shadow-lg">
@@ -244,7 +293,7 @@ const LandingPage = () => {
               {/* Decorative Elements */}
               <div className="absolute -top-10 -right-10 text-8xl opacity-20">🦴</div>
               <div className="absolute -bottom-10 -left-10 text-8xl opacity-20">🎾</div>
-              
+
               <div className="relative">
                 <div className="absolute inset-0 bg-gradient-to-r from-orange-400 to-pink-400 rounded-[3rem] transform rotate-6 blur-sm"></div>
                 <div className="relative bg-white rounded-[3rem] shadow-2xl p-4 border-8 border-white">
@@ -253,7 +302,7 @@ const LandingPage = () => {
                     alt="Happy pets playing"
                     className="rounded-3xl w-full h-[500px] object-cover"
                   />
-                  
+
                   {/* Floating Health Badge */}
                   <div className="absolute -bottom-6 -left-6 bg-white rounded-3xl shadow-2xl p-5 border-4 border-green-300 animate-pulse wiggle-on-hover">
                     <div className="flex items-center gap-4">
@@ -278,7 +327,7 @@ const LandingPage = () => {
         {/* Decorative Paw Prints */}
         <div className="absolute top-10 left-10 text-6xl opacity-10 rotate-12">🐾</div>
         <div className="absolute bottom-10 right-10 text-6xl opacity-10 -rotate-12">🐾</div>
-        
+
         <div className="max-w-7xl mx-auto px-4 relative z-10">
           <div className="text-center mb-16">
             <div className="inline-block bg-orange-100 text-orange-600 px-6 py-2 rounded-full font-bold mb-4">
@@ -305,13 +354,126 @@ const LandingPage = () => {
         </div>
       </section>
 
+      {/* Vendor Section */}
+      <section className="py-20 bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 relative overflow-hidden">
+        <div className="absolute inset-0 opacity-5">
+          <div className="absolute top-1/4 left-1/4 text-9xl">🏪</div>
+          <div className="absolute bottom-1/4 right-1/4 text-9xl">💼</div>
+        </div>
+
+        <div className="max-w-7xl mx-auto px-4 relative z-10">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            {/* Left Content */}
+            <div>
+              <div className="inline-block bg-purple-100 text-purple-600 px-6 py-2 rounded-full font-bold mb-4">
+                🏪 For Business Owners
+              </div>
+              <h2 className="text-5xl font-black mb-6 leading-tight">
+                Sell Pet Products &
+                <span className="block bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 bg-clip-text text-transparent">
+                  Grow Your Business! 📈
+                </span>
+              </h2>
+              <p className="text-xl text-gray-700 mb-8 font-medium">
+                Join our marketplace and reach thousands of pet parents looking for quality products. Easy setup, powerful tools, and happy customers await!
+              </p>
+
+              {/* Vendor Benefits */}
+              <div className="space-y-4 mb-8">
+                <div className="flex items-center gap-4">
+                  <div className="bg-green-100 p-3 rounded-full">
+                    <span className="text-2xl">💰</span>
+                  </div>
+                  <div>
+                    <div className="font-bold text-lg">Increase Sales</div>
+                    <div className="text-gray-600">Reach 10,000+ active pet parents</div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="bg-blue-100 p-3 rounded-full">
+                    <span className="text-2xl">📊</span>
+                  </div>
+                  <div>
+                    <div className="font-bold text-lg">Easy Management</div>
+                    <div className="text-gray-600">Simple dashboard to manage products & orders</div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="bg-purple-100 p-3 rounded-full">
+                    <span className="text-2xl">🚀</span>
+                  </div>
+                  <div>
+                    <div className="font-bold text-lg">Quick Setup</div>
+                    <div className="text-gray-600">Get started in minutes, not days</div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-4">
+                <button
+                  onClick={() => navigate('/vendor/register')}
+                  className="px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full text-lg font-bold shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200 flex items-center justify-center gap-3"
+                >
+                  🏪 Become a Vendor
+                </button>
+                <button
+                  onClick={() => navigate('/vendor/login')}
+                  className="px-8 py-4 bg-white text-purple-600 border-2 border-purple-600 rounded-full text-lg font-bold hover:bg-purple-50 transition-all duration-200 flex items-center justify-center gap-3"
+                >
+                  🔑 Vendor Login
+                </button>
+              </div>
+            </div>
+
+            {/* Right Image */}
+            <div className="relative">
+              <div className="absolute -top-6 -right-6 bg-gradient-to-r from-purple-400 to-pink-400 rounded-3xl transform rotate-6 blur-sm w-full h-full"></div>
+              <div className="relative bg-white rounded-3xl shadow-2xl p-6 border-4 border-white">
+                <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6">
+                  <div className="text-center mb-6">
+                    <div className="text-4xl mb-2">🏪</div>
+                    <div className="font-black text-2xl text-gray-800">Vendor Dashboard</div>
+                    <div className="text-gray-600">Manage your pet business</div>
+                  </div>
+
+                  {/* Mock Dashboard Stats */}
+                  <div className="grid grid-cols-2 gap-4 mb-6">
+                    <div className="bg-white rounded-xl p-4 shadow-sm">
+                      <div className="text-2xl font-black text-green-600">156</div>
+                      <div className="text-sm text-gray-600">Products Sold</div>
+                    </div>
+                    <div className="bg-white rounded-xl p-4 shadow-sm">
+                      <div className="text-2xl font-black text-blue-600">$2,340</div>
+                      <div className="text-sm text-gray-600">Monthly Revenue</div>
+                    </div>
+                    <div className="bg-white rounded-xl p-4 shadow-sm">
+                      <div className="text-2xl font-black text-purple-600">23</div>
+                      <div className="text-sm text-gray-600">Active Products</div>
+                    </div>
+                    <div className="bg-white rounded-xl p-4 shadow-sm">
+                      <div className="text-2xl font-black text-orange-600">4.9⭐</div>
+                      <div className="text-sm text-gray-600">Customer Rating</div>
+                    </div>
+                  </div>
+
+                  <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl p-4 text-center">
+                    <div className="font-bold">Ready to start selling?</div>
+                    <div className="text-sm opacity-90">Join 500+ successful vendors</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* How It Works - Pet Journey Style */}
       <section id="how-it-works" className="py-20 bg-gradient-to-b from-orange-50 to-pink-50 relative overflow-hidden">
         <div className="absolute inset-0 opacity-5">
           <div className="absolute top-1/4 left-1/4 text-9xl">🦴</div>
           <div className="absolute top-1/2 right-1/4 text-9xl">🎾</div>
         </div>
-        
+
         <div className="max-w-7xl mx-auto px-4 relative z-10">
           <div className="text-center mb-20">
             <div className="inline-block bg-pink-100 text-pink-600 px-6 py-2 rounded-full font-bold mb-4">
@@ -320,7 +482,7 @@ const LandingPage = () => {
             <h2 className="text-5xl font-black mb-4">Your Pet's Journey Starts Here!</h2>
             <p className="text-xl text-gray-600 font-medium">Just 4 pawsteps to happiness</p>
           </div>
-          
+
           <div className="relative grid md:grid-cols-4 gap-8">
             {[
               { emoji: "📝", title: "Sign Up", desc: "Create your free account in 30 seconds!", color: "from-blue-400 to-cyan-500" },
@@ -334,9 +496,9 @@ const LandingPage = () => {
                     {step.emoji}
                   </div>
                   {index < 3 && (
-                    <div 
+                    <div
                       className="hidden md:block absolute top-1/2 h-1 bg-gradient-to-r from-orange-300 to-pink-300 z-0"
-                      style={{ 
+                      style={{
                         left: 'calc(50% + 3.5rem)',
                         width: 'calc(100% + 2rem - 7rem)'
                       }}
@@ -396,7 +558,7 @@ const LandingPage = () => {
           <div className="absolute top-10 left-20 text-9xl animate-pulse">🐾</div>
           <div className="absolute bottom-10 right-20 text-9xl animate-pulse" style={{ animationDelay: '1s' }}>🐾</div>
         </div>
-        
+
         <div className="max-w-4xl mx-auto text-center px-4 relative z-10">
           <div className="text-7xl mb-6">🐶 🐱 🐹 🐰</div>
           <h2 className="text-5xl font-black text-white mb-6 leading-tight">Ready for Tail-Wagging Adventures?</h2>
@@ -422,10 +584,15 @@ const LandingPage = () => {
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
               <div className="flex items-center space-x-3 mb-4">
-                <div className="bg-gradient-to-br from-orange-400 to-pink-500 p-2 rounded-xl">
-                  <FaPaw className="text-white text-2xl" />
+                <div className="bg-white p-2 rounded-xl">
+                  <div className="relative flex items-center justify-center w-8 h-8">
+                    <FaHome className="text-teal-500 text-3xl" />
+                    <div className="absolute inset-0 flex items-center justify-center pt-1">
+                      <FaPaw className="text-white text-sm" />
+                    </div>
+                  </div>
                 </div>
-                <span className="text-2xl font-black text-white">PetCare</span>
+                <span className="text-2xl font-black text-white">PawHaven</span>
               </div>
               <p className="text-sm font-medium">Where every pet gets the royal treatment they deserve! 👑</p>
             </div>

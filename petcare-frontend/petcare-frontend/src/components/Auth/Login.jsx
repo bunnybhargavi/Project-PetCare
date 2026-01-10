@@ -32,8 +32,10 @@ const Login = () => {
     }
 
     setLoading(true);
+    console.log('Attempting to request login OTP for:', formData.email);
     try {
       await requestLoginOtp(formData.email);
+      console.log('Login OTP request successful!');
       toast.success('OTP sent to your email!');
       setStep(2);
     } catch (error) {

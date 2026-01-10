@@ -1,0 +1,352 @@
+.vet-appointments-view {
+    padding: 2rem;
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    min-height: 100vh;
+}
+
+.appointments-header {
+    margin-bottom: 2rem;
+}
+
+.appointments-header h2 {
+    color: white;
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+}
+
+.filter-buttons {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.filter-btn {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    padding: 0.6rem 1.2rem;
+    border-radius: 25px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.filter-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+.filter-btn.active {
+    background: white;
+    color: #f5576c;
+    border-color: white;
+}
+
+.loading {
+    text-align: center;
+    padding: 3rem;
+    color: white;
+    font-size: 1.2rem;
+}
+
+.no-appointments {
+    background: white;
+    padding: 3rem;
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.no-appointments p {
+    color: #718096;
+    font-size: 1.1rem;
+}
+
+.appointments-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    gap: 1.5rem;
+}
+
+.appointment-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 16px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.appointment-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.appointment-header-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #f7fafc;
+}
+
+.appointment-id {
+    font-size: 0.9rem;
+    color: #a0aec0;
+    font-weight: 600;
+}
+
+.status-badge {
+    padding: 0.4rem 0.9rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.status-badge.pending {
+    background: #feebc8;
+    color: #7c2d12;
+}
+
+.status-badge.confirmed {
+    background: #c6f6d5;
+    color: #22543d;
+}
+
+.status-badge.completed {
+    background: #bee3f8;
+    color: #2c5282;
+}
+
+.status-badge.cancelled {
+    background: #fed7d7;
+    color: #742a2a;
+}
+
+.status-badge.no-show {
+    background: #e2e8f0;
+    color: #2d3748;
+}
+
+.type-badge {
+    padding: 0.3rem 0.7rem;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.type-badge.video {
+    background: #e6fffa;
+    color: #234e52;
+}
+
+.type-badge.clinic {
+    background: #fef5e7;
+    color: #7c2d12;
+}
+
+.appointment-details {
+    margin-bottom: 1rem;
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    padding: 0.5rem 0;
+}
+
+.detail-row .label {
+    color: #718096;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.detail-row .value {
+    color: #2d3748;
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-align: right;
+}
+
+.meeting-link {
+    color: #4299e1;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.meeting-link:hover {
+    color: #2b6cb0;
+    text-decoration: underline;
+}
+
+.appointment-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 2px solid #f7fafc;
+}
+
+.btn-action {
+    flex: 1;
+    border: none;
+    padding: 0.75rem;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-complete {
+    background: #48bb78;
+    color: white;
+}
+
+.btn-complete:hover {
+    background: #38a169;
+    transform: translateY(-2px);
+}
+
+.btn-confirm {
+    background: #4299e1;
+    color: white;
+}
+
+.btn-confirm:hover {
+    background: #3182ce;
+    transform: translateY(-2px);
+}
+
+.btn-cancel {
+    background: #fc8181;
+    color: white;
+}
+
+.btn-cancel:hover {
+    background: #f56565;
+    transform: translateY(-2px);
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(5px);
+}
+
+.modal-content {
+    background: white;
+    padding: 2rem;
+    border-radius: 20px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.modal-content h3 {
+    color: #2d3748;
+    margin-bottom: 0.5rem;
+    font-size: 1.5rem;
+}
+
+.modal-content p {
+    color: #718096;
+    margin-bottom: 1.5rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #4a5568;
+    font-weight: 600;
+}
+
+.form-group textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-family: inherit;
+    resize: vertical;
+    transition: all 0.3s ease;
+}
+
+.form-group textarea:focus {
+    outline: none;
+    border-color: #f5576c;
+    box-shadow: 0 0 0 3px rgba(245, 87, 108, 0.1);
+}
+
+.modal-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.btn-modal {
+    flex: 1;
+    padding: 0.875rem;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-submit {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+}
+
+.btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(245, 87, 108, 0.4);
+}
+
+.btn-cancel-modal {
+    background: #e2e8f0;
+    color: #4a5568;
+}
+
+.btn-cancel-modal:hover {
+    background: #cbd5e0;
+}
+
+@media (max-width: 768px) {
+    .vet-appointments-view {
+        padding: 1rem;
+    }
+
+    .appointments-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .filter-buttons {
+        justify-content: center;
+    }
+
+    .modal-content {
+        width: 95%;
+        padding: 1.5rem;
+    }
+}

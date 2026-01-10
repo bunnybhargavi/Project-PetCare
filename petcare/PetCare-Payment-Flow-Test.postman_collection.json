@@ -1,0 +1,305 @@
+{
+    "info": {
+        "_postman_id": "b0a8c2d4-1e5f-4a9b-8c3d-7e6f5a4b2c1d",
+        "name": "PetCare Payment Flow Test (OTP Version)",
+        "description": "Automated test flow for PetCare Payment System using OTP Login.\n\nFlow:\n1. Initiate Login (Sends OTP)\n2. Fetch Latest OTP (Debug Endpoint)\n3. Complete Login (Gets Token)\n4. Add Item to Cart (Product ID 38)\n5. Checkout (Creates Order)\n6. Create Payment (Using Order ID)\n7. Verify Payment",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "1. Initiate Login (Send OTP)",
+            "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"email\": \"bhargavi123ammu@gmail.com\"\n}",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    }
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/auth/login/initiate",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "auth",
+                        "login",
+                        "initiate"
+                    ]
+                },
+                "description": "Sends a request to generate an OTP for the user."
+            },
+            "response": []
+        },
+        {
+            "name": "2. Get Latest OTP (Debug)",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "var jsonData = pm.response.json();",
+                            "if (jsonData && jsonData.otp) {",
+                            "    pm.collectionVariables.set(\"otpCode\", jsonData.otp);",
+                            "    console.log(\"OTP fetched successfully: \" + jsonData.otp);",
+                            "}"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{baseUrl}}/debug/otp/email/bhargavi123ammu@gmail.com/latest",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "debug",
+                        "otp",
+                        "email",
+                        "bhargavi123ammu@gmail.com",
+                        "latest"
+                    ]
+                },
+                "description": "Fetches the latest OTP from the debug endpoint for automation."
+            },
+            "response": []
+        },
+        {
+            "name": "3. Complete Login (Verify OTP)",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "var jsonData = pm.response.json();",
+                            "if (jsonData.token) {",
+                            "    pm.collectionVariables.set(\"authToken\", jsonData.token);",
+                            "    console.log(\"Token set successfully\");",
+                            "}"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"email\": \"bhargavi123ammu@gmail.com\",\n    \"otp\": \"{{otpCode}}\"\n}",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    }
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/auth/login/complete",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "auth",
+                        "login",
+                        "complete"
+                    ]
+                },
+                "description": "Uses the fetched OTP to verify and get the JWT token."
+            },
+            "response": []
+        },
+        {
+            "name": "4. Add to Cart",
+            "request": {
+                "auth": {
+                    "type": "bearer",
+                    "bearer": [
+                        {
+                            "key": "token",
+                            "value": "{{authToken}}",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"productId\": 38,\n    \"quantity\": 1\n}",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    }
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/cart/add",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "cart",
+                        "add"
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "5. Checkout (Create Order)",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "var jsonData = pm.response.json();",
+                            "if (jsonData.data && jsonData.data.id) {",
+                            "    pm.collectionVariables.set(\"orderId\", jsonData.data.id);",
+                            "    console.log(\"Order ID set to: \" + jsonData.data.id);",
+                            "}"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "auth": {
+                    "type": "bearer",
+                    "bearer": [
+                        {
+                            "key": "token",
+                            "value": "{{authToken}}",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"paymentMethod\": \"PAYPAL\",\n    \"shippingName\": \"Test User\",\n    \"shippingAddress\": \"123 Test St\",\n    \"shippingCity\": \"Test City\",\n    \"shippingState\": \"TS\",\n    \"shippingZipCode\": \"500001\",\n    \"shippingPhone\": \"9988776655\",\n    \"notes\": \"Automated Test Order\"\n}",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    }
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/orders/checkout",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "orders",
+                        "checkout"
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "6. Create Payment",
+            "request": {
+                "auth": {
+                    "type": "bearer",
+                    "bearer": [
+                        {
+                            "key": "token",
+                            "value": "{{authToken}}",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"orderId\": {{orderId}},\n    \"amount\": 100.00,\n    \"currency\": \"INR\"\n}",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    }
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/payments/create-order",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "payments",
+                        "create-order"
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "7. Verify Payment",
+            "request": {
+                "auth": {
+                    "type": "bearer",
+                    "bearer": [
+                        {
+                            "key": "token",
+                            "value": "{{authToken}}",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"paypalPaymentId\": \"PAYID-TEST-{{$timestamp}}\",\n    \"payerId\": \"PAYERID-TEST-{{$randomInt}}\"\n}",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    }
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/payments/verify",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "payments",
+                        "verify"
+                    ]
+                }
+            },
+            "response": []
+        }
+    ],
+    "variable": [
+        {
+            "key": "baseUrl",
+            "value": "http://localhost:8080/api",
+            "type": "string"
+        },
+        {
+            "key": "authToken",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "orderId",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "otpCode",
+            "value": "",
+            "type": "string"
+        }
+    ]
+}

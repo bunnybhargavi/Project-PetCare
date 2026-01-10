@@ -1,4 +1,4 @@
-// src/components/Layout/Navbar.jsx
+import { FaHome, FaPaw } from 'react-icons/fa';
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -13,7 +13,7 @@ const fetchImageAsBlob = async (relativePath) => {
   try {
     const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080/api';
     const BASE_URL = API_URL.replace('/api', '');
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
 
     if (!token) return null;
 
@@ -51,34 +51,15 @@ const Navbar = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [profilePhotoUrl, setProfilePhotoUrl] = useState(null);
 
-  useEffect(() => {
-    const loadProfilePhoto = async () => {
-      const photoPath = user?.profilePhoto || user?.photoUrl || user?.photo_url
-        || user?.ownerProfilePhoto || user?.vetProfilePhoto;
+  // ... existing useEffect ...
 
-      if (photoPath) {
-        const blobUrl = await fetchImageAsBlob(photoPath);
-        if (blobUrl) {
-          setProfilePhotoUrl(blobUrl);
-        }
-      }
-    };
-
-    if (user) {
-      loadProfilePhoto();
-    }
-
-    // Cleanup blob URL on unmount
-    return () => {
-      if (profilePhotoUrl && profilePhotoUrl.startsWith('blob:')) {
-        URL.revokeObjectURL(profilePhotoUrl);
-      }
-    };
-  }, [user]);
-
-  const handleLogout = () => {
-    if (window.confirm('Are you sure you want to logout?')) {
-      logout();
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/login');
+    } catch (error) {
+      console.error('Logout error:', error);
+      navigate('/login');
     }
   };
 
@@ -91,10 +72,18 @@ const Navbar = () => {
           <div className="flex items-center">
             <button
               onClick={() => navigate('/dashboard')}
-              className="flex items-center space-x-2"
+              className="flex items-center space-x-2 group"
             >
-              <span className="text-3xl">🐾</span>
-              <span className="text-xl font-bold text-gray-900">Pet Care</span>
+              {/* Composed Logo: House with Paw */}
+              <div className="relative flex items-center justify-center w-10 h-10">
+                <FaHome className="text-teal-500 text-4xl" />
+                <div className="absolute inset-0 flex items-center justify-center pt-1">
+                  <FaPaw className="text-white text-lg" />
+                </div>
+              </div>
+              <span className="text-2xl font-bold text-blue-900 tracking-tight group-hover:text-blue-700 transition-colors">
+                PawHaven
+              </span>
             </button>
           </div>
 
@@ -119,13 +108,15 @@ const Navbar = () => {
               </button>
             )}
 
-            {/* Community Link */}
-            <button
-              onClick={() => navigate('/community')}
-              className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100"
-            >
-              Community
-            </button>
+            {/* Patients Link - Only show for VET users */}
+            {user?.role === 'VET' && (
+              <button
+                onClick={() => navigate('/patients')}
+                className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100"
+              >
+                Patients
+              </button>
+            )}
 
             {user?.role !== 'VET' && (
               <button
@@ -135,6 +126,7 @@ const Navbar = () => {
                 Find a Vet
               </button>
             )}
+
 
 
 
@@ -148,7 +140,15 @@ const Navbar = () => {
               </button>
             )}
 
-
+            {/* Shop Link - Only show for non-VET users */}
+            {user?.role !== 'VET' && (
+              <button
+                onClick={() => navigate('/shop')}
+                className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100"
+              >
+                🛒 Shop
+              </button>
+            )}
 
             {/* Profile Link */}
             <button
@@ -192,8 +192,8 @@ const Navbar = () => {
                     <p className="text-sm font-medium text-gray-900">{user?.name}</p>
                     <p className="text-xs text-gray-500">{user?.email}</p>
                     <span className={`inline-block mt-1 px-2 py-1 text-xs rounded-full ${user?.role === 'VET'
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-blue-100 text-blue-800'
+                      ? 'bg-green-100 text-green-800'
+                      : 'bg-blue-100 text-blue-800'
                       }`}>
                       {user?.role === 'VET' ? '🩺 Veterinarian' : '🐕 Pet Owner'}
                     </span>
@@ -231,16 +231,6 @@ const Navbar = () => {
                     </button>
                   )}
 
-                  <button
-                    onClick={() => {
-                      navigate('/community');
-                      setShowDropdown(false);
-                    }}
-                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  >
-                    🫶 Community
-                  </button>
-
                   {user?.role !== 'VET' && (
                     <button
                       onClick={() => {
@@ -250,6 +240,18 @@ const Navbar = () => {
                       className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     >
                       🩺 Find a Vet
+                    </button>
+                  )}
+
+                  {user?.role !== 'VET' && (
+                    <button
+                      onClick={() => {
+                        navigate('/shop');
+                        setShowDropdown(false);
+                      }}
+                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      🛒 Shop
                     </button>
                   )}
 
