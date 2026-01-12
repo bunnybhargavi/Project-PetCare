@@ -93,6 +93,27 @@ public class ReminderService {
 
         log.info("Reminder added for pet: {}", pet.getName());
 
+        // Check if due date is today -> Send email immediately
+        if (reminder.getDueDate().equals(LocalDate.now())) {
+            try {
+                PetOwner owner = pet.getOwner();
+                User user = owner.getUser();
+
+                emailService.sendReminderEmail(
+                        user.getEmail(),
+                        user.getName(),
+                        pet.getName(),
+                        reminder.getTitle(),
+                        reminder.getType().name());
+
+                reminder.setEmailSent(true);
+                reminderRepository.save(reminder);
+                log.info("Immediate reminder email triggered for: {}", reminder.getTitle());
+            } catch (Exception e) {
+                log.error("Failed to send immediate reminder email", e);
+            }
+        }
+
         return mapToResponse(reminder);
     }
 

@@ -1,83 +1,42 @@
-import axios from 'axios';
+import api from './api';
 
-const API_URL = 'http://localhost:8080/api/pets';
+const base = (petId) => `/pets/${petId}/reminders`;
 
-const getAuthHeader = () => {
-  const token = localStorage.getItem('token');
-  return token ? { Authorization: `Bearer ${token}` } : {};
+export const reminderService = {
+  getRemindersByPet: async (petId) => {
+    const { data } = await api.get(base(petId));
+    return data;
+  },
+
+  getUpcomingReminders: async (petId) => {
+    const { data } = await api.get(`${base(petId)}/upcoming`);
+    return data;
+  },
+
+  getPendingReminders: async (petId) => {
+    const { data } = await api.get(`${base(petId)}/pending`);
+    return data;
+  },
+
+  createReminder: async (petId, reminderData) => {
+    const { data } = await api.post(base(petId), reminderData);
+    return data;
+  },
+
+  updateReminder: async (petId, reminderId, reminderData) => {
+    const { data } = await api.put(`${base(petId)}/${reminderId}`, reminderData);
+    return data;
+  },
+
+  deleteReminder: async (petId, reminderId) => {
+    const { data } = await api.delete(`${base(petId)}/${reminderId}`);
+    return data;
+  },
+
+  completeReminder: async (petId, reminderId) => {
+    const { data } = await api.patch(`${base(petId)}/${reminderId}/complete`);
+    return data;
+  },
 };
 
-// Get all reminders for a pet
-export const getReminders = async (petId) => {
-  const response = await axios.get(`${API_URL}/${petId}/reminders`, {
-    headers: getAuthHeader()
-  });
-  return response.data;
-};
-
-// Get upcoming reminders (next 7 days)
-export const getUpcomingReminders = async (petId) => {
-  const response = await axios.get(`${API_URL}/${petId}/reminders/upcoming`, {
-    headers: getAuthHeader()
-  });
-  return response.data;
-};
-
-// Get reminders by type (VACCINATION, CHECKUP, MEDICATION, GROOMING, etc.)
-export const getRemindersByType = async (petId, type) => {
-  const response = await axios.get(`${API_URL}/${petId}/reminders/type/${type}`, {
-    headers: getAuthHeader()
-  });
-  return response.data;
-};
-
-// Get single reminder
-export const getReminderById = async (petId, reminderId) => {
-  const response = await axios.get(`${API_URL}/${petId}/reminders/${reminderId}`, {
-    headers: getAuthHeader()
-  });
-  return response.data;
-};
-
-// Create reminder
-export const createReminder = async (petId, reminderData) => {
-  const response = await axios.post(`${API_URL}/${petId}/reminders`, reminderData, {
-    headers: getAuthHeader()
-  });
-  return response.data;
-};
-
-// Update reminder
-export const updateReminder = async (petId, reminderId, reminderData) => {
-  const response = await axios.put(`${API_URL}/${petId}/reminders/${reminderId}`, reminderData, {
-    headers: getAuthHeader()
-  });
-  return response.data;
-};
-
-// Delete reminder
-export const deleteReminder = async (petId, reminderId) => {
-  const response = await axios.delete(`${API_URL}/${petId}/reminders/${reminderId}`, {
-    headers: getAuthHeader()
-  });
-  return response.data;
-};
-
-// Mark reminder as completed
-export const completeReminder = async (petId, reminderId) => {
-  const response = await axios.patch(`${API_URL}/${petId}/reminders/${reminderId}/complete`, {}, {
-    headers: getAuthHeader()
-  });
-  return response.data;
-};
-
-export default {
-  getReminders,
-  getUpcomingReminders,
-  getRemindersByType,
-  getReminderById,
-  createReminder,
-  updateReminder,
-  deleteReminder,
-  completeReminder
-};
+export default reminderService;

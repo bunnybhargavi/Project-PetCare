@@ -4,6 +4,7 @@ import com.pets.petcare.dto.*;
 import com.pets.petcare.service.PetService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +19,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/pets")
 @RequiredArgsConstructor
+@Slf4j
 public class PetController {
     
     private final PetService petService;
@@ -48,13 +50,19 @@ public class PetController {
      * POST /api/pets
      */
     @PostMapping
-    public ResponseEntity<PetResponse> createPet(
+    public ResponseEntity<?> createPet(
             @Valid @RequestBody PetRequest request,
             Authentication auth
     ) {
-        String email = auth.getName();
-        PetResponse pet = petService.createPet(email, request);
-        return ResponseEntity.ok(pet);
+        try {
+            String email = auth.getName();
+            PetResponse pet = petService.createPet(email, request);
+            return ResponseEntity.ok(pet);
+        } catch (Exception e) {
+            log.error("Error creating pet: {}", e.getMessage(), e);
+            return ResponseEntity.badRequest()
+                .body(new ApiResponse<>(false, "Failed to create pet: " + e.getMessage(), null));
+        }
     }
     
     /**
@@ -85,12 +93,12 @@ public class PetController {
      * POST /api/pets/{petId}/photo
      */
     @PostMapping("/{petId}/photo")
-    public ResponseEntity<ApiResponse> uploadPhoto(
+    public ResponseEntity<ApiResponse<String>> uploadPhoto(
             @PathVariable Long petId,
             @RequestParam("file") MultipartFile file
     ) {
         String photoUrl = petService.uploadPetPhoto(petId, file);
-        return ResponseEntity.ok(new ApiResponse(true, "Photo uploaded: " + photoUrl));
+        return ResponseEntity.ok(new ApiResponse<>(true, "Photo uploaded successfully", photoUrl));
     }
     
     /**
@@ -108,8 +116,8 @@ public class PetController {
      * POST /api/pets/{petId}/walk
      */
     @PostMapping("/{petId}/walk")
-    public ResponseEntity<ApiResponse> incrementWalkStreak(@PathVariable Long petId) {
+    public ResponseEntity<ApiResponse<String>> incrementWalkStreak(@PathVariable Long petId) {
         petService.incrementWalkStreak(petId);
-        return ResponseEntity.ok(new ApiResponse(true, "Walk streak updated!"));
+        return ResponseEntity.ok(new ApiResponse<>(true, "Walk streak updated!", "Walk streak incremented"));
     }
 }

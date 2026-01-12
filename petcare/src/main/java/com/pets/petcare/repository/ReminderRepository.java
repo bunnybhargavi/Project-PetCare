@@ -10,7 +10,14 @@ import java.util.List;
 @Repository
 public interface ReminderRepository extends JpaRepository<Reminder, Long> {
     List<Reminder> findByPetOrderByDueDateAsc(Pet pet);
+
     List<Reminder> findByPetIdOrderByDueDateAsc(Long petId);
+
+    List<Reminder> findByPetIdAndStatusOrderByDueDateAsc(Long petId, Reminder.ReminderStatus status);
+
     List<Reminder> findByDueDateBeforeAndStatus(LocalDate date, Reminder.ReminderStatus status);
+
     List<Reminder> findByStatusAndEmailSent(Reminder.ReminderStatus status, Boolean emailSent);
+
+    List<Reminder> findByPetIdAndStatusNotOrderByDueDateAsc(Long petId, Reminder.ReminderStatus status);
 }

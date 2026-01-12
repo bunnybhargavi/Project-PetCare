@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -35,10 +36,11 @@ public class OtpService {
      * Generate and send OTP to user's email
      *
      * PROCESS:
-     * 1. Invalidate all previous unused OTPs (security)
-     * 2. Generate new 6-digit OTP
-     * 3. Save OTP to database with expiry time
-     * 4. Send OTP via email
+     * 1. Clean up expired OTPs first
+     * 2. Invalidate all previous unused OTPs (security)
+     * 3. Generate new 6-digit OTP
+     * 4. Save OTP to database with expiry time
+     * 5. Send OTP via email
      *
      * @param email - User's email address
      * @param type  - REGISTRATION or LOGIN
@@ -47,35 +49,53 @@ public class OtpService {
      */
     @Transactional
     public void generateAndSendOtp(String email, OtpToken.OtpType type) {
+        log.info("Generating OTP for email: {} with type: {}", email, type);
 
-        // STEP 1: Invalidate previous OTPs
-        // Why? Prevents user from using old OTPs
-        // Find all unused OTPs for this email and type
-        otpTokenRepository.findByEmailAndTypeAndIsUsed(email, type, false)
-                .forEach(otp -> {
-                    otp.setIsUsed(true); // Mark as used
-                    otpTokenRepository.save(otp);
-                });
+        try {
+            // STEP 1: Clean up expired OTPs first (prevents database bloat)
+            cleanupExpiredOtpsForEmail(email);
 
-        // STEP 2: Generate new random 6-digit OTP
-        String otp = generateOtp();
+            // STEP 2: Invalidate previous unused OTPs
+            // Why? Prevents user from using old OTPs
+            List<OtpToken> existingOtps = otpTokenRepository.findByEmailAndTypeAndIsUsed(email, type, false);
+            log.info("Found {} existing unused OTPs for email: {}", existingOtps.size(), email);
+            
+            existingOtps.forEach(otp -> {
+                otp.setIsUsed(true); // Mark as used
+                otpTokenRepository.save(otp);
+                log.debug("Invalidated existing OTP: {}", otp.getId());
+            });
 
-        // STEP 3: Create OTP record
-        OtpToken otpToken = new OtpToken();
-        otpToken.setEmail(email);
-        otpToken.setOtp(otp);
-        otpToken.setType(type);
-        otpToken.setExpiryTime(LocalDateTime.now().plusMinutes(OTP_VALIDITY_MINUTES));
-        otpToken.setIsUsed(false);
-        otpToken.setCreatedAt(LocalDateTime.now());
+            // STEP 3: Generate new random 6-digit OTP
+            String otp = generateOtp();
+            log.debug("Generated new OTP for email: {}", email);
 
-        // STEP 4: Save to database
-        otpTokenRepository.save(otpToken);
+            // STEP 4: Create OTP record
+            OtpToken otpToken = new OtpToken();
+            otpToken.setEmail(email);
+            otpToken.setOtp(otp);
+            otpToken.setType(type);
+            otpToken.setExpiryTime(LocalDateTime.now().plusMinutes(OTP_VALIDITY_MINUTES));
+            otpToken.setIsUsed(false);
+            otpToken.setCreatedAt(LocalDateTime.now());
 
-        // STEP 5: Send OTP via email
-        emailService.sendOtpEmail(email, otp, type.name());
+            // STEP 5: Save to database
+            OtpToken savedToken = otpTokenRepository.save(otpToken);
+            log.info("Saved OTP token with ID: {} for email: {}", savedToken.getId(), email);
 
-        log.info("OTP generated and sent to: {}", email);
+            // STEP 6: Send OTP via email
+            emailService.sendOtpEmail(email, otp, type.name());
+
+            log.info("OTP generated and sent successfully to: {}", email);
+            System.out.println("************************************************");
+            System.out.println("DEV OTP for " + email + ": " + otp);
+            System.out.println("Expires at: " + otpToken.getExpiryTime());
+            System.out.println("************************************************");
+
+        } catch (Exception e) {
+            log.error("Error generating OTP for email: {} - {}", email, e.getMessage(), e);
+            throw new RuntimeException("Failed to generate OTP: " + e.getMessage());
+        }
     }
 
     /**
@@ -145,18 +165,58 @@ public class OtpService {
      *
      * PURPOSE: Keep database clean by removing old OTPs
      * Should be run periodically (e.g., daily via scheduled job)
-     *
-     * EXAMPLE USAGE:
-     * 
-     * @Scheduled(cron = "0 0 2 * * ?") // Run at 2 AM daily
-     *                 public void scheduledCleanup() {
-     *                 otpService.cleanupExpiredOtps();
-     *                 }
      */
     @Transactional
     public void cleanupExpiredOtps() {
-        LocalDateTime cutoffTime = LocalDateTime.now().minusHours(24);
-        otpTokenRepository.deleteByCreatedAtBefore(cutoffTime);
-        log.info("Cleaned up expired OTPs");
+        try {
+            LocalDateTime cutoffTime = LocalDateTime.now().minusHours(24);
+            long deletedCount = otpTokenRepository.countByCreatedAtBefore(cutoffTime);
+            otpTokenRepository.deleteByCreatedAtBefore(cutoffTime);
+            log.info("Cleaned up {} expired OTPs older than 24 hours", deletedCount);
+        } catch (Exception e) {
+            log.error("Error during OTP cleanup: {}", e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Cleanup expired OTPs for a specific email
+     * Called before generating new OTP to prevent database bloat
+     */
+    @Transactional
+    public void cleanupExpiredOtpsForEmail(String email) {
+        try {
+            LocalDateTime cutoffTime = LocalDateTime.now().minusHours(1); // Clean OTPs older than 1 hour
+            List<OtpToken> expiredOtps = otpTokenRepository.findByEmailAndCreatedAtBefore(email, cutoffTime);
+            if (!expiredOtps.isEmpty()) {
+                otpTokenRepository.deleteAll(expiredOtps);
+                log.info("Cleaned up {} expired OTPs for email: {}", expiredOtps.size(), email);
+            }
+        } catch (Exception e) {
+            log.warn("Error cleaning up expired OTPs for email {}: {}", email, e.getMessage());
+        }
+    }
+
+    /**
+     * Force cleanup all OTPs for an email (useful for testing or troubleshooting)
+     */
+    @Transactional
+    public void forceCleanupOtpsForEmail(String email) {
+        try {
+            List<OtpToken> allOtps = otpTokenRepository.findByEmailOrderByCreatedAtDesc(email);
+            if (!allOtps.isEmpty()) {
+                otpTokenRepository.deleteAll(allOtps);
+                log.info("Force cleaned up {} OTPs for email: {}", allOtps.size(), email);
+            }
+        } catch (Exception e) {
+            log.error("Error during force cleanup for email {}: {}", email, e.getMessage());
+        }
+    }
+
+    /**
+     * Get latest OTP for debugging purposes
+     */
+    public OtpToken getLatestOtpForEmail(String email) {
+        List<OtpToken> otps = otpTokenRepository.findByEmailOrderByCreatedAtDesc(email);
+        return otps.isEmpty() ? null : otps.get(0);
     }
 }

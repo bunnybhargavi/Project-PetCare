@@ -1,0 +1,750 @@
+{
+  "info": {
+    "_postman_id": "petcare-api-enhanced-v2",
+    "name": "PetCare API - Enhanced Collection",
+    "description": "Complete API collection for PetCare Backend with automated tests and environment setup. Import this collection to test all endpoints.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "0. Setup & Health Check",
+      "item": [
+        {
+          "name": "Health Check",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"API is running\", function () {",
+                  "    pm.expect(pm.response.text()).to.include(\"running\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/auth/health",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "health"]
+            },
+            "description": "**Purpose**: Verify the API server is running\n\n**Expected Response**: \"Pet Care API is running!\"\n\n**Status Code**: 200"
+          }
+        }
+      ],
+      "description": "Basic health checks to verify API connectivity"
+    },
+    {
+      "name": "1. Authentication - Registration Flow",
+      "item": [
+        {
+          "name": "Step 1 - Initiate Registration (Send OTP)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response indicates success\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.message).to.include('OTP');",
+                  "});",
+                  "",
+                  "console.log('✅ Registration initiated. Check your email for OTP.');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{test_email}}\",\n  \"name\": \"Test User\",\n  \"phone\": \"9876543210\",\n  \"role\": \"OWNER\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/register/initiate",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "register", "initiate"]
+            },
+            "description": "**Purpose**: Initiate user registration and send OTP to email\n\n**Request Body**:\n```json\n{\n  \"email\": \"user@example.com\",\n  \"name\": \"John Doe\",\n  \"phone\": \"9876543210\",\n  \"role\": \"OWNER\" // or \"VET\"\n}\n```\n\n**Expected Response**:\n```json\n{\n  \"success\": true,\n  \"message\": \"OTP sent to your email. Please verify to complete registration.\"\n}\n```\n\n**Note**: Check email inbox for OTP code (valid for 5 minutes)"
+          }
+        },
+        {
+          "name": "Step 2 - Complete Registration (Verify OTP)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Registration successful and token received\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.token).to.exist;",
+                  "    pm.expect(jsonData.userId).to.exist;",
+                  "    pm.expect(jsonData.email).to.exist;",
+                  "    ",
+                  "    // Store token for future requests",
+                  "    pm.collectionVariables.set('jwt_token', jsonData.token);",
+                  "    pm.collectionVariables.set('user_id', jsonData.userId);",
+                  "    pm.collectionVariables.set('user_email', jsonData.email);",
+                  "});",
+                  "",
+                  "console.log('✅ Registration complete! Token saved to collection variables.');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{test_email}}\",\n  \"otp\": \"123456\",\n  \"name\": \"Test User\",\n  \"phone\": \"9876543210\",\n  \"role\": \"OWNER\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/register/complete",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "register", "complete"]
+            },
+            "description": "**Purpose**: Complete registration by verifying OTP\n\n**Request Body**:\n```json\n{\n  \"email\": \"user@example.com\",\n  \"otp\": \"123456\",\n  \"name\": \"John Doe\",\n  \"phone\": \"9876543210\",\n  \"role\": \"OWNER\"\n}\n```\n\n**Expected Response**:\n```json\n{\n  \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n  \"userId\": 1,\n  \"email\": \"user@example.com\",\n  \"name\": \"John Doe\",\n  \"role\": \"OWNER\",\n  \"message\": \"Registration successful\"\n}\n```\n\n**Note**: Token is automatically saved to collection variables"
+          }
+        }
+      ],
+      "description": "Two-step registration process with OTP verification"
+    },
+    {
+      "name": "2. Authentication - Login Flow",
+      "item": [
+        {
+          "name": "Step 1 - Initiate Login (Send OTP)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"OTP sent successfully\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.message).to.include('OTP');",
+                  "});",
+                  "",
+                  "console.log('✅ Login OTP sent. Check your email.');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{test_email}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login/initiate",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login", "initiate"]
+            },
+            "description": "**Purpose**: Request login OTP for existing user\n\n**Request Body**:\n```json\n{\n  \"email\": \"user@example.com\"\n}\n```\n\n**Expected Response**:\n```json\n{\n  \"success\": true,\n  \"message\": \"OTP sent to your email\"\n}\n```"
+          }
+        },
+        {
+          "name": "Step 2 - Complete Login (Verify OTP)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Login successful and token received\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.token).to.exist;",
+                  "    pm.expect(jsonData.userId).to.exist;",
+                  "    ",
+                  "    // Store token for future requests",
+                  "    pm.collectionVariables.set('jwt_token', jsonData.token);",
+                  "    pm.collectionVariables.set('user_id', jsonData.userId);",
+                  "    pm.collectionVariables.set('user_email', jsonData.email);",
+                  "});",
+                  "",
+                  "console.log('✅ Login successful! Token saved.');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{test_email}}\",\n  \"otp\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login/complete",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login", "complete"]
+            },
+            "description": "**Purpose**: Complete login by verifying OTP\n\n**Request Body**:\n```json\n{\n  \"email\": \"user@example.com\",\n  \"otp\": \"123456\"\n}\n```\n\n**Expected Response**:\n```json\n{\n  \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n  \"userId\": 1,\n  \"email\": \"user@example.com\",\n  \"name\": \"John Doe\",\n  \"role\": \"OWNER\",\n  \"message\": \"Login successful\"\n}\n```"
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/logout",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "logout"]
+            },
+            "description": "**Purpose**: Logout (frontend clears token)\n\n**Note**: JWT is stateless, actual logout happens client-side"
+          }
+        }
+      ],
+      "description": "Two-step login process with OTP verification"
+    },
+    {
+      "name": "3. User Profile",
+      "item": [
+        {
+          "name": "Get User Profile",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Profile data received\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.email).to.exist;",
+                  "    pm.expect(jsonData.name).to.exist;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/profile",
+              "host": ["{{base_url}}"],
+              "path": ["api", "profile"]
+            },
+            "description": "**Purpose**: Get authenticated user's profile\n\n**Headers**: Bearer token required\n\n**Expected Response**: User profile object"
+          }
+        },
+        {
+          "name": "Update User Profile",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Profile updated successfully\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.name).to.exist;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Name\",\n  \"phone\": \"9876543210\",\n  \"address\": \"123 Pet Street, Animal City\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/profile",
+              "host": ["{{base_url}}"],
+              "path": ["api", "profile"]
+            },
+            "description": "**Purpose**: Update user profile information\n\n**Headers**: Bearer token required\n\n**Request Body**: Profile fields to update"
+          }
+        }
+      ],
+      "description": "User profile management endpoints"
+    },
+    {
+      "name": "4. Pet Management",
+      "item": [
+        {
+          "name": "List My Pets",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response is an array\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/pets",
+              "host": ["{{base_url}}"],
+              "path": ["api", "pets"]
+            },
+            "description": "**Purpose**: Get all pets for authenticated user"
+          }
+        },
+        {
+          "name": "Create Pet",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 or 201\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "});",
+                  "",
+                  "pm.test(\"Pet created with ID\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    var petId = jsonData.id || jsonData.petId || (jsonData.data && jsonData.data.id);",
+                  "    pm.expect(petId).to.exist;",
+                  "    ",
+                  "    // Save pet ID for future requests",
+                  "    pm.collectionVariables.set('petId', petId);",
+                  "});",
+                  "",
+                  "console.log('✅ Pet created! ID saved to collection variables.');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Buddy\",\n  \"species\": \"Dog\",\n  \"breed\": \"Labrador\",\n  \"dateOfBirth\": \"2023-01-10\",\n  \"gender\": \"MALE\",\n  \"microchipId\": \"MC123456\",\n  \"notes\": \"Friendly and energetic dog\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/pets",
+              "host": ["{{base_url}}"],
+              "path": ["api", "pets"]
+            },
+            "description": "**Purpose**: Create a new pet\n\n**Request Body**:\n```json\n{\n  \"name\": \"Buddy\",\n  \"species\": \"Dog\",\n  \"breed\": \"Labrador\",\n  \"dateOfBirth\": \"2023-01-10\",\n  \"gender\": \"MALE\",\n  \"microchipId\": \"MC123456\",\n  \"notes\": \"Friendly dog\"\n}\n```"
+          }
+        },
+        {
+          "name": "Get Pet by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/pets/{{petId}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "pets", "{{petId}}"]
+            },
+            "description": "**Purpose**: Get specific pet by ID"
+          }
+        },
+        {
+          "name": "Update Pet",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Buddy Updated\",\n  \"species\": \"Dog\",\n  \"breed\": \"Labrador Retriever\",\n  \"dateOfBirth\": \"2023-01-10\",\n  \"gender\": \"MALE\",\n  \"microchipId\": \"MC123456\",\n  \"notes\": \"Updated notes about Buddy\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/pets/{{petId}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "pets", "{{petId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Pet",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/pets/{{petId}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "pets", "{{petId}}"]
+            }
+          }
+        }
+      ],
+      "description": "CRUD operations for pet management"
+    },
+    {
+      "name": "5. Medical Records",
+      "item": [
+        {
+          "name": "List Medical Records",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/pets/{{petId}}/medical-records",
+              "host": ["{{base_url}}"],
+              "path": ["api", "pets", "{{petId}}", "medical-records"]
+            }
+          }
+        },
+        {
+          "name": "Add Medical Record",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"visitDate\": \"2025-12-11\",\n  \"recordType\": \"CHECKUP\",\n  \"vetName\": \"Dr. Smith\",\n  \"diagnosis\": \"Healthy\",\n  \"treatment\": \"Routine checkup\",\n  \"prescriptions\": \"\",\n  \"notes\": \"All vital signs normal\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/pets/{{petId}}/medical-records",
+              "host": ["{{base_url}}"],
+              "path": ["api", "pets", "{{petId}}", "medical-records"]
+            }
+          }
+        }
+      ],
+      "description": "Medical records management for pets"
+    },
+    {
+      "name": "6. Vaccinations",
+      "item": [
+        {
+          "name": "List Vaccinations",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/pets/{{petId}}/vaccinations",
+              "host": ["{{base_url}}"],
+              "path": ["api", "pets", "{{petId}}", "vaccinations"]
+            }
+          }
+        },
+        {
+          "name": "Add Vaccination",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"vaccineName\": \"Rabies\",\n  \"dateGiven\": \"2025-12-11\",\n  \"nextDueDate\": \"2026-12-11\",\n  \"batchNumber\": \"RB2025001\",\n  \"veterinarianName\": \"Dr. Johnson\",\n  \"notes\": \"Annual rabies vaccination\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/pets/{{petId}}/vaccinations",
+              "host": ["{{base_url}}"],
+              "path": ["api", "pets", "{{petId}}", "vaccinations"]
+            }
+          }
+        }
+      ],
+      "description": "Vaccination records management"
+    },
+    {
+      "name": "7. Health Measurements",
+      "item": [
+        {
+          "name": "List Measurements",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/pets/{{petId}}/measurements",
+              "host": ["{{base_url}}"],
+              "path": ["api", "pets", "{{petId}}", "measurements"]
+            }
+          }
+        },
+        {
+          "name": "Add Measurement",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"measurementDate\": \"2025-12-11\",\n  \"weight\": 25.5,\n  \"temperature\": 38.5,\n  \"notes\": \"Normal weight, good health\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/pets/{{petId}}/measurements",
+              "host": ["{{base_url}}"],
+              "path": ["api", "pets", "{{petId}}", "measurements"]
+            }
+          }
+        }
+      ],
+      "description": "Health measurements tracking (weight, temperature, etc.)"
+    },
+    {
+      "name": "8. Reminders",
+      "item": [
+        {
+          "name": "List Reminders",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/pets/{{petId}}/reminders",
+              "host": ["{{base_url}}"],
+              "path": ["api", "pets", "{{petId}}", "reminders"]
+            }
+          }
+        },
+        {
+          "name": "Add Reminder",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Vet Checkup\",\n  \"type\": \"CHECKUP\",\n  \"dueDate\": \"2025-12-25\",\n  \"isRecurring\": false,\n  \"repeatRule\": \"\",\n  \"notes\": \"Annual health checkup\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/pets/{{petId}}/reminders",
+              "host": ["{{base_url}}"],
+              "path": ["api", "pets", "{{petId}}", "reminders"]
+            }
+          }
+        }
+      ],
+      "description": "Reminders for pet care activities"
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Global pre-request script",
+          "console.log('🔵 Request:', pm.request.method, pm.request.url.toString());"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Global test script",
+          "console.log('📊 Response Status:', pm.response.code, pm.response.status);"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080",
+      "type": "string",
+      "description": "Base URL of the API server"
+    },
+    {
+      "key": "test_email",
+      "value": "test@example.com",
+      "type": "string",
+      "description": "Email for testing (change this to your email to receive OTP)"
+    },
+    {
+      "key": "jwt_token",
+      "value": "",
+      "type": "string",
+      "description": "JWT token (auto-populated after login/registration)"
+    },
+    {
+      "key": "user_id",
+      "value": "",
+      "type": "string",
+      "description": "User ID (auto-populated after login/registration)"
+    },
+    {
+      "key": "user_email",
+      "value": "",
+      "type": "string",
+      "description": "User email (auto-populated after login/registration)"
+    },
+    {
+      "key": "petId",
+      "value": "",
+      "type": "string",
+      "description": "Pet ID (auto-populated when creating a pet)"
+    }
+  ]
+}

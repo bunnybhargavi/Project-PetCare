@@ -54,20 +54,28 @@ const PetList = () => {
     setFilteredPets(filtered);
   };
 
-  const handleAddPet = async (petData) => {
+  const handleAddPet = async ({ petData, photoFile }) => {
     try {
       const newPet = await petService.createPet(petData);
-      setPets([...pets, newPet]);
+      if (photoFile) {
+        await petService.uploadPetImage(newPet.id, photoFile);
+      }
+      const refreshed = await petService.getAllPets();
+      setPets(refreshed);
       setShowAddModal(false);
     } catch (error) {
       console.error('Error adding pet:', error);
     }
   };
 
-  const handleUpdatePet = async (id, petData) => {
+  const handleUpdatePet = async (id, { petData, photoFile }) => {
     try {
-      const updatedPet = await petService.updatePet(id, petData);
-      setPets(pets.map(p => p.id === id ? updatedPet : p));
+      await petService.updatePet(id, petData);
+      if (photoFile) {
+        await petService.uploadPetImage(id, photoFile);
+      }
+      const refreshed = await petService.getAllPets();
+      setPets(refreshed);
       setShowEditModal(false);
       setEditingPet(null);
     } catch (error) {
@@ -105,8 +113,7 @@ const PetList = () => {
       <div className="max-w-7xl mx-auto mb-8">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-4xl font-bold text-gray-800 mb-2">My Pets</h1>
-            <p className="text-gray-600">Manage and track your beloved companions</p>
+            <h1 className="text-4xl font-bold text-gray-800 mb-2">My Pets 🐾</h1>
           </div>
           <button
             onClick={() => setShowAddModal(true)}
@@ -120,28 +127,28 @@ const PetList = () => {
         {/* Search and Filter */}
         <div className="flex gap-4 mb-6">
           <div className="flex-1 relative">
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+
             <input
               type="text"
-              placeholder="Search pets by name or breed..."
+              placeholder="Search pets... 🔍"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 bg-white rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:outline-none transition-colors"
+              className="w-full px-6 py-4 bg-white rounded-[15px] border-2 border-[#FFE4E1] focus:border-purple-500 focus:outline-none transition-colors text-base"
             />
           </div>
           <div className="relative">
-            <Filter className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+
             <select
               value={selectedSpecies}
               onChange={(e) => setSelectedSpecies(e.target.value)}
-              className="pl-12 pr-8 py-3 bg-white rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:outline-none transition-colors appearance-none"
+              className="px-6 py-4 bg-white rounded-[15px] border-2 border-[#FFE4E1] focus:border-purple-500 focus:outline-none transition-colors appearance-none cursor-pointer min-w-[180px]"
             >
-              <option value="all">All Species</option>
-              <option value="Dog">Dogs</option>
-              <option value="Cat">Cats</option>
-              <option value="Bird">Birds</option>
-              <option value="Rabbit">Rabbits</option>
-              <option value="Other">Other</option>
+              <option value="all">All Species 🌟</option>
+              <option value="Dog">Dogs 🐶</option>
+              <option value="Cat">Cats 🐱</option>
+              <option value="Bird">Birds 🐦</option>
+              <option value="Rabbit">🐰 Rabbit</option>
+              <option value="Other">Other 🐾</option>
             </select>
           </div>
         </div>

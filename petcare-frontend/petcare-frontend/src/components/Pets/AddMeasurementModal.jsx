@@ -4,30 +4,30 @@ import { healthService } from '../../services/healthService';
 
 const AddMeasurementModal = ({ isOpen, petId, onClose, onAdd }) => {
   const [formData, setFormData] = useState({
-    date: new Date().toISOString().split('T')[0],
-    type: 'WEIGHT',
+    measurementDate: new Date().toISOString().split('T')[0],
     weight: '',
     temperature: '',
-    heartRate: '',
-    respiratoryRate: '',
     notes: '',
   });
+
+  const [saving, setSaving] = useState(false);
 
   if (!isOpen) return null;
 
   const handleSubmit = async () => {
     try {
-      await healthService.createMeasurement({
-        ...formData,
-        petId,
+      setSaving(true);
+      await healthService.createMeasurement(petId, {
+        measurementDate: formData.measurementDate,
         weight: formData.weight ? parseFloat(formData.weight) : null,
         temperature: formData.temperature ? parseFloat(formData.temperature) : null,
-        heartRate: formData.heartRate ? parseInt(formData.heartRate) : null,
-        respiratoryRate: formData.respiratoryRate ? parseInt(formData.respiratoryRate) : null,
+        notes: formData.notes,
       });
       onAdd();
     } catch (error) {
       console.error('Error adding measurement:', error);
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -52,28 +52,11 @@ const AddMeasurementModal = ({ isOpen, petId, onClose, onAdd }) => {
               <label className="block text-sm font-semibold text-gray-700 mb-2">Date</label>
               <input
                 type="date"
-                value={formData.date}
-                onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                value={formData.measurementDate}
+                onChange={(e) => setFormData({ ...formData, measurementDate: e.target.value })}
                 className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:outline-none"
               />
             </div>
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Type</label>
-              <select
-                value={formData.type}
-                onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:outline-none"
-              >
-                <option value="WEIGHT">Weight</option>
-                <option value="TEMPERATURE">Temperature</option>
-                <option value="HEART_RATE">Heart Rate</option>
-                <option value="RESPIRATORY_RATE">Respiratory Rate</option>
-                <option value="OTHER">Other</option>
-              </select>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">Weight (kg)</label>
               <input
@@ -85,6 +68,9 @@ const AddMeasurementModal = ({ isOpen, petId, onClose, onAdd }) => {
                 placeholder="e.g., 25.5"
               />
             </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">Temperature (°C)</label>
               <input
@@ -96,40 +82,16 @@ const AddMeasurementModal = ({ isOpen, petId, onClose, onAdd }) => {
                 placeholder="e.g., 38.5"
               />
             </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Heart Rate (bpm)</label>
-              <input
-                type="number"
-                value={formData.heartRate}
-                onChange={(e) => setFormData({ ...formData, heartRate: e.target.value })}
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Notes</label>
+              <textarea
+                value={formData.notes}
+                onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                rows="3"
                 className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:outline-none"
-                placeholder="e.g., 90"
+                placeholder="Additional observations..."
               />
             </div>
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Respiratory Rate</label>
-              <input
-                type="number"
-                value={formData.respiratoryRate}
-                onChange={(e) => setFormData({ ...formData, respiratoryRate: e.target.value })}
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:outline-none"
-                placeholder="e.g., 25"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Notes</label>
-            <textarea
-              value={formData.notes}
-              onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-              className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:outline-none"
-              rows="3"
-              placeholder="Additional observations..."
-            />
           </div>
 
           <div className="flex gap-3 pt-4">
@@ -141,9 +103,10 @@ const AddMeasurementModal = ({ isOpen, petId, onClose, onAdd }) => {
             </button>
             <button
               onClick={handleSubmit}
-              className="flex-1 px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-600 text-white rounded-xl font-semibold hover:shadow-lg"
+              disabled={saving}
+              className="flex-1 px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-600 text-white rounded-xl font-semibold hover:shadow-lg disabled:opacity-70"
             >
-              Add Measurement
+              {saving ? 'Saving...' : 'Add Measurement'}
             </button>
           </div>
         </div>

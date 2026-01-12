@@ -1,66 +1,79 @@
 import React from 'react';
-import { Calendar, Weight, MapPin, Hash, Palette } from 'lucide-react';
+import { ClipboardList, StickyNote } from 'lucide-react';
 
-const PetInfoTab = ({ pet }) => {
-  const infoCards = [
-    { icon: Weight, label: 'Weight', value: pet.weight ? `${pet.weight} kg` : 'Not recorded', color: 'blue' },
-    { icon: Calendar, label: 'Age', value: `${pet.age} years`, color: 'purple' },
-    { icon: Palette, label: 'Color', value: pet.color || 'Not specified', color: 'pink' },
-    { icon: Hash, label: 'Microchip', value: pet.microchipId || 'Not registered', color: 'green' },
-  ];
-
-  const colorClasses = {
-    blue: 'from-blue-50 to-blue-100 text-blue-600',
-    purple: 'from-purple-50 to-purple-100 text-purple-600',
-    pink: 'from-pink-50 to-pink-100 text-pink-600',
-    green: 'from-green-50 to-green-100 text-green-600',
-  };
-
+const PetInfoTab = ({ pet, latestMeasurement }) => {
   return (
-    <div className="animate-fadeIn">
+    <div className="animate-fadeIn space-y-6">
+      {/* Two Column Layout */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {infoCards.map((card, index) => {
-          const Icon = card.icon;
-          return (
-            <div
-              key={index}
-              className={`bg-gradient-to-br ${colorClasses[card.color]} p-6 rounded-2xl hover:shadow-lg transition-all duration-300 transform hover:scale-105`}
-            >
-              <div className="flex items-center gap-4">
-                <div className={`p-4 bg-white rounded-xl shadow-md`}>
-                  <Icon className={`${colorClasses[card.color].split(' ')[1]}`} size={28} />
-                </div>
-                <div>
-                  <p className="text-sm text-gray-600 font-medium">{card.label}</p>
-                  <p className="text-2xl font-bold text-gray-800">{card.value}</p>
-                </div>
-              </div>
+        {/* Basic Details Card */}
+        <div className="bg-white rounded-2xl border border-gray-200 p-6">
+          <div className="flex items-center gap-3 mb-5">
+            <ClipboardList className="text-gray-700" size={22} />
+            <h3 className="text-lg font-bold text-gray-900">Basic Details</h3>
+          </div>
+
+          <div className="space-y-4">
+            <div className="flex justify-between items-center py-2 border-b border-gray-100">
+              <span className="text-gray-600">Gender</span>
+              <span className="font-semibold text-gray-900 uppercase">{pet.gender || 'Unknown'}</span>
             </div>
-          );
-        })}
+
+            <div className="flex justify-between items-center py-2 border-b border-gray-100">
+              <span className="text-gray-600">Weight</span>
+              <span className="font-semibold text-gray-900">
+                {latestMeasurement?.weight != null ? `${latestMeasurement.weight} kg` : 'Not recorded'}
+              </span>
+            </div>
+
+            <div className="flex justify-between items-center py-2 border-b border-gray-100">
+              <span className="text-gray-600">Microchip ID</span>
+              <span className="font-semibold text-gray-900">{pet.microchipId || 'Not registered'}</span>
+            </div>
+
+            <div className="flex justify-between items-center py-2">
+              <span className="text-gray-600">Birthday</span>
+              <span className="font-semibold text-gray-900">{pet.dateOfBirth || 'Unknown'}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Notes Card */}
+        <div className="bg-white rounded-2xl border border-gray-200 p-6">
+          <div className="flex items-center gap-3 mb-5">
+            <StickyNote className="text-gray-700" size={22} />
+            <h3 className="text-lg font-bold text-gray-900">Notes</h3>
+          </div>
+
+          <div className="bg-yellow-50 rounded-xl p-4 min-h-[150px]">
+            <p className="text-gray-700 leading-relaxed">
+              {pet.notes || 'No notes added yet.'}
+            </p>
+          </div>
+        </div>
       </div>
 
-      <div className="mt-6 bg-gray-50 rounded-2xl p-6">
-        <h3 className="text-lg font-bold text-gray-800 mb-4">Additional Information</h3>
-        <div className="grid grid-cols-2 gap-4 text-sm">
-          <div>
-            <span className="text-gray-600">Species:</span>
-            <span className="ml-2 font-semibold text-gray-800">{pet.species}</span>
+      {/* Optional: Species and Temperature info */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="bg-purple-50 rounded-xl p-4 text-center">
+          <div className="text-sm text-purple-600 font-medium mb-1">Species</div>
+          <div className="text-lg font-bold text-purple-900">{pet.species}</div>
+        </div>
+        <div className="bg-blue-50 rounded-xl p-4 text-center">
+          <div className="text-sm text-blue-600 font-medium mb-1">Breed</div>
+          <div className="text-lg font-bold text-blue-900">{pet.breed}</div>
+        </div>
+        <div className="bg-pink-50 rounded-xl p-4 text-center">
+          <div className="text-sm text-pink-600 font-medium mb-1">Age</div>
+          <div className="text-lg font-bold text-pink-900">
+            {pet.age != null ? `${pet.age} ${pet.age === 1 ? 'year' : 'years'}` : 'Unknown'}
           </div>
-          <div>
-            <span className="text-gray-600">Gender:</span>
-            <span className="ml-2 font-semibold text-gray-800">{pet.gender}</span>
+        </div>
+        <div className="bg-green-50 rounded-xl p-4 text-center">
+          <div className="text-sm text-green-600 font-medium mb-1">Temperature</div>
+          <div className="text-lg font-bold text-green-900">
+            {latestMeasurement?.temperature != null ? `${latestMeasurement.temperature} °C` : 'Not recorded'}
           </div>
-          <div>
-            <span className="text-gray-600">Breed:</span>
-            <span className="ml-2 font-semibold text-gray-800">{pet.breed}</span>
-          </div>
-          {pet.dateOfBirth && (
-            <div>
-              <span className="text-gray-600">Date of Birth:</span>
-              <span className="ml-2 font-semibold text-gray-800">{pet.dateOfBirth}</span>
-            </div>
-          )}
         </div>
       </div>
     </div>

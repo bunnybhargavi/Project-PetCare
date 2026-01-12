@@ -38,6 +38,7 @@ public class AuthService {
     @Transactional
     public ApiResponse initiateRegistration(RegisterRequest request) {
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+            log.warn("Registration attempt failed: Email {} is already registered", request.getEmail());
             throw new RuntimeException("Email already registered");
         }
 
@@ -90,28 +91,46 @@ public class AuthService {
         // Generate JWT token
         String token = jwtUtil.generateToken(user.getEmail(), user.getRole().name(), user.getId());
 
+        Long vetId = null;
+        if (user.getRole() == User.Role.VET) {
+            Veterinarian vet = veterinarianRepository.findByUserId(user.getId())
+                    .orElse(null);
+            if (vet != null)
+                vetId = vet.getId();
+        }
+
         return AuthResponse.builder()
                 .token(token)
                 .userId(user.getId())
                 .email(user.getEmail())
                 .name(user.getName())
                 .role(user.getRole().name())
+                .vetId(vetId)
                 .message("Registration successful")
                 .build();
     }
 
     @Transactional
     public ApiResponse initiateLogin(LoginRequest request) {
-        User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        log.info("Initiating login for email: {}", request.getEmail());
+        
+        try {
+            User user = userRepository.findByEmail(request.getEmail())
+                    .orElseThrow(() -> new RuntimeException("User not found"));
 
-        if (!user.getIsActive()) {
-            throw new RuntimeException("Account is deactivated");
+            if (!user.getIsActive()) {
+                log.warn("Login attempt for inactive user: {}", request.getEmail());
+                throw new RuntimeException("Account is deactivated");
+            }
+
+            log.info("User found and active, generating OTP for: {}", request.getEmail());
+            otpService.generateAndSendOtp(request.getEmail(), OtpToken.OtpType.LOGIN);
+
+            return new ApiResponse(true, "OTP sent to your email");
+        } catch (Exception e) {
+            log.error("Error during login initiation for email {}: {}", request.getEmail(), e.getMessage(), e);
+            throw e; // Re-throw to maintain error handling
         }
-
-        otpService.generateAndSendOtp(request.getEmail(), OtpToken.OtpType.LOGIN);
-
-        return new ApiResponse(true, "OTP sent to your email");
     }
 
     @Transactional
@@ -132,12 +151,21 @@ public class AuthService {
 
         log.info("User logged in successfully: {}", user.getEmail());
 
+        Long vetId = null;
+        if (user.getRole() == User.Role.VET) {
+            Veterinarian vet = veterinarianRepository.findByUserId(user.getId())
+                    .orElse(null);
+            if (vet != null)
+                vetId = vet.getId();
+        }
+
         return AuthResponse.builder()
                 .token(token)
                 .userId(user.getId())
                 .email(user.getEmail())
                 .name(user.getName())
                 .role(user.getRole().name())
+                .vetId(vetId)
                 .message("Login successful")
                 .build();
     }

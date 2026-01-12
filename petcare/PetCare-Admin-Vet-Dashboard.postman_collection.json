@@ -1,0 +1,389 @@
+{
+    "info": {
+        "_postman_id": "admin-vet-dashboard",
+        "name": "PetCare Admin & Vet Dashboard APIs",
+        "description": "API collection for Admin Panel and Vet Dashboard functionality with sample data",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Admin APIs",
+            "item": [
+                {
+                    "name": "Get Admin Statistics",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{jwt_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/stats",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "admin", "stats"]
+                        },
+                        "description": "Get comprehensive admin dashboard statistics including products, orders, users, and appointments"
+                    }
+                },
+                {
+                    "name": "Get All Products (Admin)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{jwt_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/products",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "admin", "products"]
+                        },
+                        "description": "Get all products for admin management (including inactive products)"
+                    }
+                },
+                {
+                    "name": "Update Product Status",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{jwt_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/products/1/status?isActive=false",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "admin", "products", "1", "status"],
+                            "query": [
+                                {
+                                    "key": "isActive",
+                                    "value": "false",
+                                    "description": "Set to true to activate, false to deactivate"
+                                }
+                            ]
+                        },
+                        "description": "Admin can activate or deactivate any product"
+                    }
+                },
+                {
+                    "name": "Get All Orders (Admin)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{jwt_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/orders",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "admin", "orders"]
+                        },
+                        "description": "Get all orders for admin management"
+                    }
+                },
+                {
+                    "name": "Update Order Status (Admin)",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{jwt_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/orders/1/status?status=SHIPPED",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "admin", "orders", "1", "status"],
+                            "query": [
+                                {
+                                    "key": "status",
+                                    "value": "SHIPPED",
+                                    "description": "PLACED, PAID, PACKED, SHIPPED, DELIVERED, CANCELLED"
+                                }
+                            ]
+                        },
+                        "description": "Admin can update any order status"
+                    }
+                },
+                {
+                    "name": "Get Orders by Status",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{jwt_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/orders/status/PLACED",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "admin", "orders", "status", "PLACED"]
+                        },
+                        "description": "Get orders filtered by status"
+                    }
+                },
+                {
+                    "name": "Get Vendor Statistics",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{jwt_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/vendors/2/stats",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "admin", "vendors", "2", "stats"]
+                        },
+                        "description": "Get statistics for a specific vendor"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Vet Dashboard APIs",
+            "item": [
+                {
+                    "name": "Get Vet Statistics",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{jwt_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/vet-dashboard/stats/1",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "vet-dashboard", "stats", "1"]
+                        },
+                        "description": "Get vet dashboard statistics including appointment counts"
+                    }
+                },
+                {
+                    "name": "Get Upcoming Appointments",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{jwt_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/vet-dashboard/appointments/upcoming/1",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "vet-dashboard", "appointments", "upcoming", "1"]
+                        },
+                        "description": "Get upcoming appointments for a specific vet"
+                    }
+                },
+                {
+                    "name": "Get Today's Appointments",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{jwt_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/vet-dashboard/appointments/today/1",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "vet-dashboard", "appointments", "today", "1"]
+                        },
+                        "description": "Get today's appointments for a specific vet"
+                    }
+                },
+                {
+                    "name": "Get Appointments by Status",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{jwt_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/vet-dashboard/appointments/1/status/CONFIRMED",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "vet-dashboard", "appointments", "1", "status", "CONFIRMED"]
+                        },
+                        "description": "Get vet appointments filtered by status"
+                    }
+                },
+                {
+                    "name": "Complete Appointment",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Appointment completed successfully\", function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.status).to.eql('COMPLETED');",
+                                    "    pm.expect(jsonData.notes).to.exist;",
+                                    "    console.log('✅ Appointment completed with notes:', jsonData.notes);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{jwt_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"notes\": \"Pet is in excellent health. Weight is normal. Recommended regular exercise and balanced diet. Next checkup in 6 months.\",\n  \"prescription\": \"Multivitamin supplements - 1 tablet daily with food for 30 days. Flea prevention medication - apply monthly.\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/vet-dashboard/appointments/1/complete",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "vet-dashboard", "appointments", "1", "complete"]
+                        },
+                        "description": "Complete an appointment with consultation notes and prescription"
+                    }
+                },
+                {
+                    "name": "Update Appointment Status",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{jwt_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"status\": \"CONFIRMED\",\n  \"notes\": \"Appointment confirmed. Please arrive 10 minutes early.\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/vet-dashboard/appointments/2/status",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "vet-dashboard", "appointments", "2", "status"]
+                        },
+                        "description": "Update appointment status (confirm, cancel, no-show)"
+                    }
+                },
+                {
+                    "name": "Cancel Appointment",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{jwt_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"status\": \"CANCELLED\",\n  \"notes\": \"Vet unavailable due to emergency. Please reschedule.\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/vet-dashboard/appointments/3/status",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "vet-dashboard", "appointments", "3", "status"]
+                        },
+                        "description": "Cancel an appointment with reason"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Sample Data Verification",
+            "item": [
+                {
+                    "name": "Verify Sample Products",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/products",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "products"]
+                        },
+                        "description": "Verify that sample products were created successfully"
+                    }
+                },
+                {
+                    "name": "Verify Sample Veterinarians",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/veterinarians",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "veterinarians"]
+                        },
+                        "description": "Verify that sample veterinarians were created"
+                    }
+                },
+                {
+                    "name": "Check Sample Appointments",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{jwt_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/appointments/vet/1",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "appointments", "vet", "1"]
+                        },
+                        "description": "Check sample appointments for vet ID 1"
+                    }
+                }
+            ]
+        }
+    ],
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "http://localhost:8080",
+            "type": "string"
+        },
+        {
+            "key": "jwt_token",
+            "value": "",
+            "type": "string",
+            "description": "JWT token for authentication"
+        }
+    ]
+}

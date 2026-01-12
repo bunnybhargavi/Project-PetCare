@@ -1,0 +1,1074 @@
+{
+    "info": {
+        "_postman_id": "complete-marketplace-testing",
+        "name": "PetCare Complete Marketplace & Role Testing",
+        "description": "Comprehensive API testing for all roles: Admin, Vendor, Customer with complete marketplace workflows",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Authentication & Setup",
+            "item": [
+                {
+                    "name": "Login as Admin",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Admin login successful\", function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.token).to.exist;",
+                                    "    pm.collectionVariables.set('admin_token', jsonData.token);",
+                                    "    console.log('✅ Admin logged in successfully');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"email\": \"admin@petcare.com\",\n  \"password\": \"password123\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/auth/login",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "auth", "login"]
+                        }
+                    }
+                },
+                {
+                    "name": "Login as Vendor",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Vendor login successful\", function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.token).to.exist;",
+                                    "    pm.collectionVariables.set('vendor_token', jsonData.token);",
+                                    "    console.log('✅ Vendor logged in successfully');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"email\": \"vendor1@petcare.com\",\n  \"password\": \"password123\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/auth/login",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "auth", "login"]
+                        }
+                    }
+                },
+                {
+                    "name": "Login as Customer",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Customer login successful\", function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.token).to.exist;",
+                                    "    pm.collectionVariables.set('customer_token', jsonData.token);",
+                                    "    console.log('✅ Customer logged in successfully');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"email\": \"customer1@petcare.com\",\n  \"password\": \"password123\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/auth/login",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "auth", "login"]
+                        }
+                    }
+                },
+                {
+                    "name": "Login as Vet",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Vet login successful\", function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.token).to.exist;",
+                                    "    pm.collectionVariables.set('vet_token', jsonData.token);",
+                                    "    console.log('✅ Vet logged in successfully');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"email\": \"vet1@petcare.com\",\n  \"password\": \"password123\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/auth/login",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "auth", "login"]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Admin Role Testing",
+            "item": [
+                {
+                    "name": "Get Admin Dashboard Stats",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{admin_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/stats",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "admin", "stats"]
+                        },
+                        "description": "Admin views system-wide statistics"
+                    }
+                },
+                {
+                    "name": "Admin - View All Products",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{admin_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/products",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "admin", "products"]
+                        },
+                        "description": "Admin can view all products from all vendors"
+                    }
+                },
+                {
+                    "name": "Admin - Deactivate Product",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{admin_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/products/1/status?isActive=false",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "admin", "products", "1", "status"],
+                            "query": [
+                                {
+                                    "key": "isActive",
+                                    "value": "false"
+                                }
+                            ]
+                        },
+                        "description": "Admin deactivates a product (removes from marketplace)"
+                    }
+                },
+                {
+                    "name": "Admin - Reactivate Product",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{admin_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/products/1/status?isActive=true",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "admin", "products", "1", "status"],
+                            "query": [
+                                {
+                                    "key": "isActive",
+                                    "value": "true"
+                                }
+                            ]
+                        },
+                        "description": "Admin reactivates a product"
+                    }
+                },
+                {
+                    "name": "Admin - View All Orders",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{admin_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/orders",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "admin", "orders"]
+                        },
+                        "description": "Admin views all orders across all vendors"
+                    }
+                },
+                {
+                    "name": "Admin - Update Order Status",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{admin_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/orders/1/status?status=SHIPPED",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "admin", "orders", "1", "status"],
+                            "query": [
+                                {
+                                    "key": "status",
+                                    "value": "SHIPPED"
+                                }
+                            ]
+                        },
+                        "description": "Admin can override order status"
+                    }
+                },
+                {
+                    "name": "Admin - View Pending Orders",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{admin_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/orders/status/PLACED",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "admin", "orders", "status", "PLACED"]
+                        },
+                        "description": "Admin filters orders by status"
+                    }
+                },
+                {
+                    "name": "Admin - Monitor Vendor Performance",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{admin_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/vendors/2/stats",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "admin", "vendors", "2", "stats"]
+                        },
+                        "description": "Admin monitors individual vendor performance"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Vendor Role Testing",
+            "item": [
+                {
+                    "name": "Vendor - View Dashboard Stats",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{vendor_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/products/vendor/stats",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "products", "vendor", "stats"]
+                        },
+                        "description": "Vendor views their own statistics"
+                    }
+                },
+                {
+                    "name": "Vendor - View My Products",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{vendor_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/products/vendor/my-products",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "products", "vendor", "my-products"]
+                        },
+                        "description": "Vendor views only their own products"
+                    }
+                },
+                {
+                    "name": "Vendor - Add New Product",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Product created successfully\", function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.id).to.exist;",
+                                    "    pm.collectionVariables.set('new_product_id', jsonData.id);",
+                                    "    console.log('✅ New product created with ID:', jsonData.id);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{vendor_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"title\": \"Premium Cat Food - Salmon Flavor\",\n  \"description\": \"High-quality salmon-based cat food with essential nutrients for adult cats. Made with real salmon and no artificial preservatives.\",\n  \"price\": 32.99,\n  \"stockQuantity\": 45,\n  \"category\": \"FOOD\",\n  \"brand\": \"PureFeline\",\n  \"imageUrl\": \"https://example.com/cat-food-salmon.jpg\",\n  \"tags\": \"cat,food,salmon,premium,adult\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/products",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "products"]
+                        },
+                        "description": "Vendor adds a new product to their inventory"
+                    }
+                },
+                {
+                    "name": "Vendor - Update Product",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{vendor_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"title\": \"Premium Cat Food - Salmon Flavor (Updated)\",\n  \"description\": \"High-quality salmon-based cat food with essential nutrients for adult cats. Made with real salmon and no artificial preservatives. Now with improved formula!\",\n  \"price\": 34.99,\n  \"stockQuantity\": 50,\n  \"category\": \"FOOD\",\n  \"brand\": \"PureFeline\",\n  \"imageUrl\": \"https://example.com/cat-food-salmon-new.jpg\",\n  \"tags\": \"cat,food,salmon,premium,adult,improved\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/products/{{new_product_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "products", "{{new_product_id}}"]
+                        },
+                        "description": "Vendor updates their product details"
+                    }
+                },
+                {
+                    "name": "Vendor - Update Stock Quantity",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{vendor_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/products/{{new_product_id}}/stock?quantity=75",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "products", "{{new_product_id}}", "stock"],
+                            "query": [
+                                {
+                                    "key": "quantity",
+                                    "value": "75"
+                                }
+                            ]
+                        },
+                        "description": "Vendor updates stock quantity for their product"
+                    }
+                },
+                {
+                    "name": "Vendor - View My Orders",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{vendor_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/orders/vendor/orders",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "orders", "vendor", "orders"]
+                        },
+                        "description": "Vendor views orders containing their products"
+                    }
+                },
+                {
+                    "name": "Vendor - Update Order Status",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{vendor_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/orders/1/status?status=PACKED",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "orders", "1", "status"],
+                            "query": [
+                                {
+                                    "key": "status",
+                                    "value": "PACKED"
+                                }
+                            ]
+                        },
+                        "description": "Vendor updates order status (can only update orders with their products)"
+                    }
+                },
+                {
+                    "name": "Vendor - View Order Statistics",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{vendor_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/orders/vendor/stats",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "orders", "vendor", "stats"]
+                        },
+                        "description": "Vendor views their sales statistics"
+                    }
+                },
+                {
+                    "name": "Vendor - Delete Product",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{vendor_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/products/{{new_product_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "products", "{{new_product_id}}"]
+                        },
+                        "description": "Vendor soft-deletes their product (sets isActive to false)"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Customer Shopping Workflow",
+            "item": [
+                {
+                    "name": "Customer - Browse All Products",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/products",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "products"]
+                        },
+                        "description": "Customer browses all available products"
+                    }
+                },
+                {
+                    "name": "Customer - Search Products",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/products/search?searchTerm=dog&category=FOOD&minPrice=10&maxPrice=50",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "products", "search"],
+                            "query": [
+                                {
+                                    "key": "searchTerm",
+                                    "value": "dog"
+                                },
+                                {
+                                    "key": "category",
+                                    "value": "FOOD"
+                                },
+                                {
+                                    "key": "minPrice",
+                                    "value": "10"
+                                },
+                                {
+                                    "key": "maxPrice",
+                                    "value": "50"
+                                }
+                            ]
+                        },
+                        "description": "Customer searches for specific products with filters"
+                    }
+                },
+                {
+                    "name": "Customer - View Product by Category",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/products/category/TOYS",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "products", "category", "TOYS"]
+                        },
+                        "description": "Customer browses products by category"
+                    }
+                },
+                {
+                    "name": "Customer - View Product Details",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/products/1",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "products", "1"]
+                        },
+                        "description": "Customer views detailed product information"
+                    }
+                },
+                {
+                    "name": "Customer - Add to Cart",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{customer_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"productId\": 1,\n  \"quantity\": 2\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/cart/add",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "cart", "add"]
+                        },
+                        "description": "Customer adds product to cart"
+                    }
+                },
+                {
+                    "name": "Customer - Add Another Item to Cart",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{customer_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"productId\": 3,\n  \"quantity\": 1\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/cart/add",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "cart", "add"]
+                        },
+                        "description": "Customer adds another product to cart"
+                    }
+                },
+                {
+                    "name": "Customer - View Cart",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{customer_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/cart",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "cart"]
+                        },
+                        "description": "Customer views their cart contents"
+                    }
+                },
+                {
+                    "name": "Customer - Update Cart Item Quantity",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{customer_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"productId\": 1,\n  \"quantity\": 3\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/cart/update",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "cart", "update"]
+                        },
+                        "description": "Customer updates quantity of item in cart"
+                    }
+                },
+                {
+                    "name": "Customer - Create Order from Cart",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Order created successfully\", function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.id).to.exist;",
+                                    "    pm.collectionVariables.set('customer_order_id', jsonData.id);",
+                                    "    console.log('✅ Order created with ID:', jsonData.id);",
+                                    "    console.log('💰 Total Amount:', jsonData.totalAmount);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{customer_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"shippingAddress\": \"123 Pet Lover Street, Dog City, PC 12345\",\n  \"paymentMethod\": \"CREDIT_CARD\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/orders",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "orders"]
+                        },
+                        "description": "Customer creates order from cart items"
+                    }
+                },
+                {
+                    "name": "Customer - View My Orders",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{customer_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/orders/my-orders",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "orders", "my-orders"]
+                        },
+                        "description": "Customer views their order history"
+                    }
+                },
+                {
+                    "name": "Customer - View Order Details",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{customer_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/orders/{{customer_order_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "orders", "{{customer_order_id}}"]
+                        },
+                        "description": "Customer views specific order details"
+                    }
+                },
+                {
+                    "name": "Customer - Cancel Order",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{customer_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/orders/{{customer_order_id}}/cancel",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "orders", "{{customer_order_id}}", "cancel"]
+                        },
+                        "description": "Customer cancels their order (if allowed)"
+                    }
+                },
+                {
+                    "name": "Customer - Remove Item from Cart",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{customer_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/cart/remove/3",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "cart", "remove", "3"]
+                        },
+                        "description": "Customer removes item from cart"
+                    }
+                },
+                {
+                    "name": "Customer - Clear Cart",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{customer_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/cart/clear",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "cart", "clear"]
+                        },
+                        "description": "Customer clears entire cart"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Vet Role Testing",
+            "item": [
+                {
+                    "name": "Vet - View Dashboard Stats",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{vet_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/vet-dashboard/stats/1",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "vet-dashboard", "stats", "1"]
+                        },
+                        "description": "Vet views their dashboard statistics"
+                    }
+                },
+                {
+                    "name": "Vet - View Upcoming Appointments",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{vet_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/vet-dashboard/appointments/upcoming/1",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "vet-dashboard", "appointments", "upcoming", "1"]
+                        },
+                        "description": "Vet views upcoming appointments"
+                    }
+                },
+                {
+                    "name": "Vet - View Today's Appointments",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{vet_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/vet-dashboard/appointments/today/1",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "vet-dashboard", "appointments", "today", "1"]
+                        },
+                        "description": "Vet views today's appointments"
+                    }
+                },
+                {
+                    "name": "Vet - Complete Appointment",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{vet_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"notes\": \"Pet examination completed. Overall health is excellent. Weight: 25kg. Temperature: Normal. Heart rate: Normal. Recommended regular exercise and balanced diet. Next checkup scheduled in 6 months.\",\n  \"prescription\": \"1. Daily multivitamin supplement - 1 tablet with morning meal for 30 days\\n2. Flea and tick prevention - Apply topically once monthly\\n3. Dental chews - 2-3 times per week for oral health\\n4. Continue current diet, reduce treats to maintain healthy weight\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/vet-dashboard/appointments/1/complete",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "vet-dashboard", "appointments", "1", "complete"]
+                        },
+                        "description": "Vet completes appointment with detailed notes and prescription"
+                    }
+                },
+                {
+                    "name": "Vet - Confirm Appointment",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{vet_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"status\": \"CONFIRMED\",\n  \"notes\": \"Appointment confirmed. Please bring vaccination records and arrive 10 minutes early for check-in.\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/vet-dashboard/appointments/2/status",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "vet-dashboard", "appointments", "2", "status"]
+                        },
+                        "description": "Vet confirms a pending appointment"
+                    }
+                },
+                {
+                    "name": "Vet - Cancel Appointment",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{vet_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"status\": \"CANCELLED\",\n  \"notes\": \"Appointment cancelled due to emergency. Please reschedule at your earliest convenience. Apologies for the inconvenience.\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/vet-dashboard/appointments/3/status",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "vet-dashboard", "appointments", "3", "status"]
+                        },
+                        "description": "Vet cancels appointment with reason"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Cross-Role Verification",
+            "item": [
+                {
+                    "name": "Verify Sample Data - Products",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/products",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "products"]
+                        },
+                        "description": "Verify sample products are available"
+                    }
+                },
+                {
+                    "name": "Verify Sample Data - Veterinarians",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/veterinarians",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "veterinarians"]
+                        },
+                        "description": "Verify sample veterinarians are available"
+                    }
+                },
+                {
+                    "name": "Admin - Monitor System After Activities",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{admin_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/stats",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "admin", "stats"]
+                        },
+                        "description": "Admin checks updated system statistics after all activities"
+                    }
+                }
+            ]
+        }
+    ],
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "http://localhost:8080",
+            "type": "string"
+        },
+        {
+            "key": "admin_token",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "vendor_token",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "customer_token",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "vet_token",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "new_product_id",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "customer_order_id",
+            "value": "",
+            "type": "string"
+        }
+    ]
+}

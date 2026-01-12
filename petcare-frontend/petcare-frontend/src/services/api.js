@@ -8,13 +8,13 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  withCredentials: true, // Enable CORS cookies + credentials
+  withCredentials: false,
 });
 
 // --- REQUEST INTERCEPTOR: Attach JWT Token ---
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -29,8 +29,8 @@ api.interceptors.response.use(
   (error) => {
     // Auto-logout on 401
     if (error.response?.status === 401) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
+      sessionStorage.removeItem('token');
+      sessionStorage.removeItem('user');
       window.location.href = '/login';
     }
 

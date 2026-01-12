@@ -9,7 +9,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
- * HealthMeasurement Entity - Tracks weight, temperature trends
+ * HealthMeasurement Entity - Tracks dynamic health measurements based on vet requirements
  */
 @Entity
 @Table(name = "health_measurements")
@@ -29,9 +29,20 @@ public class HealthMeasurement {
     @Column(nullable = false)
     private LocalDate measurementDate;
     
+    // Standard measurements
     private Double weight; // in kg
-    
     private Double temperature; // in Celsius
+    
+    // Dynamic measurement fields
+    private String measurementType; // e.g., "Blood Pressure", "Heart Rate", "Blood Sugar"
+    private String value; // flexible value field
+    private String unit; // e.g., "mmHg", "bpm", "mg/dL"
+    
+    // Additional health indicators
+    private Double heartRate; // bpm
+    private String bloodPressure; // e.g., "120/80"
+    private Double bloodSugar; // mg/dL
+    private Double respiratoryRate; // breaths per minute
     
     @Column(columnDefinition = "TEXT")
     private String notes;
@@ -39,4 +50,10 @@ public class HealthMeasurement {
     @CreationTimestamp
     @Column(updatable = false)
     private LocalDateTime createdAt;
+    
+    // Vet who recorded this measurement
+    @Column(name = "recorded_by_vet_id")
+    private Long recordedByVetId;
+    
+    private String vetName;
 }

@@ -65,6 +65,19 @@ public class AuthController {
     @PostMapping("/register/initiate")
     public ResponseEntity<ApiResponse> initiateRegistration(
             @Valid @RequestBody RegisterRequest request) {
+        // System.out.println(">>> [AuthController] Received registration request for: "
+        // + request.getEmail());
+        // Using System.out might be missed in file logs, using a logger if available or
+        // just System.err might be better,
+        // but strictly speaking I should use the logger class field usually present in
+        // controllers or create one.
+        // The class doesn't have a logger field. I will add one? OR just use System.err
+        // which usually captures into logs?
+        // Let's rely on the fact that I want to see if it even hits.
+        // Actually, let's just add a logger since I can't be sure about stdout
+        // redirection.
+        org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(AuthController.class);
+        logger.info(">>> [AuthController] Received registration request for: " + request.getEmail());
         ApiResponse response = authService.initiateRegistration(request);
         return ResponseEntity.ok(response);
     }
@@ -124,6 +137,8 @@ public class AuthController {
     @PostMapping("/login/initiate")
     public ResponseEntity<ApiResponse> initiateLogin(
             @Valid @RequestBody LoginRequest request) {
+        org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(AuthController.class);
+        logger.info(">>> [AuthController] Received LOGIN OTP request for: " + request.getEmail());
         ApiResponse response = authService.initiateLogin(request);
         return ResponseEntity.ok(response);
     }

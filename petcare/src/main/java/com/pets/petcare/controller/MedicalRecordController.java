@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -46,6 +47,17 @@ public class MedicalRecordController {
     public ResponseEntity<MedicalRecordResponse> updateMedicalRecord(
             @PathVariable Long recordId, @Valid @RequestBody MedicalRecordRequest request) {
         return ResponseEntity.ok(medicalRecordService.updateMedicalRecord(recordId, request));
+    }
+
+    /**
+     * Upload or replace an attachment for a medical record (PDF/report image)
+     * POST /api/pets/{petId}/medical-records/{recordId}/attachment
+     */
+    @PostMapping("/{recordId}/attachment")
+    public ResponseEntity<MedicalRecordResponse> uploadAttachment(
+            @PathVariable Long recordId,
+            @RequestParam("file") MultipartFile file) {
+        return ResponseEntity.ok(medicalRecordService.uploadAttachment(recordId, file));
     }
     
     @DeleteMapping("/{recordId}")

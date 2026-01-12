@@ -1,4 +1,4 @@
-// src/components/Layout/Navbar.jsx
+import { FaHome, FaPaw } from 'react-icons/fa';
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -9,14 +9,14 @@ const fetchImageAsBlob = async (relativePath) => {
   if (relativePath.startsWith('http') && !relativePath.includes('localhost:8080')) {
     return relativePath;
   }
-  
+
   try {
     const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080/api';
     const BASE_URL = API_URL.replace('/api', '');
-    const token = localStorage.getItem('token');
-    
+    const token = sessionStorage.getItem('token');
+
     if (!token) return null;
-    
+
     let imageUrl;
     if (relativePath.startsWith('/uploads/profiles/')) {
       imageUrl = `${BASE_URL}${relativePath}`;
@@ -25,7 +25,7 @@ const fetchImageAsBlob = async (relativePath) => {
     } else {
       imageUrl = `${BASE_URL}/uploads/profiles/${relativePath.replace(/^\/+/, '')}`;
     }
-    
+
     const response = await fetch(imageUrl, {
       method: 'GET',
       headers: {
@@ -33,7 +33,7 @@ const fetchImageAsBlob = async (relativePath) => {
       },
       credentials: 'include',
     });
-    
+
     if (response.ok) {
       const blob = await response.blob();
       return URL.createObjectURL(blob);
@@ -50,35 +50,16 @@ const Navbar = () => {
   const navigate = useNavigate();
   const [showDropdown, setShowDropdown] = useState(false);
   const [profilePhotoUrl, setProfilePhotoUrl] = useState(null);
-  
-  useEffect(() => {
-    const loadProfilePhoto = async () => {
-      const photoPath = user?.profilePhoto || user?.photoUrl || user?.photo_url 
-        || user?.ownerProfilePhoto || user?.vetProfilePhoto;
-      
-      if (photoPath) {
-        const blobUrl = await fetchImageAsBlob(photoPath);
-        if (blobUrl) {
-          setProfilePhotoUrl(blobUrl);
-        }
-      }
-    };
-    
-    if (user) {
-      loadProfilePhoto();
-    }
-    
-    // Cleanup blob URL on unmount
-    return () => {
-      if (profilePhotoUrl && profilePhotoUrl.startsWith('blob:')) {
-        URL.revokeObjectURL(profilePhotoUrl);
-      }
-    };
-  }, [user]);
 
-  const handleLogout = () => {
-    if (window.confirm('Are you sure you want to logout?')) {
-      logout();
+  // ... existing useEffect ...
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/login');
+    } catch (error) {
+      console.error('Logout error:', error);
+      navigate('/login');
     }
   };
 
@@ -86,21 +67,29 @@ const Navbar = () => {
     <nav className="bg-white shadow-lg sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
-          
+
           {/* Logo and Brand */}
           <div className="flex items-center">
-            <button 
+            <button
               onClick={() => navigate('/dashboard')}
-              className="flex items-center space-x-2"
+              className="flex items-center space-x-2 group"
             >
-              <span className="text-3xl">🐾</span>
-              <span className="text-xl font-bold text-gray-900">Pet Care</span>
+              {/* Composed Logo: House with Paw */}
+              <div className="relative flex items-center justify-center w-10 h-10">
+                <FaHome className="text-teal-500 text-4xl" />
+                <div className="absolute inset-0 flex items-center justify-center pt-1">
+                  <FaPaw className="text-white text-lg" />
+                </div>
+              </div>
+              <span className="text-2xl font-bold text-blue-900 tracking-tight group-hover:text-blue-700 transition-colors">
+                PawHaven
+              </span>
             </button>
           </div>
 
           {/* Navigation Links */}
           <div className="flex items-center space-x-4">
-            
+
             {/* Dashboard Link */}
             <button
               onClick={() => navigate('/dashboard')}
@@ -108,6 +97,58 @@ const Navbar = () => {
             >
               Dashboard
             </button>
+
+            {/* Pets Link - Only show for non-VET users */}
+            {user?.role !== 'VET' && (
+              <button
+                onClick={() => navigate('/pets')}
+                className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100"
+              >
+                Pets
+              </button>
+            )}
+
+            {/* Patients Link - Only show for VET users */}
+            {user?.role === 'VET' && (
+              <button
+                onClick={() => navigate('/patients')}
+                className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100"
+              >
+                Patients
+              </button>
+            )}
+
+            {user?.role !== 'VET' && (
+              <button
+                onClick={() => navigate('/find-vet')}
+                className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100"
+              >
+                Find a Vet
+              </button>
+            )}
+
+
+
+
+            {/* My Orders Link */}
+            {user?.role !== 'VET' && (
+              <button
+                onClick={() => navigate('/orders')}
+                className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100"
+              >
+                My Orders
+              </button>
+            )}
+
+            {/* Shop Link - Only show for non-VET users */}
+            {user?.role !== 'VET' && (
+              <button
+                onClick={() => navigate('/shop')}
+                className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100"
+              >
+                🛒 Shop
+              </button>
+            )}
 
             {/* Profile Link */}
             <button
@@ -124,7 +165,7 @@ const Navbar = () => {
                 className="flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100"
               >
                 {profilePhotoUrl ? (
-                  <img 
+                  <img
                     src={profilePhotoUrl}
                     alt={user?.name}
                     className="w-8 h-8 rounded-full object-cover"
@@ -150,15 +191,14 @@ const Navbar = () => {
                   <div className="px-4 py-2 border-b border-gray-100">
                     <p className="text-sm font-medium text-gray-900">{user?.name}</p>
                     <p className="text-xs text-gray-500">{user?.email}</p>
-                    <span className={`inline-block mt-1 px-2 py-1 text-xs rounded-full ${
-                      user?.role === 'VET' 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-blue-100 text-blue-800'
-                    }`}>
+                    <span className={`inline-block mt-1 px-2 py-1 text-xs rounded-full ${user?.role === 'VET'
+                      ? 'bg-green-100 text-green-800'
+                      : 'bg-blue-100 text-blue-800'
+                      }`}>
                       {user?.role === 'VET' ? '🩺 Veterinarian' : '🐕 Pet Owner'}
                     </span>
                   </div>
-                  
+
                   <button
                     onClick={() => {
                       navigate('/profile');
@@ -168,7 +208,7 @@ const Navbar = () => {
                   >
                     👤 My Profile
                   </button>
-                  
+
                   <button
                     onClick={() => {
                       navigate('/dashboard');
@@ -178,9 +218,45 @@ const Navbar = () => {
                   >
                     📊 Dashboard
                   </button>
-                  
+
+                  {user?.role !== 'VET' && (
+                    <button
+                      onClick={() => {
+                        navigate('/pets');
+                        setShowDropdown(false);
+                      }}
+                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      🐾 Pets
+                    </button>
+                  )}
+
+                  {user?.role !== 'VET' && (
+                    <button
+                      onClick={() => {
+                        navigate('/find-vet');
+                        setShowDropdown(false);
+                      }}
+                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      🩺 Find a Vet
+                    </button>
+                  )}
+
+                  {user?.role !== 'VET' && (
+                    <button
+                      onClick={() => {
+                        navigate('/shop');
+                        setShowDropdown(false);
+                      }}
+                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      🛒 Shop
+                    </button>
+                  )}
+
                   <hr className="my-1" />
-                  
+
                   <button
                     onClick={handleLogout}
                     className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"

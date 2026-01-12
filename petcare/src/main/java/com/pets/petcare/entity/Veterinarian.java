@@ -1,5 +1,6 @@
 package com.pets.petcare.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -20,6 +21,7 @@ public class Veterinarian {
   // One-to-One relationship with User
   @OneToOne
   @JoinColumn(name = "user_id", nullable = false, unique = true)
+  @JsonManagedReference
   private User user;
 
   // Veterinarian specific fields
@@ -50,6 +52,9 @@ public class Veterinarian {
 
   private Double consultationFee;
 
+  @Column(nullable = false)
+  private Boolean profileComplete = false;
+
   @CreationTimestamp
   @Column(updatable = false)
   private LocalDateTime createdAt;
@@ -62,8 +67,8 @@ public class Veterinarian {
 
   public Veterinarian(Long id, User user, String clinicName, String specialization, String clinicAddress,
       String profilePhoto, String licenseNumber, Integer yearsOfExperience, String qualifications, String bio,
-      String workingHours, Boolean availableForTeleconsult, Double consultationFee, LocalDateTime createdAt,
-      LocalDateTime updatedAt) {
+      String workingHours, Boolean availableForTeleconsult, Double consultationFee, Boolean profileComplete,
+      LocalDateTime createdAt, LocalDateTime updatedAt) {
     this.id = id;
     this.user = user;
     this.clinicName = clinicName;
@@ -77,6 +82,7 @@ public class Veterinarian {
     this.workingHours = workingHours;
     this.availableForTeleconsult = availableForTeleconsult;
     this.consultationFee = consultationFee;
+    this.profileComplete = profileComplete;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
   }
@@ -183,6 +189,14 @@ public class Veterinarian {
 
   public void setConsultationFee(Double consultationFee) {
     this.consultationFee = consultationFee;
+  }
+
+  public Boolean getProfileComplete() {
+    return profileComplete;
+  }
+
+  public void setProfileComplete(Boolean profileComplete) {
+    this.profileComplete = profileComplete;
   }
 
   public LocalDateTime getCreatedAt() {

@@ -20,6 +20,8 @@ public class User {
     @Column(nullable = false, unique = true)
     private String email;
 
+    private String password;
+
     @Column(nullable = false)
     private String name;
 
@@ -45,10 +47,12 @@ public class User {
 
     // One-to-One relationship with PetOwner
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @com.fasterxml.jackson.annotation.JsonBackReference
     private PetOwner petOwner;
 
     // One-to-One relationship with Veterinarian
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @com.fasterxml.jackson.annotation.JsonBackReference
     private Veterinarian veterinarian;
 
     public User() {
@@ -158,7 +162,15 @@ public class User {
         this.veterinarian = veterinarian;
     }
 
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     public enum Role {
-        OWNER, VET
+        OWNER, VET, VENDOR, ADMIN
     }
 }

@@ -1,0 +1,465 @@
+.patients-page {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #E3FDF5 0%, #FFE6FA 100%);
+    color: #4a5568;
+}
+
+.patients-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.patients-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.patients-header h1 {
+    color: #4a5568;
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.patients-header p {
+    color: #718096;
+    font-size: 1.1rem;
+}
+
+.search-section {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 16px;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+}
+
+.search-box {
+    position: relative;
+    margin-bottom: 1rem;
+}
+
+.search-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.2rem;
+}
+
+.search-box input {
+    width: 100%;
+    padding: 1rem 1rem 1rem 3rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.search-box input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.stats-summary {
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #667eea;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: #718096;
+}
+
+.loading-state {
+    text-align: center;
+    padding: 4rem;
+    background: white;
+    border-radius: 16px;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid #f3f4f6;
+    border-top-color: #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.loading-state p {
+    color: #718096;
+    font-size: 1.1rem;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 4rem;
+    background: white;
+    border-radius: 16px;
+}
+
+.empty-icon {
+    font-size: 4rem;
+    display: block;
+    margin-bottom: 1rem;
+}
+
+.empty-state h3 {
+    color: #2d3748;
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+    color: #718096;
+    font-size: 1.1rem;
+}
+
+.patients-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 1.5rem;
+}
+
+.patient-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.patient-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.patient-card-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #f7fafc;
+}
+
+.patient-icon {
+    font-size: 3rem;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #A18CD1 0%, #FBC2EB 100%);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.patient-photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 12px;
+}
+
+.patient-basic-info h3 {
+    color: #2d3748;
+    font-size: 1.3rem;
+    margin-bottom: 0.25rem;
+}
+
+.patient-species {
+    color: #718096;
+    font-size: 0.9rem;
+}
+
+.patient-details {
+    margin-bottom: 1rem;
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #f7fafc;
+}
+
+.detail-row:last-child {
+    border-bottom: none;
+}
+
+.detail-row .label {
+    color: #718096;
+    font-size: 0.9rem;
+}
+
+.detail-row .value {
+    color: #2d3748;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.detail-row .badge {
+    background: linear-gradient(135deg, #A18CD1 0%, #FBC2EB 100%);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.85rem;
+}
+
+.view-details-btn {
+    width: 100%;
+    background: linear-gradient(135deg, #A18CD1 0%, #FBC2EB 100%);
+    color: white;
+    border: none;
+    padding: 0.75rem;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.view-details-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(5px);
+}
+
+.modal-content {
+    background: white;
+    border-radius: 20px;
+    max-width: 800px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: #f7fafc;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 10;
+}
+
+.modal-close:hover {
+    background: #e2e8f0;
+    transform: rotate(90deg);
+}
+
+.modal-header {
+    background: linear-gradient(135deg, #A18CD1 0%, #FBC2EB 100%);
+    padding: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    border-radius: 20px 20px 0 0;
+}
+
+.modal-icon {
+    font-size: 4rem;
+    background: white;
+    width: 80px;
+    height: 80px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.modal-pet-photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 16px;
+}
+
+.modal-header h2 {
+    color: white;
+    font-size: 2rem;
+    margin-bottom: 0.25rem;
+}
+
+.modal-header p {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1.1rem;
+}
+
+.modal-tabs {
+    display: flex;
+    border-bottom: 2px solid #e2e8f0;
+    padding: 0 2rem;
+}
+
+.tab {
+    padding: 1rem 1.5rem;
+    cursor: pointer;
+    color: #718096;
+    font-weight: 600;
+    border-bottom: 3px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.tab:hover {
+    color: #667eea;
+}
+
+.tab.active {
+    color: #667eea;
+    border-bottom-color: #667eea;
+}
+
+.modal-body {
+    padding: 2rem;
+}
+
+.info-section {
+    margin-bottom: 2rem;
+}
+
+.info-section h3 {
+    color: #2d3748;
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.info-item {
+    background: #f7fafc;
+    padding: 1rem;
+    border-radius: 10px;
+}
+
+.info-label {
+    display: block;
+    color: #718096;
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
+}
+
+.info-value {
+    display: block;
+    color: #2d3748;
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.email-value {
+    word-break: break-all;
+    overflow-wrap: break-word;
+    max-width: 200px;
+    line-height: 1.3;
+}
+
+.appointments-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.appointment-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: #f7fafc;
+    border-radius: 10px;
+}
+
+.apt-date {
+    color: #2d3748;
+    font-weight: 600;
+}
+
+.apt-type {
+    color: #667eea;
+    font-weight: 600;
+}
+
+.apt-status {
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    background: #e2e8f0;
+    color: #4a5568;
+}
+
+@media (max-width: 768px) {
+    .patients-container {
+        padding: 1rem;
+    }
+
+    .patients-header h1 {
+        font-size: 2rem;
+    }
+
+    .patients-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .stats-summary {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .modal-content {
+        width: 95%;
+    }
+
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
+}

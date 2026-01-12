@@ -66,29 +66,52 @@ public class PetService {
      */
     @Transactional
     public PetResponse createPet(String email, PetRequest request) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-        
-        PetOwner owner = petOwnerRepository.findByUserId(user.getId())
-                .orElseThrow(() -> new RuntimeException("Pet owner profile not found"));
-        
-        Pet pet = new Pet();
-        pet.setOwner(owner);
-        pet.setName(request.getName());
-        pet.setSpecies(request.getSpecies());
-        pet.setBreed(request.getBreed());
-        pet.setDateOfBirth(request.getDateOfBirth());
-        pet.setGender(Pet.Gender.valueOf(request.getGender()));
-        pet.setMicrochipId(request.getMicrochipId());
-        pet.setNotes(request.getNotes());
-        pet.setHealthStatus(Pet.HealthStatus.HEALTHY);
-        pet.setWalkStreak(0);
-        
-        pet = petRepository.save(pet);
-        
-        log.info("Pet created: {} for owner: {}", pet.getName(), email);
-        
-        return mapToResponse(pet);
+        try {
+            User user = userRepository.findByEmail(email)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+            
+            // Get or create PetOwner profile
+            PetOwner owner = petOwnerRepository.findByUserId(user.getId())
+                    .orElseGet(() -> {
+                        log.info("Creating PetOwner profile for user: {}", email);
+                        PetOwner newOwner = new PetOwner();
+                        newOwner.setUser(user);
+                        return petOwnerRepository.save(newOwner);
+                    });
+            
+            Pet pet = new Pet();
+            pet.setOwner(owner);
+            pet.setName(request.getName());
+            pet.setSpecies(request.getSpecies());
+            pet.setBreed(request.getBreed());
+            pet.setDateOfBirth(request.getDateOfBirth());
+            
+            // Validate and set gender
+            if (request.getGender() != null) {
+                try {
+                    pet.setGender(Pet.Gender.valueOf(request.getGender().toUpperCase()));
+                } catch (IllegalArgumentException e) {
+                    throw new RuntimeException("Invalid gender value: " + request.getGender() + 
+                        ". Valid values are: MALE, FEMALE, UNKNOWN");
+                }
+            } else {
+                pet.setGender(Pet.Gender.UNKNOWN);
+            }
+            
+            pet.setMicrochipId(request.getMicrochipId());
+            pet.setNotes(request.getNotes());
+            pet.setHealthStatus(Pet.HealthStatus.HEALTHY);
+            pet.setWalkStreak(0);
+            
+            pet = petRepository.save(pet);
+            
+            log.info("Pet created: {} for owner: {}", pet.getName(), email);
+            
+            return mapToResponse(pet);
+        } catch (Exception e) {
+            log.error("Error creating pet for user {}: {}", email, e.getMessage(), e);
+            throw new RuntimeException("Failed to create pet: " + e.getMessage());
+        }
     }
     
     /**
@@ -235,6 +258,7 @@ public class PetService {
                 .photo(pet.getPhoto())
                 .microchipId(pet.getMicrochipId())
                 .notes(pet.getNotes())
+                .weight(pet.getWeight()) // Added weight field
                 .healthStatus(pet.getHealthStatus().name())
                 .walkStreak(pet.getWalkStreak())
                 .age(calculateAge(pet.getDateOfBirth()))

@@ -9,17 +9,17 @@ const fetchImageAsBlob = async (relativePath) => {
   if (relativePath.startsWith('http') && !relativePath.includes('localhost:8080')) {
     return relativePath;
   }
-  
+
   try {
     const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080/api';
     const BASE_URL = API_URL.replace('/api', '');
-    const token = localStorage.getItem('token');
-    
+    const token = sessionStorage.getItem('token');
+
     if (!token) {
       console.error('No JWT token found');
       return null;
     }
-    
+
     let imageUrl;
     if (relativePath.startsWith('/uploads/profiles/')) {
       imageUrl = `${BASE_URL}${relativePath}`;
@@ -28,9 +28,9 @@ const fetchImageAsBlob = async (relativePath) => {
     } else {
       imageUrl = `${BASE_URL}/uploads/profiles/${relativePath.replace(/^\/+/, '')}`;
     }
-    
+
     console.log('Fetching image with auth:', imageUrl);
-    
+
     const response = await fetch(imageUrl, {
       method: 'GET',
       headers: {
@@ -38,7 +38,7 @@ const fetchImageAsBlob = async (relativePath) => {
       },
       credentials: 'include',
     });
-    
+
     if (response.ok) {
       const blob = await response.blob();
       const blobUrl = URL.createObjectURL(blob);
@@ -57,10 +57,10 @@ const fetchImageAsBlob = async (relativePath) => {
 const getImageUrl = (relativePath) => {
   if (!relativePath) return null;
   if (relativePath.startsWith('http')) return relativePath;
-  
+
   const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080/api';
   const BASE_URL = API_URL.replace('/api', '');
-  
+
   if (relativePath.startsWith('/uploads/profiles/')) {
     return `${BASE_URL}${relativePath}`;
   } else if (relativePath.startsWith('/uploads/')) {
@@ -111,17 +111,17 @@ const ProfilePage = () => {
       const updatedUser = await authService.getProfile();
       console.log("Updated user data:", updatedUser);
 
-      const rawPhotoUrl = updatedUser.profilePhoto || updatedUser.photoUrl || updatedUser.photo_url 
+      const rawPhotoUrl = updatedUser.profilePhoto || updatedUser.photoUrl || updatedUser.photo_url
         || updatedUser.ownerProfilePhoto || updatedUser.vetProfilePhoto
         || response.profilePhoto || response.photoUrl || response.photo_url;
-      
+
       console.log("Raw photo URL from backend:", rawPhotoUrl);
-      
+
       const fullPhotoUrl = await fetchImageAsBlob(rawPhotoUrl);
       console.log("Constructed full photo URL:", fullPhotoUrl);
 
       setPhotoUrl(fullPhotoUrl);
-      
+
       const updatedUserData = {
         ...user,
         ...updatedUser,
@@ -134,7 +134,7 @@ const ProfilePage = () => {
       updateUser(updatedUserData);
       console.log("Updated user data:", updatedUserData);
 
-      const userStr = localStorage.getItem('user');
+      const userStr = sessionStorage.getItem('user');
       if (userStr) {
         const currentUser = JSON.parse(userStr);
         const updatedLocalUser = {
@@ -146,13 +146,13 @@ const ProfilePage = () => {
           ownerProfilePhoto: currentUser?.role === 'OWNER' ? fullPhotoUrl : currentUser?.ownerProfilePhoto,
           vetProfilePhoto: currentUser?.role === 'VET' ? fullPhotoUrl : currentUser?.vetProfilePhoto
         };
-        localStorage.setItem('user', JSON.stringify(updatedLocalUser));
+        sessionStorage.setItem('user', JSON.stringify(updatedLocalUser));
         console.log("Updated localStorage user:", updatedLocalUser);
       }
 
-      setMessage({ 
-        type: "success", 
-        text: "Profile photo updated successfully!" 
+      setMessage({
+        type: "success",
+        text: "Profile photo updated successfully!"
       });
 
       e.target.value = null;
@@ -179,10 +179,10 @@ const ProfilePage = () => {
         specialization: user.specialization || "",
         clinicAddress: user.clinicAddress || "",
       });
-      
-      const rawPhotoUrl = user?.profilePhoto || user?.photoUrl || user?.photo_url 
+
+      const rawPhotoUrl = user?.profilePhoto || user?.photoUrl || user?.photo_url
         || user?.ownerProfilePhoto || user?.vetProfilePhoto;
-      
+
       if (rawPhotoUrl) {
         try {
           const blobUrl = await fetchImageAsBlob(rawPhotoUrl);
@@ -197,11 +197,11 @@ const ProfilePage = () => {
         try {
           const profile = await authService.getProfile();
           console.log("Fetched profile:", profile);
-          
+
           if (profile) {
-            const photoUrlFromProfile = profile.profilePhoto || profile.photoUrl || profile.photo_url 
+            const photoUrlFromProfile = profile.profilePhoto || profile.photoUrl || profile.photo_url
               || profile.ownerProfilePhoto || profile.vetProfilePhoto;
-            
+
             if (photoUrlFromProfile) {
               try {
                 const blobUrl = await fetchImageAsBlob(photoUrlFromProfile);
@@ -275,20 +275,20 @@ const ProfilePage = () => {
             <div className="relative">
               {photoUrl ? (
                 <>
-                  <img 
+                  <img
                     key={photoUrl}
-                    src={photoUrl} 
-                    alt="Profile" 
+                    src={photoUrl}
+                    alt="Profile"
                     className="w-28 h-28 rounded-2xl object-cover shadow-lg"
                     onError={(e) => {
                       console.error("Error loading image:", photoUrl);
-                      
-                      const originalPath = user?.profilePhoto || user?.photoUrl || user?.photo_url 
+
+                      const originalPath = user?.profilePhoto || user?.photoUrl || user?.photo_url
                         || user?.ownerProfilePhoto || user?.vetProfilePhoto;
-                      
+
                       if (originalPath) {
                         console.log("Retrying image fetch with authentication for:", originalPath);
-                        
+
                         fetchImageAsBlob(originalPath).then(blobUrl => {
                           if (blobUrl) {
                             console.log("Successfully fetched image as blob, updating src");
@@ -321,7 +321,7 @@ const ProfilePage = () => {
                   {user?.name?.charAt(0).toUpperCase()}
                 </div>
               )}
-              
+
               <label className="absolute -bottom-2 -right-2 bg-white border border-slate-200 rounded-full p-2 shadow-md cursor-pointer hover:bg-slate-50 transition">
                 <svg
                   className="w-4 h-4 text-slate-600"
@@ -359,9 +359,8 @@ const ProfilePage = () => {
                 </h1>
 
                 <span
-                  className={`inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full ${
-                    tagColors[user?.role] || tagColors.OWNER
-                  }`}
+                  className={`inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full ${tagColors[user?.role] || tagColors.OWNER
+                    }`}
                 >
                   {user?.role === "VET" ? "Veterinarian" : "Pet Owner"}
                 </span>
@@ -407,11 +406,10 @@ const ProfilePage = () => {
 
         {message.text && (
           <div
-            className={`mb-6 px-4 py-3 rounded-2xl border text-sm font-medium ${
-              message.type === "success"
+            className={`mb-6 px-4 py-3 rounded-2xl border text-sm font-medium ${message.type === "success"
                 ? "bg-emerald-50 border-emerald-200 text-emerald-800"
                 : "bg-rose-50 border-rose-200 text-rose-800"
-            }`}
+              }`}
           >
             {message.text}
           </div>

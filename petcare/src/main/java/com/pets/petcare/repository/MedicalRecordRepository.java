@@ -12,5 +12,6 @@ public interface MedicalRecordRepository extends JpaRepository<MedicalRecord, Lo
     List<MedicalRecord> findByPetOrderByVisitDateDesc(Pet pet);
     List<MedicalRecord> findByPetIdOrderByVisitDateDesc(Long petId);
     List<MedicalRecord> findByPetAndRecordType(Pet pet, MedicalRecord.RecordType type);
+    List<MedicalRecord> findByPetIdAndRecordTypeOrderByVisitDateDesc(Long petId, MedicalRecord.RecordType recordType);
     List<MedicalRecord> findByPetAndVisitDateBetween(Pet pet, LocalDate start, LocalDate end);
 }
