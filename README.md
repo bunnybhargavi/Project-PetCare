@@ -234,16 +234,6 @@ npm test
    ```
 2. Serve the build folder using a web server
 
-## 🔄 Database Migrations
-
-The project uses Flyway for database version control. Migration files are located in `src/main/resources/db/migration/`:
-
-- `V1__Initial_Schema.sql` - Initial database schema
-- `V2__Add_Appointment_System_Enhancements.sql` - Appointment system
-- `V3__Add_Marketplace_Tables.sql` - E-commerce tables
-- `V6__Add_Payment_System.sql` - Payment integration
-- `V7__Add_Vendor_System.sql` - Vendor management
-- And more...
 
 ## 🐛 Troubleshooting
 
@@ -277,16 +267,6 @@ The project uses Flyway for database version control. Migration files are locate
 4. Add tests if applicable
 5. Submit a pull request
 
-## 📄 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## 🙏 Acknowledgments
-
-- Spring Boot team for the excellent framework
-- React team for the powerful frontend library
-- PayPal for payment integration
-- All contributors who helped build this platform
 
 ## 📞 Support
 
@@ -296,5 +276,6 @@ For support and questions:
 - Review the documentation
 
 ---
+
 
 **Built with ❤️ for pet lovers everywhere! 🐾**
