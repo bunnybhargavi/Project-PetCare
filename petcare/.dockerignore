@@ -1,0 +1,11 @@
+target/
+*.log
+*.gz
+.git
+.gitignore
+README.md
+*.md
+.env*
+uploads/
+application.log*
+*.postman_collection.json

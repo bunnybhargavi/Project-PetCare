@@ -4749,3 +4749,55 @@ This generated password is for development use only. Your security configuration
 2026-01-14T17:41:17.263+05:30 ERROR 27584 --- [petcare-backend] [http-nio-8080-exec-3] c.p.p.security.JwtAuthenticationFilter   : JWT Authentication failed: JWT strings must contain exactly 2 period characters. Found: 0
 2026-01-14T17:41:22.431+05:30 ERROR 27584 --- [petcare-backend] [http-nio-8080-exec-5] c.p.p.security.JwtAuthenticationFilter   : JWT Authentication failed: JWT strings must contain exactly 2 period characters. Found: 0
 2026-01-14T17:41:22.515+05:30 ERROR 27584 --- [petcare-backend] [http-nio-8080-exec-6] c.p.p.security.JwtAuthenticationFilter   : JWT Authentication failed: JWT strings must contain exactly 2 period characters. Found: 0
+2026-01-14T17:53:52.898+05:30  WARN 27584 --- [petcare-backend] [HikariPool-1:housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=2m22s270ms637µs600ns).
+2026-01-14T17:55:05.139+05:30  INFO 27584 --- [petcare-backend] [http-nio-8080-exec-9] c.p.p.controller.ImageUploadController   : Image uploaded successfully: /uploads/products/dfeb385a-979d-427a-87ca-1dcae7802afc.webp
+2026-01-14T17:55:05.163+05:30 ERROR 27584 --- [petcare-backend] [http-nio-8080-exec-2] c.p.p.security.JwtAuthenticationFilter   : JWT Authentication failed: JWT strings must contain exactly 2 period characters. Found: 0
+2026-01-14T17:55:05.281+05:30  INFO 27584 --- [petcare-backend] [http-nio-8080-exec-2] com.pets.petcare.service.VendorService   : Vendor Nani created product: Hank 3M Reflective Harness for Puller Dogs (Active: true)
+2026-01-14T17:55:05.316+05:30 ERROR 27584 --- [petcare-backend] [http-nio-8080-exec-1] c.p.p.security.JwtAuthenticationFilter   : JWT Authentication failed: JWT strings must contain exactly 2 period characters. Found: 0
+2026-01-14T17:55:25.142+05:30  INFO 27584 --- [petcare-backend] [http-nio-8080-exec-6] c.p.petcare.controller.AuthController    : >>> [AuthController] Received LOGIN OTP request for: bhargavi123ammu@gmail.com
+2026-01-14T17:55:25.146+05:30  INFO 27584 --- [petcare-backend] [http-nio-8080-exec-6] com.pets.petcare.service.AuthService     : Initiating login for email: bhargavi123ammu@gmail.com
+2026-01-14T17:55:25.182+05:30  INFO 27584 --- [petcare-backend] [http-nio-8080-exec-6] com.pets.petcare.service.AuthService     : User found and active, generating OTP for: bhargavi123ammu@gmail.com
+2026-01-14T17:55:25.182+05:30  INFO 27584 --- [petcare-backend] [http-nio-8080-exec-6] com.pets.petcare.service.OtpService      : Generating OTP for email: bhargavi123ammu@gmail.com with type: LOGIN
+2026-01-14T17:55:25.192+05:30  INFO 27584 --- [petcare-backend] [http-nio-8080-exec-6] com.pets.petcare.service.OtpService      : Cleaned up 3 expired OTPs for email: bhargavi123ammu@gmail.com
+2026-01-14T17:55:25.206+05:30  INFO 27584 --- [petcare-backend] [http-nio-8080-exec-6] com.pets.petcare.service.OtpService      : Found 0 existing unused OTPs for email: bhargavi123ammu@gmail.com
+2026-01-14T17:55:25.207+05:30 DEBUG 27584 --- [petcare-backend] [http-nio-8080-exec-6] com.pets.petcare.service.OtpService      : Generated new OTP for email: bhargavi123ammu@gmail.com
+2026-01-14T17:55:25.212+05:30  INFO 27584 --- [petcare-backend] [http-nio-8080-exec-6] com.pets.petcare.service.OtpService      : Saved OTP token with ID: 288 for email: bhargavi123ammu@gmail.com
+2026-01-14T17:55:25.214+05:30  INFO 27584 --- [petcare-backend] [http-nio-8080-exec-6] com.pets.petcare.service.EmailService    : Generating OTP for bhargavi123ammu@gmail.com: 165445
+2026-01-14T17:55:30.217+05:30  INFO 27584 --- [petcare-backend] [http-nio-8080-exec-6] com.pets.petcare.service.EmailService    : OTP email sent successfully to: bhargavi123ammu@gmail.com
+2026-01-14T17:55:30.217+05:30  INFO 27584 --- [petcare-backend] [http-nio-8080-exec-6] com.pets.petcare.service.OtpService      : OTP generated and sent successfully to: bhargavi123ammu@gmail.com
+2026-01-14T17:55:43.365+05:30  INFO 27584 --- [petcare-backend] [http-nio-8080-exec-8] com.pets.petcare.service.OtpService      : OTP verified successfully for email: bhargavi123ammu@gmail.com
+2026-01-14T17:55:43.414+05:30  INFO 27584 --- [petcare-backend] [http-nio-8080-exec-8] com.pets.petcare.service.AuthService     : User logged in successfully: bhargavi123ammu@gmail.com
+2026-01-14T17:55:59.578+05:30  INFO 27584 --- [petcare-backend] [http-nio-8080-exec-6] c.p.petcare.service.AppointmentService   : Booking appointment request received:
+2026-01-14T17:55:59.578+05:30  INFO 27584 --- [petcare-backend] [http-nio-8080-exec-6] c.p.petcare.service.AppointmentService   :   petId: 20
+2026-01-14T17:55:59.578+05:30  INFO 27584 --- [petcare-backend] [http-nio-8080-exec-6] c.p.petcare.service.AppointmentService   :   veterinarianId: 11
+2026-01-14T17:55:59.578+05:30  INFO 27584 --- [petcare-backend] [http-nio-8080-exec-6] c.p.petcare.service.AppointmentService   :   slotId: null
+2026-01-14T17:55:59.578+05:30  INFO 27584 --- [petcare-backend] [http-nio-8080-exec-6] c.p.petcare.service.AppointmentService   :   dateTime: 2026-01-15T05:30
+2026-01-14T17:55:59.578+05:30  INFO 27584 --- [petcare-backend] [http-nio-8080-exec-6] c.p.petcare.service.AppointmentService   :   type: IN_CLINIC
+2026-01-14T17:55:59.578+05:30  INFO 27584 --- [petcare-backend] [http-nio-8080-exec-6] c.p.petcare.service.AppointmentService   :   reason: null
+2026-01-14T17:56:04.260+05:30  INFO 27584 --- [petcare-backend] [http-nio-8080-exec-6] com.pets.petcare.service.EmailService    : Appointment confirmation email sent to: bhargavi123ammu@gmail.com
+2026-01-14T17:56:09.344+05:30  INFO 27584 --- [petcare-backend] [http-nio-8080-exec-6] com.pets.petcare.service.EmailService    : Vet booking notification sent to: bunny123bhargavi@gmail.com
+2026-01-14T17:56:17.284+05:30  WARN 27584 --- [petcare-backend] [http-nio-8080-exec-6] ration$PageModule$WarningLoggingModifier : Serializing PageImpl instances as-is is not supported, meaning that there is no guarantee about the stability of the resulting JSON structure!
+	For a stable JSON structure, please use Spring Data's PagedModel (globally via @EnableSpringDataWebSupport(pageSerializationMode = VIA_DTO))
+	or Spring HATEOAS and Spring Data's PagedResourcesAssembler as documented in https://docs.spring.io/spring-data/commons/reference/repositories/core-extensions.html#core.web.pageables.
+
+2026-01-14T17:56:19.839+05:30  INFO 27584 --- [petcare-backend] [http-nio-8080-exec-3] c.pets.petcare.service.ProductService    : Loading products - Total active products found: 2
+2026-01-14T17:56:19.839+05:30  INFO 27584 --- [petcare-backend] [http-nio-8080-exec-3] c.pets.petcare.service.ProductService    : Vendor products in result: 2
+2026-01-14T17:56:19.841+05:30  INFO 27584 --- [petcare-backend] [http-nio-8080-exec-3] c.pets.petcare.service.ProductService    : Admin products in result: 0
+2026-01-14T17:56:19.881+05:30  INFO 27584 --- [petcare-backend] [http-nio-8080-exec-4] c.pets.petcare.service.ProductService    : Loading products - Total active products found: 2
+2026-01-14T17:56:19.883+05:30  INFO 27584 --- [petcare-backend] [http-nio-8080-exec-4] c.pets.petcare.service.ProductService    : Vendor products in result: 2
+2026-01-14T17:56:19.883+05:30  INFO 27584 --- [petcare-backend] [http-nio-8080-exec-4] c.pets.petcare.service.ProductService    : Admin products in result: 0
+2026-01-14T17:58:47.112+05:30  INFO 27584 --- [petcare-backend] [http-nio-8080-exec-4] c.p.petcare.controller.AuthController    : >>> [AuthController] Received LOGIN OTP request for: bunny123bhargavi@gmail.com
+2026-01-14T17:58:47.113+05:30  INFO 27584 --- [petcare-backend] [http-nio-8080-exec-4] com.pets.petcare.service.AuthService     : Initiating login for email: bunny123bhargavi@gmail.com
+2026-01-14T17:58:47.130+05:30  INFO 27584 --- [petcare-backend] [http-nio-8080-exec-4] com.pets.petcare.service.AuthService     : User found and active, generating OTP for: bunny123bhargavi@gmail.com
+2026-01-14T17:58:47.130+05:30  INFO 27584 --- [petcare-backend] [http-nio-8080-exec-4] com.pets.petcare.service.OtpService      : Generating OTP for email: bunny123bhargavi@gmail.com with type: LOGIN
+2026-01-14T17:58:47.141+05:30  INFO 27584 --- [petcare-backend] [http-nio-8080-exec-4] com.pets.petcare.service.OtpService      : Cleaned up 1 expired OTPs for email: bunny123bhargavi@gmail.com
+2026-01-14T17:58:47.150+05:30  INFO 27584 --- [petcare-backend] [http-nio-8080-exec-4] com.pets.petcare.service.OtpService      : Found 0 existing unused OTPs for email: bunny123bhargavi@gmail.com
+2026-01-14T17:58:47.151+05:30 DEBUG 27584 --- [petcare-backend] [http-nio-8080-exec-4] com.pets.petcare.service.OtpService      : Generated new OTP for email: bunny123bhargavi@gmail.com
+2026-01-14T17:58:47.155+05:30  INFO 27584 --- [petcare-backend] [http-nio-8080-exec-4] com.pets.petcare.service.OtpService      : Saved OTP token with ID: 289 for email: bunny123bhargavi@gmail.com
+2026-01-14T17:58:47.156+05:30  INFO 27584 --- [petcare-backend] [http-nio-8080-exec-4] com.pets.petcare.service.EmailService    : Generating OTP for bunny123bhargavi@gmail.com: 621396
+2026-01-14T17:58:51.425+05:30  INFO 27584 --- [petcare-backend] [http-nio-8080-exec-4] com.pets.petcare.service.EmailService    : OTP email sent successfully to: bunny123bhargavi@gmail.com
+2026-01-14T17:58:51.426+05:30  INFO 27584 --- [petcare-backend] [http-nio-8080-exec-4] com.pets.petcare.service.OtpService      : OTP generated and sent successfully to: bunny123bhargavi@gmail.com
+2026-01-14T17:59:05.619+05:30  INFO 27584 --- [petcare-backend] [http-nio-8080-exec-8] com.pets.petcare.service.OtpService      : OTP verified successfully for email: bunny123bhargavi@gmail.com
+2026-01-14T17:59:05.633+05:30  INFO 27584 --- [petcare-backend] [http-nio-8080-exec-8] com.pets.petcare.service.AuthService     : User logged in successfully: bunny123bhargavi@gmail.com
+2026-01-14T17:59:18.546+05:30  INFO 27584 --- [petcare-backend] [http-nio-8080-exec-8] com.pets.petcare.service.EmailService    : Appointment approval email sent to: bhargavi123ammu@gmail.com
+2026-01-14T18:00:19.478+05:30  INFO 27584 --- [petcare-backend] [http-nio-8080-exec-7] com.pets.petcare.service.UserService     : Profile photo uploaded for user: bunny123bhargavi@gmail.com -> /uploads/profiles/a6e5bde3-ee6a-4049-a3f9-a4ba4d0d3817.jpeg
