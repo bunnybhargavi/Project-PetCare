@@ -19,8 +19,45 @@ const AddPetModal = ({ isOpen, onClose, onAdd }) => {
 
   const validateForm = () => {
     const newErrors = {};
-    if (!formData.name.trim()) newErrors.name = 'Name is required';
-    if (!formData.species.trim()) newErrors.species = 'Species is required';
+    
+    // Name validation
+    if (!formData.name.trim()) {
+      newErrors.name = 'Name is required';
+    } else if (formData.name.trim().length < 2) {
+      newErrors.name = 'Name must be at least 2 characters';
+    } else if (formData.name.trim().length > 100) {
+      newErrors.name = 'Name must not exceed 100 characters';
+    }
+    
+    // Species validation
+    if (!formData.species.trim()) {
+      newErrors.species = 'Species is required';
+    }
+    
+    // Breed validation (optional but if provided, check length)
+    if (formData.breed && formData.breed.length > 100) {
+      newErrors.breed = 'Breed must not exceed 100 characters';
+    }
+    
+    // Date of birth validation (optional but if provided, check it's not in future)
+    if (formData.dateOfBirth) {
+      const birthDate = new Date(formData.dateOfBirth);
+      const today = new Date();
+      if (birthDate > today) {
+        newErrors.dateOfBirth = 'Birth date cannot be in the future';
+      }
+    }
+    
+    // Microchip ID validation (optional but if provided, check format)
+    if (formData.microchipId && formData.microchipId.length > 50) {
+      newErrors.microchipId = 'Microchip ID must not exceed 50 characters';
+    }
+    
+    // Notes validation
+    if (formData.notes && formData.notes.length > 1000) {
+      newErrors.notes = 'Notes must not exceed 1000 characters';
+    }
+    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -152,8 +189,12 @@ const AddPetModal = ({ isOpen, onClose, onAdd }) => {
                 placeholder="e.g. Beagle"
                 value={formData.breed}
                 onChange={(e) => setFormData({ ...formData, breed: e.target.value })}
-                className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-purple-500"
+                maxLength="100"
+                className={`w-full px-4 py-2.5 border-2 rounded-xl focus:outline-none transition-colors ${
+                  errors.breed ? 'border-red-300 focus:border-red-500' : 'border-gray-200 focus:border-purple-500'
+                }`}
               />
+              {errors.breed && <p className="text-xs mt-1 text-red-500">{errors.breed}</p>}
             </div>
           </div>
 
@@ -167,8 +208,12 @@ const AddPetModal = ({ isOpen, onClose, onAdd }) => {
                 type="date"
                 value={formData.dateOfBirth}
                 onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
-                className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-purple-500"
+                max={new Date().toISOString().split('T')[0]}
+                className={`w-full px-4 py-2.5 border-2 rounded-xl focus:outline-none transition-colors ${
+                  errors.dateOfBirth ? 'border-red-300 focus:border-red-500' : 'border-gray-200 focus:border-purple-500'
+                }`}
               />
+              {errors.dateOfBirth && <p className="text-xs mt-1 text-red-500">{errors.dateOfBirth}</p>}
             </div>
 
             <div>
@@ -187,18 +232,43 @@ const AddPetModal = ({ isOpen, onClose, onAdd }) => {
             </div>
           </div>
 
+          {/* Microchip ID */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+              Microchip ID (Optional)
+            </label>
+            <input
+              type="text"
+              placeholder="e.g. 123456789012345"
+              value={formData.microchipId}
+              onChange={(e) => setFormData({ ...formData, microchipId: e.target.value })}
+              maxLength="50"
+              className={`w-full px-4 py-2.5 border-2 rounded-xl focus:outline-none transition-colors ${
+                errors.microchipId ? 'border-red-300 focus:border-red-500' : 'border-gray-200 focus:border-purple-500'
+              }`}
+            />
+            {errors.microchipId && <p className="text-xs mt-1 text-red-500">{errors.microchipId}</p>}
+          </div>
+
           {/* Notes */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Notes
+              Notes (Optional)
             </label>
             <textarea
-              placeholder="Any special needs?"
+              placeholder="Any special needs or information..."
               value={formData.notes}
               onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
               rows="2"
-              className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-purple-500 resize-none"
+              maxLength="1000"
+              className={`w-full px-4 py-2.5 border-2 rounded-xl focus:outline-none resize-none transition-colors ${
+                errors.notes ? 'border-red-300 focus:border-red-500' : 'border-gray-200 focus:border-purple-500'
+              }`}
             />
+            <div className="flex justify-between items-center mt-1">
+              {errors.notes && <p className="text-xs text-red-500">{errors.notes}</p>}
+              <p className="text-xs text-gray-500 ml-auto">{formData.notes.length}/1000</p>
+            </div>
           </div>
 
           {/* Action Buttons */}

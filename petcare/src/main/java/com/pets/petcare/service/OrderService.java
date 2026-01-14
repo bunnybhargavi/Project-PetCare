@@ -44,14 +44,34 @@ public class OrderService {
 
         List<CartItem> cartItems = cartItemRepository.findByCart(cart);
         if (cartItems.isEmpty()) {
-            throw new RuntimeException("Cart is empty");
+            throw new RuntimeException("Cart is empty. Please add items to your cart before checkout.");
         }
 
-        // Validate stock availability
+        // Validate all cart items and stock availability
         for (CartItem cartItem : cartItems) {
             Product product = cartItem.getProduct();
+            
+            // Check if product still exists and is active
+            if (!product.getActive()) {
+                throw new RuntimeException("Product '" + product.getTitle() + "' is no longer available");
+            }
+            
+            // Check stock availability
             if (product.getStock() < cartItem.getQuantity()) {
-                throw new RuntimeException("Insufficient stock for product: " + product.getTitle());
+                throw new RuntimeException("Insufficient stock for product '" + product.getTitle() + 
+                    "'. Available: " + product.getStock() + ", Requested: " + cartItem.getQuantity());
+            }
+            
+            // Validate price hasn't changed significantly (more than 10%)
+            BigDecimal currentPrice = product.getDiscountedPrice();
+            BigDecimal cartPrice = cartItem.getUnitPrice();
+            BigDecimal priceDifference = currentPrice.subtract(cartPrice).abs();
+            BigDecimal priceChangePercentage = priceDifference.divide(cartPrice, 4, BigDecimal.ROUND_HALF_UP)
+                    .multiply(BigDecimal.valueOf(100));
+            
+            if (priceChangePercentage.compareTo(BigDecimal.valueOf(10)) > 0) {
+                throw new RuntimeException("Price for product '" + product.getTitle() + 
+                    "' has changed significantly. Please refresh your cart and try again.");
             }
         }
 
@@ -71,15 +91,15 @@ public class OrderService {
 
         // Set payment information
         order.setPaymentMethod(request.getPaymentMethod());
-        order.setPaymentTransactionId(request.getPaymentTransactionId());
         order.setPaymentStatus(Order.PaymentStatus.PENDING);
 
-        order.setNotes(request.getNotes());
-
-        // Calculate totals
-        BigDecimal subtotal = cartItems.stream()
-                .map(CartItem::getTotalPrice)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        // Calculate totals with current prices
+        BigDecimal subtotal = BigDecimal.ZERO;
+        for (CartItem cartItem : cartItems) {
+            BigDecimal currentPrice = cartItem.getProduct().getDiscountedPrice();
+            BigDecimal itemTotal = currentPrice.multiply(BigDecimal.valueOf(cartItem.getQuantity()));
+            subtotal = subtotal.add(itemTotal);
+        }
 
         BigDecimal shippingCost = calculateShippingCost(subtotal);
         BigDecimal tax = calculateTax(subtotal);
@@ -92,26 +112,33 @@ public class OrderService {
 
         Order savedOrder = orderRepository.save(order);
 
-        // Create order items and update product stock
+        // Create order items and reserve stock atomically
         for (CartItem cartItem : cartItems) {
+            Product product = cartItem.getProduct();
+            
+            // Double-check stock before reserving (race condition protection)
+            if (product.getStock() < cartItem.getQuantity()) {
+                throw new RuntimeException("Stock changed during checkout for product: " + product.getTitle());
+            }
+            
             OrderItem orderItem = new OrderItem();
             orderItem.setOrder(savedOrder);
-            orderItem.setProduct(cartItem.getProduct());
+            orderItem.setProduct(product);
             orderItem.setQuantity(cartItem.getQuantity());
-            orderItem.setUnitPrice(cartItem.getUnitPrice());
-            orderItem.setTotalPrice(cartItem.getTotalPrice());
+            orderItem.setUnitPrice(product.getDiscountedPrice()); // Use current price
+            orderItem.setTotalPrice(product.getDiscountedPrice().multiply(BigDecimal.valueOf(cartItem.getQuantity())));
             orderItemRepository.save(orderItem);
 
-            // Update product stock
-            Product product = cartItem.getProduct();
+            // Reserve stock
             product.setStock(product.getStock() - cartItem.getQuantity());
             productRepository.save(product);
         }
 
-        // Clear cart
+        // Clear cart only after successful order creation
         cartItemRepository.deleteByCart(cart);
 
-        log.info("Order created: {} for user: {}", savedOrder.getOrderNumber(), userEmail);
+        log.info("Order created: {} for user: {} with {} items", 
+            savedOrder.getOrderNumber(), userEmail, cartItems.size());
 
         return mapToResponse(savedOrder);
     }

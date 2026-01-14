@@ -309,6 +309,8 @@ const CheckoutModal = ({ cart, onClose, onOrderComplete, onCartUpdate }) => {
                                     type="tel"
                                     value={shippingInfo.shippingPhone}
                                     onChange={(e) => setShippingInfo({ ...shippingInfo, shippingPhone: e.target.value })}
+                                    pattern="[0-9]{10}"
+                                    title="Phone number must be 10 digits"
                                     className="pet-input"
                                     placeholder=" "
                                 />
@@ -366,6 +368,9 @@ const CheckoutModal = ({ cart, onClose, onOrderComplete, onCartUpdate }) => {
                                     value={shippingInfo.shippingZipCode}
                                     onChange={(e) => setShippingInfo({ ...shippingInfo, shippingZipCode: e.target.value })}
                                     required
+                                    pattern="[0-9]{5,6}"
+                                    title="ZIP code must be 5-6 digits"
+                                    maxLength="6"
                                     className="pet-input"
                                     placeholder=" "
                                 />

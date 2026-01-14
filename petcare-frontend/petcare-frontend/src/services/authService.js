@@ -157,6 +157,49 @@ const authService = {
     return response.data;
   },
 
+  getProfile: async () => {
+    try {
+      const response = await api.get('/profile');
+      const profileData = response.data?.data || response.data;
+      
+      // Update user data in sessionStorage
+      const user = JSON.parse(sessionStorage.getItem('user') || '{}');
+      const updatedUser = { ...user, ...profileData };
+      sessionStorage.setItem('user', JSON.stringify(updatedUser));
+      
+      return profileData;
+    } catch (error) {
+      console.error('Failed to get profile:', error);
+      throw error;
+    }
+  },
+
+  uploadProfilePhoto: async (file) => {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      const response = await api.post('/profile/photo', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      
+      // Update user data in sessionStorage with new photo URL
+      const user = JSON.parse(sessionStorage.getItem('user') || '{}');
+      const photoUrl = response.data?.data || response.data?.message?.split(': ')[1];
+      if (photoUrl) {
+        user.profilePhoto = photoUrl;
+        sessionStorage.setItem('user', JSON.stringify(user));
+      }
+      
+      return response.data;
+    } catch (error) {
+      console.error('Failed to upload profile photo:', error);
+      throw error;
+    }
+  },
+
   getCurrentUser: () => {
     const userStr = sessionStorage.getItem('user');
     return userStr ? JSON.parse(userStr) : null;

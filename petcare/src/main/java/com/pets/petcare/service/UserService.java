@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -105,20 +106,52 @@ public class UserService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
+        // Validate file
+        if (file.isEmpty()) {
+            throw new RuntimeException("Please select a file to upload");
+        }
+
+        // Validate file type
+        String contentType = file.getContentType();
+        if (contentType == null || !contentType.startsWith("image/")) {
+            throw new RuntimeException("Only image files are allowed");
+        }
+
+        // Validate file size (5MB max)
+        if (file.getSize() > 5 * 1024 * 1024) {
+            throw new RuntimeException("File size must be less than 5MB");
+        }
+
         try {
+            // Create upload directory if it doesn't exist
             Path uploadPath = Paths.get(UPLOAD_DIR);
             if (!Files.exists(uploadPath)) {
                 Files.createDirectories(uploadPath);
             }
 
+            // Generate unique filename
             String originalFilename = file.getOriginalFilename();
-            String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+            String extension = "";
+            if (originalFilename != null && originalFilename.contains(".")) {
+                extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+            } else {
+                extension = ".jpg"; // Default extension
+            }
             String filename = UUID.randomUUID().toString() + extension;
 
             Path filePath = uploadPath.resolve(filename);
-            Files.copy(file.getInputStream(), filePath);
+            
+            // Delete old profile photo if exists
+            deleteOldProfilePhoto(user);
+            
+            // Save new file
+            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
             String photoUrl = "/uploads/profiles/" + filename;
+
+            // Update user's profile photo
+            user.setProfilePhoto(photoUrl);
+            userRepository.save(user);
 
             // Update photo in role-specific table (create if missing)
             if (user.getRole() == User.Role.OWNER) {
@@ -141,12 +174,31 @@ public class UserService {
                 veterinarianRepository.save(vet);
             }
 
-            log.info("Profile photo uploaded for user: {}", email);
+            log.info("Profile photo uploaded for user: {} -> {}", email, photoUrl);
             return photoUrl;
 
         } catch (IOException e) {
-            log.error("Failed to upload profile photo", e);
-            throw new RuntimeException("Failed to upload profile photo");
+            log.error("Failed to upload profile photo for user: {}", email, e);
+            throw new RuntimeException("Failed to upload profile photo: " + e.getMessage());
+        }
+    }
+
+    private void deleteOldProfilePhoto(User user) {
+        try {
+            if (user.getProfilePhoto() != null && !user.getProfilePhoto().isEmpty()) {
+                String oldPhotoPath = user.getProfilePhoto();
+                if (oldPhotoPath.startsWith("/uploads/profiles/")) {
+                    String filename = oldPhotoPath.substring("/uploads/profiles/".length());
+                    Path oldFilePath = Paths.get(UPLOAD_DIR, filename);
+                    if (Files.exists(oldFilePath)) {
+                        Files.delete(oldFilePath);
+                        log.info("Deleted old profile photo: {}", oldFilePath);
+                    }
+                }
+            }
+        } catch (IOException e) {
+            log.warn("Failed to delete old profile photo for user: {}", user.getEmail(), e);
+            // Don't throw exception, just log warning
         }
     }
 

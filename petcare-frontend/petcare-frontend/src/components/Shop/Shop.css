@@ -5094,3 +5094,43 @@
   color: #C026D3;
 }
 
+/* Enhanced Empty State Styling */
+.empty-state-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.vendor-info {
+  padding: 16px;
+  background: linear-gradient(135deg, #f8f9ff, #e8f2ff);
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+}
+
+.vendor-message {
+  margin: 0;
+  font-size: 14px;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.vendor-link {
+  color: #7C3F8C;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.vendor-link:hover {
+  color: #5A2E6B;
+  text-decoration: underline;
+}
+
+.vendor-icon {
+  font-size: 16px;
+}

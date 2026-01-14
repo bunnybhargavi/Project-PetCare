@@ -211,8 +211,6 @@ const OwnerDashboard = () => {
   const menuItems = [
     { id: 'overview', icon: FaHeart, label: 'Overview', emoji: '🏠', badge: null },
     { id: 'pets', icon: FaHeart, label: 'My Pets', emoji: '🐾', badge: navBadges.pets },
-    { id: 'shop', icon: FaShoppingCart, label: 'Shop', emoji: '🛒', badge: null },
-    { id: 'orders', icon: FaShoppingCart, label: 'My Orders', emoji: '📦', badge: null },
     { id: 'appointments', icon: FaCalendarAlt, label: 'Appointments', emoji: '📅', badge: navBadges.appointments },
     { id: 'health', icon: FaChartLine, label: 'Health', emoji: '📊', badge: navBadges.health },
     { id: 'reminders', icon: FaBell, label: 'Reminders', emoji: '🔔', badge: navBadges.reminders },
@@ -344,8 +342,7 @@ const OwnerDashboard = () => {
               styles={styles}
             />
           )}
-          {activeSection === 'shop' && <ShopSection styles={styles} />}
-          {activeSection === 'orders' && <OrdersSection styles={styles} />}
+
           {activeSection === 'appointments' && (
             <AppointmentsSection pets={pets} styles={styles} />
           )}
@@ -1031,49 +1028,130 @@ const AppointmentBookingModal = ({ pets, onClose, styles }) => {
   }, []);
 
   const handleVetSelect = async (vet) => {
+    console.log('=== Vet Selected ===');
+    console.log('Vet:', vet);
     setSelectedVet(vet);
     setLoading(true);
+    setSlots([]); // Clear previous slots
     try {
+      console.log('Fetching slots for vet ID:', vet.id);
       const data = await appointmentService.getAvailableSlots(vet.id);
-      setSlots(data || []);
-    } catch (e) { console.error(e); setSlots([]); }
-    setLoading(false);
-    setStep(2);
+      console.log('Slots received from API:', data);
+      
+      // If vet has created slots, use them; otherwise use default slots
+      if (data && data.length > 0) {
+        console.log('Using vet-created slots:', data.length);
+        setSlots(data);
+      } else {
+        console.log('No vet slots found, generating default slots');
+        const defaultSlots = generateDefaultSlots();
+        console.log('Generated default slots:', defaultSlots.length);
+        setSlots(defaultSlots);
+      }
+    } catch (e) { 
+      console.error('Error fetching slots:', e); 
+      // On error, use default slots
+      console.log('Error occurred, using default slots');
+      const defaultSlots = generateDefaultSlots();
+      console.log('Generated default slots after error:', defaultSlots.length);
+      setSlots(defaultSlots);
+    } finally {
+      console.log('Setting loading to false');
+      setLoading(false);
+      setStep(2);
+    }
+  };
+
+  // Generate default time slots (9 AM to 5 PM, every hour) for tomorrow
+  const generateDefaultSlots = () => {
+    const defaultSlots = [];
+    const now = new Date();
+    const tomorrow = new Date(now);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(9, 0, 0, 0); // Start at 9 AM tomorrow
+
+    for (let hour = 9; hour <= 17; hour++) {
+      const slotTime = new Date(tomorrow);
+      slotTime.setHours(hour);
+      
+      defaultSlots.push({
+        id: `default-${hour}`,
+        startTime: slotTime.toISOString(),
+        endTime: new Date(slotTime.getTime() + 60 * 60 * 1000).toISOString(),
+        mode: 'IN_CLINIC',
+        capacity: 5,
+        bookedCount: 0,
+        status: 'AVAILABLE',
+        isDefault: true // Flag to identify default slots
+      });
+    }
+
+    return defaultSlots;
   };
 
   const handleBook = async () => {
-    if (!selectedPetId) return alert("Select a pet");
-    if (!selectedDate) return alert("Select a date");
+    if (!selectedPetId) return alert("Please select a pet");
+    if (!selectedDate) return alert("Please select a date");
+    if (!selectedSlot) return alert("Please select a time slot");
+    if (!selectedVet) return alert("Please select a veterinarian");
+    
+    // Validate reason if provided
+    if (reason && reason.trim().length > 0 && reason.trim().length < 5) {
+      return alert("Reason must be at least 5 characters long");
+    }
+    if (reason && reason.trim().length > 500) {
+      return alert("Reason must not exceed 500 characters");
+    }
 
     setLoading(true);
     try {
-      // Combine selected date with slot time, or use default time if no slot
-      let appointmentDateTime;
-      if (selectedSlot && selectedSlot.startTime) {
-        // Use the slot's time but with the selected date
-        const slotTime = new Date(selectedSlot.startTime);
-        const [year, month, day] = selectedDate.split('-');
-        appointmentDateTime = new Date(year, month - 1, day, slotTime.getHours(), slotTime.getMinutes());
-      } else {
-        // Use selected date with default time (10:00 AM)
-        const [year, month, day] = selectedDate.split('-');
-        appointmentDateTime = new Date(year, month - 1, day, 10, 0, 0);
+      // Combine selected date with slot time
+      const slotTime = new Date(selectedSlot.startTime);
+      const [year, month, day] = selectedDate.split('-');
+      const appointmentDateTime = new Date(
+        parseInt(year), 
+        parseInt(month) - 1, 
+        parseInt(day), 
+        slotTime.getHours(), 
+        slotTime.getMinutes(),
+        0, 0
+      );
+
+      // Ensure the appointment type is set correctly
+      const appointmentType = selectedSlot.mode === 'TELECONSULT' ? 'TELECONSULT' : 'IN_CLINIC';
+
+      const appointmentData = {
+        petId: parseInt(selectedPetId),
+        veterinarianId: parseInt(selectedVet.id),
+        type: appointmentType,
+        dateTime: appointmentDateTime.toISOString()
+      };
+      
+      // Only add slot ID if it's a real vet-created slot (not default)
+      if (selectedSlot && !selectedSlot.isDefault && selectedSlot.id && typeof selectedSlot.id === 'number') {
+        appointmentData.slotId = parseInt(selectedSlot.id);
+      }
+      
+      // Add reason if provided and valid
+      if (reason && reason.trim().length >= 5) {
+        appointmentData.reason = reason.trim();
       }
 
-      await appointmentService.bookAppointment({
-        petId: selectedPetId,
-        slotId: selectedSlot?.id,
-        veterinarianId: selectedVet.id,
-        dateTime: appointmentDateTime.toISOString(),
-        type: selectedSlot?.mode === 'IN_CLINIC' ? 'IN_CLINIC' : 'TELECONSULT',
-        reason
-      });
-      alert('Appointment Requested Successfully! Status: PENDING. Please wait for Vet approval.');
+      console.log('Booking appointment with data:', appointmentData);
+      
+      const response = await appointmentService.bookAppointment(appointmentData);
+      console.log('Booking response:', response);
+      
+      alert('✅ Appointment Requested Successfully!\n\nStatus: PENDING\nPlease wait for veterinarian approval.');
       onClose();
     } catch (e) {
-      alert('Booking Failed: ' + (e.response?.data?.message || e.message));
+      console.error('Booking error:', e);
+      console.error('Error response:', e.response?.data);
+      const errorMessage = e.response?.data?.message || e.message || 'Unknown error occurred';
+      alert('❌ Booking Failed:\n\n' + errorMessage + '\n\nPlease check all fields and try again.');
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
@@ -1098,26 +1176,7 @@ const AppointmentBookingModal = ({ pets, onClose, styles }) => {
               ))}
             </div>
 
-            <label className="block text-sm font-medium">Select Veterinarian</label>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-60 overflow-y-auto">
-              {vets.map(vet => (
-                <div key={vet.id} onClick={() => handleVetSelect(vet)}
-                  className="p-3 border rounded-xl hover:shadow-md cursor-pointer transition-all">
-                  <div className="font-bold">{vet.clinicName}</div>
-                  <div className="text-sm text-gray-600">{vet.name || vet.user?.name}</div>
-                  <div className="text-xs text-blue-500">{vet.specialization}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {step === 2 && (
-          <div className="space-y-4">
-            <button onClick={() => setStep(1)} className="text-sm text-gray-500 mb-2">&larr; Back to Vets</button>
-            <h3 className="font-bold text-lg">Book with {selectedVet?.clinicName}</h3>
-
-            {/* Date Picker */}
+            {/* Date Picker in Step 1 */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 📅 Select Date
@@ -1133,36 +1192,143 @@ const AppointmentBookingModal = ({ pets, onClose, styles }) => {
               <p className="text-xs text-gray-500 mt-1">You can book up to 3 months in advance</p>
             </div>
 
+            <label className="block text-sm font-medium">Select Veterinarian</label>
+            {vets.length === 0 ? (
+              <div className="text-center py-8 text-gray-500">
+                <p className="text-4xl mb-2">👨‍⚕️</p>
+                <p>No veterinarians available</p>
+                <p className="text-xs mt-2">Please contact support</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-60 overflow-y-auto">
+                {vets.map(vet => (
+                  <div key={vet.id} onClick={() => handleVetSelect(vet)}
+                    className="p-3 border rounded-xl hover:shadow-md cursor-pointer transition-all hover:border-purple-300">
+                    <div className="font-bold">{vet.clinicName}</div>
+                    <div className="text-sm text-gray-600">{vet.name || vet.user?.name}</div>
+                    <div className="text-xs text-blue-500">{vet.specialization}</div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {step === 2 && (
+          <div className="space-y-4">
+            <button onClick={() => setStep(1)} className="text-sm text-gray-500 mb-2 hover:text-purple-600">&larr; Back to Selection</button>
+            
+            <div className="bg-purple-50 p-4 rounded-xl mb-4">
+              <h3 className="font-bold text-lg text-purple-900">Booking Summary</h3>
+              <div className="mt-2 space-y-1 text-sm">
+                <p><span className="font-semibold">Clinic:</span> {selectedVet?.clinicName}</p>
+                <p><span className="font-semibold">Doctor:</span> {selectedVet?.name || selectedVet?.user?.name}</p>
+                <p><span className="font-semibold">Pet:</span> {pets.find(p => p.id === selectedPetId)?.name}</p>
+                <p><span className="font-semibold">Date:</span> {new Date(selectedDate).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+              </div>
+            </div>
+
             {/* Time Slots */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 ⏰ Select Time Slot
               </label>
-              {loading ? <p>Loading slots...</p> : (
-                <div className="grid grid-cols-3 gap-2">
-                  {slots.length === 0 && <p className="col-span-3 text-gray-500">No slots available. (Using fallback booking)</p>}
-
-                  {(slots.length > 0 ? slots : [
-                    { id: null, startTime: new Date(new Date().setHours(10, 0, 0, 0)).toISOString(), mode: 'TELECONSULT' }, // Mock
-                  ]).map((slot, idx) => (
-                    <div key={slot.id || idx}
-                      onClick={() => setSelectedSlot(slot)}
-                      className={`p-2 border rounded text-center cursor-pointer ${selectedSlot === slot ? 'bg-blue-600 text-white' : 'hover:bg-gray-50'}`}>
-                      {new Date(slot.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    </div>
-                  ))}
+              {loading ? (
+                <div className="text-center py-8">
+                  <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+                  <p className="mt-2 text-gray-600">Loading available slots...</p>
                 </div>
+              ) : (
+                <>
+                  {slots.length === 0 ? (
+                    <div className="text-center py-8 bg-gray-50 rounded-xl">
+                      <p className="text-4xl mb-2">📅</p>
+                      <p className="text-gray-600">No slots available</p>
+                    </div>
+                  ) : (
+                    <>
+                      {/* Show info about slot types */}
+                      {slots.some(s => s.isDefault) && slots.some(s => !s.isDefault) && (
+                        <div className="mb-3 p-2 bg-blue-50 rounded-lg text-xs text-blue-700">
+                          💡 Showing both vet-created slots and default time slots
+                        </div>
+                      )}
+                      {slots.every(s => s.isDefault) && (
+                        <div className="mb-3 p-2 bg-gray-50 rounded-lg text-xs text-gray-600">
+                          📅 Default time slots (9 AM - 5 PM)
+                        </div>
+                      )}
+                      
+                      <div className="grid grid-cols-3 gap-2 max-h-64 overflow-y-auto">
+                        {slots.map((slot, idx) => (
+                          <div 
+                            key={slot.id || idx}
+                            onClick={() => setSelectedSlot(slot)}
+                            className={`p-3 border-2 rounded-lg text-center cursor-pointer transition-all ${
+                              selectedSlot === slot 
+                                ? 'bg-purple-600 text-white border-purple-600 shadow-lg transform scale-105' 
+                                : 'hover:bg-gray-50 border-gray-200 hover:border-purple-300'
+                            }`}
+                          >
+                            <div className="font-bold text-sm">
+                              {new Date(slot.startTime).toLocaleTimeString([], { 
+                                hour: '2-digit', 
+                                minute: '2-digit',
+                                hour12: true 
+                              })}
+                            </div>
+                            <div className={`text-xs mt-1 ${selectedSlot === slot ? 'text-purple-100' : 'text-gray-500'}`}>
+                              {slot.isDefault ? '📅 Default' : '👨‍⚕️ Vet Slot'}
+                            </div>
+                            {!slot.isDefault && slot.mode && (
+                              <div className={`text-xs mt-1 ${selectedSlot === slot ? 'text-purple-100' : 'text-blue-600'}`}>
+                                {slot.mode === 'TELECONSULT' ? '📹 Video' : '🏥 Clinic'}
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </>
               )}
             </div>
 
-            <textarea
-              placeholder="Reason for visit..."
-              className="w-full border rounded-xl p-3 mt-4"
-              value={reason} onChange={e => setReason(e.target.value)}
-            />
+            {/* Reason for visit */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                📝 Reason for Visit (Optional)
+              </label>
+              <textarea
+                placeholder="Describe your pet's symptoms or reason for the visit (minimum 5 characters if provided)..."
+                className="w-full border-2 border-gray-200 rounded-xl p-3 focus:outline-none focus:border-purple-500 transition-colors resize-none"
+                rows="3"
+                value={reason} 
+                onChange={e => setReason(e.target.value)}
+                maxLength={500}
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                {reason.length}/500 characters {reason.length > 0 && reason.length < 5 && '(minimum 5 required)'}
+              </p>
+            </div>
 
-            <button onClick={handleBook} disabled={loading} className="w-full py-3 bg-purple-600 text-white rounded-xl font-bold mt-4 hover:bg-purple-700">
-              {loading ? 'Booking...' : 'Confirm Booking'}
+            <button 
+              onClick={handleBook} 
+              disabled={loading || !selectedSlot} 
+              className={`w-full py-3 rounded-xl font-bold mt-4 transition-all ${
+                loading || !selectedSlot
+                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  : 'bg-purple-600 text-white hover:bg-purple-700 shadow-lg hover:shadow-xl'
+              }`}
+            >
+              {loading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <div className="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  Booking...
+                </span>
+              ) : (
+                '✅ Confirm Booking'
+              )}
             </button>
           </div>
         )}

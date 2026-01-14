@@ -41,20 +41,34 @@ const OrdersPage = () => {
     }
   };
 
-  const loadOrders = async () => {
-    setLoading(true);
+  const loadOrders = async (showLoading = true) => {
+    if (showLoading) setLoading(true);
     try {
+      console.log('Loading orders for user...');
       const response = await orderService.getUserOrders();
+      console.log('Orders API response:', response);
+      
       if (response && response.success && response.data) {
-        setOrders(response.data.content || []);
+        // Handle both paginated and non-paginated responses
+        const ordersData = response.data.content || response.data || [];
+        setOrders(ordersData);
+        console.log('Orders loaded successfully:', ordersData.length, 'orders');
+        
+        if (ordersData.length > 0) {
+          console.log('Order details:', ordersData.map(o => ({ id: o.id, status: o.status, total: o.totalAmount })));
+        } else {
+          console.log('No orders found for user');
+        }
       } else {
+        console.log('No order data in response');
         setOrders([]);
       }
     } catch (error) {
       console.error('Failed to load orders:', error);
+      console.error('Error details:', error.response?.data || error.message);
       setOrders([]);
     } finally {
-      setLoading(false);
+      if (showLoading) setLoading(false);
     }
   };
 
@@ -135,8 +149,14 @@ const OrdersPage = () => {
           ) : filteredOrders.length === 0 ? (
             <div className="text-center py-12 bg-white rounded-2xl shadow">
               <p className="text-6xl mb-4">📦</p>
-              <h3 className="text-xl font-bold text-gray-700 mb-2">No Orders Found</h3>
-              <p className="text-gray-500">You haven't placed any orders yet</p>
+              <h3 className="text-xl font-bold text-gray-700 mb-2">No Orders Yet</h3>
+              <p className="text-gray-500 mb-4">You haven't placed any orders yet</p>
+              <div className="space-y-2">
+                <p className="text-sm text-gray-400">Start shopping to see your orders here!</p>
+                <a href="/shop" className="inline-block px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                  🛒 Browse Products
+                </a>
+              </div>
             </div>
           ) : (
             <div className="space-y-6">

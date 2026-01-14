@@ -50,13 +50,88 @@ const BookingModal = ({ onClose, preSelectedVet = null }) => {
                 setLoading(true);
                 try {
                     const data = await appointmentService.getAvailableSlots(selectedVet.id);
-                    setSlots(data || []);
-                } catch (e) { console.error(e); }
+                    // If vet has created slots, use them; otherwise use default slots
+                    if (data && data.length > 0) {
+                        setSlots(data);
+                    } else {
+                        // Generate default time slots
+                        setSlots(generateDefaultSlots());
+                    }
+                } catch (e) { 
+                    console.error(e);
+                    // On error, use default slots
+                    setSlots(generateDefaultSlots());
+                }
                 setLoading(false);
             };
             loadSlots();
         }
     }, [selectedVet, step]);
+
+    // Generate default time slots (Morning, Afternoon, Evening)
+    const generateDefaultSlots = () => {
+        const defaultSlots = [];
+        const now = new Date();
+        const tomorrow = new Date(now);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        tomorrow.setHours(0, 0, 0, 0); // Start of tomorrow
+        
+        // Morning slots (9 AM - 12 PM)
+        for (let hour = 9; hour <= 11; hour++) {
+            const slotTime = new Date(tomorrow);
+            slotTime.setHours(hour, 0, 0, 0);
+            
+            defaultSlots.push({
+                id: `default-morning-${hour}`,
+                startTime: slotTime.toISOString(),
+                endTime: new Date(slotTime.getTime() + 60 * 60 * 1000).toISOString(),
+                mode: 'IN_CLINIC',
+                capacity: 5,
+                bookedCount: 0,
+                status: 'AVAILABLE',
+                isDefault: true,
+                period: 'Morning'
+            });
+        }
+        
+        // Afternoon slots (2 PM - 5 PM)
+        for (let hour = 14; hour <= 16; hour++) {
+            const slotTime = new Date(tomorrow);
+            slotTime.setHours(hour, 0, 0, 0);
+            
+            defaultSlots.push({
+                id: `default-afternoon-${hour}`,
+                startTime: slotTime.toISOString(),
+                endTime: new Date(slotTime.getTime() + 60 * 60 * 1000).toISOString(),
+                mode: 'IN_CLINIC',
+                capacity: 5,
+                bookedCount: 0,
+                status: 'AVAILABLE',
+                isDefault: true,
+                period: 'Afternoon'
+            });
+        }
+        
+        // Evening slots (6 PM - 8 PM)
+        for (let hour = 18; hour <= 19; hour++) {
+            const slotTime = new Date(tomorrow);
+            slotTime.setHours(hour, 0, 0, 0);
+            
+            defaultSlots.push({
+                id: `default-evening-${hour}`,
+                startTime: slotTime.toISOString(),
+                endTime: new Date(slotTime.getTime() + 60 * 60 * 1000).toISOString(),
+                mode: 'IN_CLINIC',
+                capacity: 5,
+                bookedCount: 0,
+                status: 'AVAILABLE',
+                isDefault: true,
+                period: 'Evening'
+            });
+        }
+
+        return defaultSlots;
+    };
 
     const handleVetSelect = (vet) => {
         setSelectedVet(vet);
@@ -66,21 +141,45 @@ const BookingModal = ({ onClose, preSelectedVet = null }) => {
     const handleBook = async () => {
         if (!selectedPetId) return alert("Please select a pet");
         if (!selectedVet) return alert("Please select a veterinarian");
+        if (!selectedSlot) return alert("Please select a time slot");
+        
+        // Validate reason if provided
+        if (reason && reason.trim().length > 0 && reason.trim().length < 5) {
+            return alert("Reason must be at least 5 characters long");
+        }
+        if (reason && reason.trim().length > 500) {
+            return alert("Reason must not exceed 500 characters");
+        }
 
         setLoading(true);
         try {
-            await appointmentService.bookAppointment({
-                petId: selectedPetId,
-                slotId: selectedSlot?.id,
+            const appointmentData = {
+                petId: parseInt(selectedPetId),
                 veterinarianId: selectedVet.id,
-                dateTime: new Date().toISOString(), // Fallback if no slot
-                type: selectedSlot?.mode === 'IN_CLINIC' ? 'IN_CLINIC' : 'TELECONSULT', // Default logic
-                reason
-            });
-            alert('Appointment Requested Successfully! Status: PENDING. Please wait for Vet approval.');
+                type: selectedSlot?.mode === 'TELECONSULT' ? 'TELECONSULT' : 'IN_CLINIC',
+                dateTime: selectedSlot.startTime // Always include dateTime
+            };
+            
+            // Only add slot ID if it's a real vet-created slot (not default)
+            if (selectedSlot && !selectedSlot.isDefault && typeof selectedSlot.id === 'number') {
+                appointmentData.slotId = parseInt(selectedSlot.id);
+            }
+            
+            // Add reason if provided and valid
+            if (reason && reason.trim().length >= 5) {
+                appointmentData.reason = reason.trim();
+            }
+            
+            console.log('Booking appointment with data:', appointmentData);
+            
+            await appointmentService.bookAppointment(appointmentData);
+            alert('✅ Appointment Requested Successfully!\n\nStatus: PENDING\nPlease wait for veterinarian approval.');
             onClose();
         } catch (e) {
-            alert('Booking Failed: ' + (e.response?.data?.message || e.message));
+            console.error('Booking error:', e);
+            console.error('Error response:', e.response?.data);
+            const errorMessage = e.response?.data?.message || e.message || 'Unknown error occurred';
+            alert('❌ Booking Failed:\n\n' + errorMessage + '\n\nPlease try again.');
         }
         setLoading(false);
     };
@@ -152,36 +251,81 @@ const BookingModal = ({ onClose, preSelectedVet = null }) => {
                         <div>
                             <label className="block text-sm font-semibold mb-2 text-gray-700">Available Slots</label>
                             {loading ? <div className="text-center py-4 text-gray-500">Loading slots...</div> : (
-                                <div className="grid grid-cols-3 gap-2">
-                                    {slots.length === 0 && (
-                                        <div className="col-span-3 text-center py-4 text-gray-500 italic">
-                                            No specific slots available.
+                                <>
+                                    {slots.length === 0 ? (
+                                        <div className="text-center py-4 text-gray-500 italic">
+                                            No slots available.
                                         </div>
+                                    ) : (
+                                        <>
+                                            {/* Show info about slot types */}
+                                            {slots.every(s => s.isDefault) && (
+                                                <div className="mb-3 p-2 bg-blue-50 rounded-lg text-xs text-blue-700">
+                                                    📅 Default time slots available
+                                                </div>
+                                            )}
+                                            {slots.some(s => s.isDefault) && slots.some(s => !s.isDefault) && (
+                                                <div className="mb-3 p-2 bg-blue-50 rounded-lg text-xs text-blue-700">
+                                                    💡 Showing both vet-created and default slots
+                                                </div>
+                                            )}
+                                            
+                                            <div className="grid grid-cols-3 gap-2">
+                                                {slots.map((slot) => (
+                                                    <div key={slot.id}
+                                                        onClick={() => setSelectedSlot(slot)}
+                                                        className={`p-2 border rounded-lg text-center text-sm cursor-pointer transition-all ${selectedSlot === slot ? 'bg-blue-600 text-white border-blue-600 shadow-md' : 'border-gray-200 hover:bg-gray-50'
+                                                            }`}>
+                                                        <div className="font-semibold">
+                                                            {new Date(slot.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}
+                                                        </div>
+                                                        <div className={`text-[10px] ${selectedSlot === slot ? 'text-blue-100' : 'text-gray-500'}`}>
+                                                            {slot.isDefault ? `📅 ${slot.period}` : `👨‍⚕️ ${slot.mode}`}
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </>
                                     )}
-                                    {slots.map((slot) => (
-                                        <div key={slot.id}
-                                            onClick={() => setSelectedSlot(slot)}
-                                            className={`p-2 border rounded-lg text-center text-sm cursor-pointer transition-all ${selectedSlot === slot ? 'bg-blue-600 text-white border-blue-600 shadow-md' : 'border-gray-200 hover:bg-gray-50'
-                                                }`}>
-                                            {new Date(slot.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                            <div className="text-[10px] opacity-75">{slot.mode}</div>
-                                        </div>
-                                    ))}
-                                </div>
+                                </>
                             )}
                         </div>
 
-                        <textarea
-                            placeholder="Reason for visit (optional)..."
-                            className="w-full border-2 border-gray-100 rounded-xl p-3 focus:outline-none focus:border-blue-500 transition-colors"
-                            rows="3"
-                            value={reason} onChange={e => setReason(e.target.value)}
-                        />
+                        <div>
+                            <label className="block text-sm font-semibold mb-2 text-gray-700">
+                                Reason for visit (optional)
+                                {reason && reason.trim().length > 0 && (
+                                    <span className={`ml-2 text-xs ${
+                                        reason.trim().length < 5 ? 'text-red-500' : 
+                                        reason.trim().length > 500 ? 'text-red-500' : 'text-green-500'
+                                    }`}>
+                                        {reason.trim().length < 5 ? `Need ${5 - reason.trim().length} more characters` :
+                                         reason.trim().length > 500 ? `${reason.trim().length - 500} characters over limit` :
+                                         `${reason.trim().length}/500 characters`}
+                                    </span>
+                                )}
+                            </label>
+                            <textarea
+                                placeholder="Describe your pet's symptoms or reason for the visit (minimum 5 characters if provided)..."
+                                className={`w-full border-2 rounded-xl p-3 focus:outline-none transition-colors ${
+                                    reason && reason.trim().length > 0 && (reason.trim().length < 5 || reason.trim().length > 500) 
+                                        ? 'border-red-300 focus:border-red-500' 
+                                        : 'border-gray-100 focus:border-blue-500'
+                                }`}
+                                rows="3"
+                                value={reason} 
+                                onChange={e => setReason(e.target.value)}
+                                maxLength={520} // Allow a bit over to show error
+                            />
+                        </div>
 
                         <button
                             onClick={handleBook}
-                            disabled={loading || !selectedPetId || (slots.length > 0 && !selectedSlot)}
-                            className={`w-full py-3 rounded-xl font-bold text-white shadow-lg transition-all ${loading || !selectedPetId || (slots.length > 0 && !selectedSlot)
+                            disabled={loading || !selectedPetId || (slots.length > 0 && !selectedSlot) || 
+                                     (reason && reason.trim().length > 0 && (reason.trim().length < 5 || reason.trim().length > 500))}
+                            className={`w-full py-3 rounded-xl font-bold text-white shadow-lg transition-all ${
+                                loading || !selectedPetId || (slots.length > 0 && !selectedSlot) ||
+                                (reason && reason.trim().length > 0 && (reason.trim().length < 5 || reason.trim().length > 500))
                                 ? 'bg-gray-300 cursor-not-allowed'
                                 : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 transform hover:-translate-y-1'
                                 }`}>

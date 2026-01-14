@@ -42,17 +42,33 @@ const VetSearchWithBooking = ({ pets, ownerId }) => {
             alert('Please select a pet');
             return;
         }
+        
+        // Validate reason if provided
+        if (reason && reason.trim().length > 0 && reason.trim().length < 5) {
+            alert("Reason must be at least 5 characters long");
+            return;
+        }
+        if (reason && reason.trim().length > 500) {
+            alert("Reason must not exceed 500 characters");
+            return;
+        }
 
         try {
-            await appointmentService.bookAppointment({
+            const appointmentData = {
                 petId: parseInt(selectedPet),
                 veterinarianId: selectedSlot.veterinarianId,
                 slotId: selectedSlot.id,
                 type: selectedSlot.mode === 'BOTH' ?
                     (searchParams.appointmentType || 'IN_CLINIC') :
-                    selectedSlot.mode,
-                reason
-            });
+                    selectedSlot.mode
+            };
+            
+            // Add reason if provided and valid
+            if (reason && reason.trim().length >= 5) {
+                appointmentData.reason = reason.trim();
+            }
+
+            await appointmentService.bookAppointment(appointmentData);
 
             alert('Appointment Requested! Status: PENDING. Vet approval required.');
             setShowBookingModal(false);
@@ -62,7 +78,8 @@ const VetSearchWithBooking = ({ pets, ownerId }) => {
             handleSearch(); // Refresh the list
         } catch (error) {
             console.error('Error booking appointment:', error);
-            alert('Failed to book appointment');
+            const errorMessage = error.response?.data?.message || error.message || 'Unknown error occurred';
+            alert('Failed to book appointment: ' + errorMessage);
         }
     };
 

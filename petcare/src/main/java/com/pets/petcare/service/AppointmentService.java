@@ -5,6 +5,8 @@ import com.pets.petcare.dto.AppointmentStatusUpdateRequest;
 import com.pets.petcare.dto.SlotRequest;
 import com.pets.petcare.entity.*;
 import com.pets.petcare.repository.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,6 +16,8 @@ import java.util.List;
 
 @Service
 public class AppointmentService {
+
+    private static final Logger log = LoggerFactory.getLogger(AppointmentService.class);
 
     @Autowired
     private AppointmentRepository appointmentRepository;
@@ -56,6 +60,32 @@ public class AppointmentService {
 
     @Transactional
     public Appointment bookAppointment(AppointmentRequest request) {
+        // Debug logging
+        log.info("Booking appointment request received:");
+        log.info("  petId: {}", request.getPetId());
+        log.info("  veterinarianId: {}", request.getVeterinarianId());
+        log.info("  slotId: {}", request.getSlotId());
+        log.info("  dateTime: {}", request.getDateTime());
+        log.info("  type: {}", request.getType());
+        log.info("  reason: {}", request.getReason());
+        
+        // Validate the request
+        if (!request.isValid()) {
+            log.error("Validation failed for appointment request");
+            throw new RuntimeException("Invalid appointment request. Please check all required fields.");
+        }
+        
+        // Validate reason if provided
+        if (request.getReason() != null && !request.getReason().trim().isEmpty()) {
+            String trimmedReason = request.getReason().trim();
+            if (trimmedReason.length() < 5) {
+                throw new RuntimeException("Reason must be at least 5 characters long");
+            }
+            if (trimmedReason.length() > 500) {
+                throw new RuntimeException("Reason must not exceed 500 characters");
+            }
+        }
+        
         Pet pet = petRepository.findById(request.getPetId())
                 .orElseThrow(() -> new RuntimeException("Pet not found"));
 

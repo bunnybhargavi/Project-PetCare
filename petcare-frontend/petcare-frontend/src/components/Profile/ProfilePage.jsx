@@ -105,7 +105,7 @@ const ProfilePage = () => {
     setMessage({ type: "", text: "" });
 
     try {
-      const response = await authService.uploadPhoto(file);
+      const response = await authService.uploadProfilePhoto(file);
       console.log("Upload response:", response);
 
       const updatedUser = await authService.getProfile();

@@ -51,7 +51,32 @@ const Navbar = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [profilePhotoUrl, setProfilePhotoUrl] = useState(null);
 
-  // ... existing useEffect ...
+  // Load profile photo when user changes
+  useEffect(() => {
+    const loadProfilePhoto = async () => {
+      if (!user) {
+        setProfilePhotoUrl(null);
+        return;
+      }
+
+      const rawPhotoUrl = user?.profilePhoto || user?.photoUrl || user?.photo_url
+        || user?.ownerProfilePhoto || user?.vetProfilePhoto;
+
+      if (rawPhotoUrl) {
+        try {
+          const blobUrl = await fetchImageAsBlob(rawPhotoUrl);
+          setProfilePhotoUrl(blobUrl);
+        } catch (err) {
+          console.error('Error fetching profile photo:', err);
+          setProfilePhotoUrl(null);
+        }
+      } else {
+        setProfilePhotoUrl(null);
+      }
+    };
+
+    loadProfilePhoto();
+  }, [user?.userId, user?.profilePhoto, user?.photoUrl, user?.photo_url, user?.ownerProfilePhoto, user?.vetProfilePhoto]);
 
   const handleLogout = async () => {
     try {
@@ -105,16 +130,6 @@ const Navbar = () => {
                 className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100"
               >
                 Pets
-              </button>
-            )}
-
-            {/* Patients Link - Only show for VET users */}
-            {user?.role === 'VET' && (
-              <button
-                onClick={() => navigate('/patients')}
-                className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100"
-              >
-                Patients
               </button>
             )}
 

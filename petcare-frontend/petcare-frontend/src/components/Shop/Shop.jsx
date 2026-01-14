@@ -78,9 +78,33 @@ const Shop = () => {
         try {
             setLoading(true);
             const response = await productService.getAllProducts(0, 100, 'createdAt', 'desc');
-            // Keep only the first product
             const allProducts = response.content || [];
-            setProducts(allProducts);
+            
+            console.log('API Response:', response);
+            console.log('All products loaded:', allProducts.length);
+            
+            if (allProducts.length === 0) {
+                setProducts([]);
+                console.log('No products found - showing empty state');
+                return;
+            }
+            
+            // Prioritize vendor-added products (products with vendor_id)
+            const vendorProducts = allProducts.filter(product => product.vendorId !== null && product.vendorId !== undefined);
+            const systemProducts = allProducts.filter(product => product.vendorId === null || product.vendorId === undefined);
+            
+            // Show vendor products first, then system products
+            const prioritizedProducts = [...vendorProducts, ...systemProducts];
+            
+            setProducts(prioritizedProducts);
+            console.log('Products loaded successfully:');
+            console.log('- Total products:', prioritizedProducts.length);
+            console.log('- Vendor products:', vendorProducts.length);
+            console.log('- System products:', systemProducts.length);
+            
+            if (vendorProducts.length > 0) {
+                console.log('Vendor products found:', vendorProducts.map(p => ({ id: p.id, title: p.title, vendor: p.vendorBusinessName || p.vendorName })));
+            }
         } catch (error) {
             console.error('Failed to load products:', error);
             setProducts([]);
@@ -715,12 +739,20 @@ const Shop = () => {
                                         <span>🐾</span>
                                     </div>
                                 </div>
-                                <h3>No products found</h3>
-                                <p>Try adjusting your search or filters to find what you're looking for!</p>
-                                <button className="reset-filters-btn" onClick={clearAllFilters}>
-                                    <span className="btn-icon">🔄</span>
-                                    Reset All Filters
-                                </button>
+                                <h3>No products available yet</h3>
+                                <p>Our vendors haven't added any products yet. Check back soon for amazing pet products!</p>
+                                <div className="empty-state-actions">
+                                    <button className="reset-filters-btn" onClick={clearAllFilters}>
+                                        <span className="btn-icon">🔄</span>
+                                        Reset All Filters
+                                    </button>
+                                    <div className="vendor-info">
+                                        <p className="vendor-message">
+                                            <span className="vendor-icon">🏪</span>
+                                            Are you a vendor? <a href="/vendor/register" className="vendor-link">Join us</a> to start selling!
+                                        </p>
+                                    </div>
+                                </div>
                             </div>
                         ) : (
                             <>
