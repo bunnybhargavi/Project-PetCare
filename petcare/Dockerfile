@@ -21,8 +21,15 @@ COPY src ./src
 # Build the application
 RUN ./mvnw clean package -DskipTests
 
-# Expose port (Render will inject PORT env variable)
-EXPOSE 8080
+# Create uploads directory
+RUN mkdir -p /app/uploads
 
-# Run the application
-CMD ["java", "-jar", "target/PetCare-0.0.1-SNAPSHOT.jar", "--spring.profiles.active=prod"]
+# Expose port (Render will inject PORT env variable)
+EXPOSE ${PORT:-8080}
+
+# Set environment variable for PORT
+ENV PORT=8080
+
+# Run the application with PORT binding
+ENTRYPOINT ["sh", "-c", "java -Dserver.port=${PORT} -jar target/PetCare-0.0.1-SNAPSHOT.jar --spring.profiles.active=prod"]
+

@@ -1,3 +1,8 @@
+databases:
+  - name: pawhaven-db
+    databaseName: petcare_db
+    user: petcare_user
+
 services:
   - type: web
     name: pawhaven-backend
@@ -7,8 +12,12 @@ services:
     envVars:
       - key: SPRING_PROFILES_ACTIVE
         value: prod
+      - key: DATABASE_URL
+        fromDatabase:
+          name: pawhaven-db
+          property: connectionString
       - key: JWT_SECRET
-        value: petcare-super-secret-jwt-key-change-this-12345678
+        generateValue: true
       - key: MAIL_USERNAME
         value: petcare.customerservices@gmail.com
       - key: MAIL_PASSWORD
